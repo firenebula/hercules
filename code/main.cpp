@@ -1,22 +1,30 @@
 
-
-
 #include <iostream>
 #include <fstream>
 #include <cstring>
 #include "Room.hpp"
+#include "Parser.h"
+
 //using namespace std;
 using std::cin;
 using std::cout;
 using std::endl;
-//using std::string;
-//const int NUM_OF_EXITS = 4;
+
+
+void testParseVal(string, Parser);
 Room loadRoom(string roomFile);
 string move(Room current, string destination);
 
 int main()
 {
+		
 	string command;
+
+	Parser hParser;  // new Parser Object
+    testParseVal("Default Values: ", hParser); // default values set to -1
+    hParser.parse("any input"); // will parse input.  For now, just updating to dummy values
+    testParseVal("After Parse: ", hParser);
+
 	
 	// start game in throne roome
 	Room current = loadRoom("Throne");	
@@ -49,12 +57,8 @@ int main()
 		
 	}
 	
-	
-	
-	
     return 0;
 }
-
 
 Room loadRoom(string roomFile) {
 	std::string data;
@@ -67,7 +71,6 @@ Room loadRoom(string roomFile) {
 	for(unsigned int i = 0; i < roomFile.length(); i++) {
 		roomFile[i] = tolower(roomFile[i]);
 	}
-	
 	
 	// create file path string 
 	string room_path = "./rooms/";
@@ -171,3 +174,13 @@ string move(Room current, string destination) {
 	
 }
 
+// This test function is just printing out the contents of the Parse obj variables
+void testParseVal(string label, Parser p){
+
+    cout << label << endl << "Action Value: " << p.getAction() << endl
+    << "Object Value: " << p.getObject() << endl
+    << "Indirect Value: " << p.getIndirect() << endl;
+
+
+
+}
