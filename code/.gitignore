@@ -1,0 +1,9 @@
+#Compile Source #
+################
+*.o
+
+
+#Game executable  #
+###################
+main
+
