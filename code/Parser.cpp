@@ -1,27 +1,29 @@
 #include "Parser.h"
+#include "Definitions.h"
+
 
 // Parser constructor
 Parser::Parser()
 {
-    action = -1;
-    object = -1;
-    indirect = -1;
+    action = MOVE;
+    object = NORTH;
+    indirect = "inv";
 
 }
 
-void Parser::setAction(int action)
+void Parser::setAction(string action)
 {
     this->action = action;
 }
 
 
-void Parser::setObject(int object)
+void Parser::setObject(string object)
 {
     this->object = object;
 }
 
 
-void Parser::setIndirect(int indirect)
+void Parser::setIndirect(string indirect)
 {
     this->indirect = indirect;
 }
@@ -29,9 +31,19 @@ void Parser::setIndirect(int indirect)
 
 void Parser::parse(string inPut){
 
-    action = 1;
-    object = 2;
-    indirect = 3;
+    action = NORTH;
+    object = SOUTH;
+    indirect = EAST;
 
 }
 
+void Parser::dictionaryLoad(){
+
+
+
+}
+
+
+void Parser::addEntry(map <string, string> curMap, string cmds[], string key){
+
+}
