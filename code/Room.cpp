@@ -55,6 +55,17 @@ Room::Room(std::string name) {
  void Room::setVisited(bool visited) {
 	 this->visited = visited; 
  }
+
+ 
+/*****************************************************
+ * string Room::getName()
+ * This function returns the member variable, name.
+******************************************************/
+
+string Room::getName() {
+	return this->name;
+}
+ 
  
 /*****************************************************
  * bool Room::getVisited()
@@ -87,7 +98,7 @@ Room::Room(std::string name) {
 
  
  /****************************************************
- * Room::getExits(int exit_index)
+ * string Room::getExit(int exit_index)
  * This function returns the name of the exit specified
  * by the parameter, exit_index.
  *
@@ -116,18 +127,18 @@ Room::Room(std::string name) {
  
  
   /****************************************************
- * Room::look()
+ * string Room::look()
  * This function prints the room's long description if
  * the variable, visited is false. If visited is true
  * then this function prints the short description.
 ****************************************************/
  
- void Room::look() {
+ string Room::look() {
 	 if (!this->visited) {
-		cout << endl << this->desc_long;
+		return this->desc_long;
 	 }
 	 else {
-		cout << endl << this->desc_short;	 
+		return this->desc_short;	 
 	 }
  }
  

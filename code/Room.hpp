@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <string>
+
 using std::cout;
 using std::cin;
 using std::endl;
@@ -24,9 +25,9 @@ const int NUM_OF_EXITS = 4;
 class Room
 {
    private:
-      std::string name;
-      std::string desc_short;
-      std::string desc_long;
+      string name;
+      string desc_short;
+      string desc_long;
       bool visited;
       std::string exits[NUM_OF_EXITS];
 
@@ -35,10 +36,11 @@ class Room
 	void setDescLong(std::string desc_long);
 	void setDescShort(std::string desc_short);
 	void setVisited(bool visited);
-        bool getVisited();
+	string getName();
+    bool getVisited();
 	void setExits(int exit_index, std::string exit_name);
-        string getExit(int exit_index);
-        void printRoom();
-        void look();
+    string getExit(int exit_index);
+    void printRoom();
+    string look();
 };
 #endif

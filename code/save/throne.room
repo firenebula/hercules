@@ -1,7 +1,7 @@
-throne
+Throne
 
 visited
-false
+true
 
 exits
 Nemean
@@ -22,6 +22,4 @@ There's a border wall to the South but you're free to go North to Nemean.
 
 items
 pokeball
-1
-club
 1
