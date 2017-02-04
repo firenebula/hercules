@@ -1,0 +1,24 @@
+all: main
+
+main: main.o Room.o Parser.o Item.o
+	g++ -g main.o Parser.o Room.o Item.o -o main
+
+main.o: main.cpp Parser.h Room.hpp Item.cpp
+	g++ -c main.cpp
+
+Item.o: Item.cpp Item.hpp
+	g++ -c Item.cpp
+	
+Room.o: Room.cpp Room.hpp
+	g++ -c Room.cpp
+
+Parser.o: Parser.cpp Parser.h
+	g++ -c Parser.cpp
+
+clean:
+	rm -f *.o
+
+
+
+
+
