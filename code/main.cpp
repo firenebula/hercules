@@ -21,10 +21,10 @@ int main()
 
 	string command;
 
-	Parser hParser;  // new Parser Object
-    testParseVal("Default Values: ", hParser); // default values set to -1
-    hParser.parse("any input"); // will parse input.  For now, just updating to dummy values
-    testParseVal("After Parse: ", hParser);
+	//Parser hParser;  // new Parser Object
+    //testParseVal("Default Values: ", hParser); // default values set to -1
+    //hParser.parse("move"); // will parse input.  For now, just updating to dummy values
+    //testParseVal("After Parse: ", hParser);
 
 
 	// start game in throne roome

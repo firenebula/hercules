@@ -1,7 +1,11 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 #include <string>
+#include <vector>
+#include <iterator>
 using std::string;
+
+
 
 
 //ACTION DEFINITIONS
@@ -9,10 +13,13 @@ using std::string;
 
 
 const string MOVE = "move";
-string MOVE_CMDS[] = {"go", "move", "m"};
+const char* moveArr[] = {"go", "move"};
+std::vector<std::string> MOVE_CMDS(moveArr, moveArr + 2);
+
 
 const string LOOK = "look";
-string LOOK_CMDS[] = {"l", "look"};
+const char* lookArr[] = {"l", "look"};
+std::vector<std::string> LOOK_CMDS(lookArr, lookArr + 2);
 
 
 //OBJECT DEFINITIONS
