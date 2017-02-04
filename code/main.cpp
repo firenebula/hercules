@@ -17,7 +17,6 @@ using std::endl;
 
 void testParseVal(string, Parser);
 Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile);
-//Room loadRoom(string roomFile);
 void loadItems(std::map<string, Item*>& itemMap, string itemFile);
 Item makeItem(string itemFile);
 string move(Room current, string destination);
@@ -97,6 +96,9 @@ int main()
 			else if (!roomItems.empty()) {
 				if(roomItems.find("club") != roomItems.end()) {
 					cout << roomItems["club"]->look() << endl;
+				}
+				else {
+					cout << "You look at the club but realize that it's not really there. It was just a mirage!" << endl;
 				}
 			}
 			else {
@@ -187,7 +189,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 	// if room file is not in save directory, then copy original room file
 	// to save directory and open it
 	if (!save_room) {
-		cout << "Cannot find save room file, creating file : [" << save_path << "]" << endl;
+//		cout << "Cannot find save room file, creating file : [" << save_path << "]" << endl;
 		save_room.close();
 		
 		// convert room_path to c-string for fstream open() and open room file
@@ -202,11 +204,11 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		
 		if (!(src && dest))
 			cout << "Cannot create save room file" << endl;
-		else {
+/*		else {
 			cout << "Save room file created" << endl;
 			//save_room.open(save_path.c_str(), std::ios::out | std::ios::in );
 		}
-		
+*/		
 	}
 	
 	room_path = "./save/";   // original room directory
@@ -219,6 +221,18 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		std::getline(room_file, data);
 		string name = data;
 
+		// get lines of text until visited section is reached
+		while (data.compare("visited") != 0) {
+			std::getline(room_file, data);
+		}
+		std::getline(room_file, data);
+		
+		if (data.compare("true") == 0)
+				current.setVisited(true);
+			else
+				current.setVisited(false);
+		
+		
 		// get lines of text until exits section is reached
 		while (data.compare("exits") != 0) {
 			std::getline(room_file, data);
@@ -240,8 +254,10 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		std::getline(room_file, data);
 		while(data.compare("short description") != 0)
 		{
-			desc_long.append(data);
-			desc_long.append("\n");
+			if (data.compare("") != 0) {
+				desc_long.append(data);
+				desc_long.append("\n");
+			}
 			std::getline(room_file, data);
 		}
 		
@@ -250,8 +266,10 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		std::getline(room_file, data);
 		while(data.compare("items") != 0)
 		{
-			desc_short.append(data);
-			desc_short.append("\n");
+			if (data.compare("") != 0) {
+				desc_short.append(data);
+				desc_short.append("\n");
+			}
 			std::getline(room_file, data);
 		}
 
@@ -278,7 +296,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 	room_file.close();
 
 
-	cout << current.look();
+	cout << endl << current.look();
 	current.setVisited(true);
 
 	return current;
@@ -287,13 +305,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 
 
 void saveRoom(std::map<string, Item*>& roomItems, Room current) {
-//	string data;
-//	string desc_long = "";
-//	string desc_short = "";
-	std::ofstream save_room;
-	//std::fstream room_file;
-	//Room current(roomFile);
-	
+	std::ofstream save_room;	
 	string roomFile = current.getName();
 
 	// convert roomFile to lowercase
@@ -347,15 +359,13 @@ void saveRoom(std::map<string, Item*>& roomItems, Room current) {
 			save_room << it->first << "\n";
 			save_room << roomItems[it->first]->getQuantity() << "\n";
 		}
-		
-		
+
     }
     else
        {
          cout << "could not create save room file" << endl;
        }
 
-	//current.printRoom();
 	save_room.close();
 
 }
