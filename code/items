@@ -11,8 +11,8 @@ You throw the pokeball! What ferocious beast is ready to come out and fight for 
 ....
 Jigglypuff appears!
 
-[location]
-inventory
+[movable]
+true
 
 [quantity]
 1
@@ -30,17 +30,13 @@ club
 It's wrapped in barbed wire. I call her 'Lucille' and she is thirsty for blood.
 
 [use]
-You swing the club
+Batter up! You swing the club
 
-
-[location]
-inventory
+[movable]
+true
 
 [quantity]
 1
 
 [available]
 true
-
-
-
