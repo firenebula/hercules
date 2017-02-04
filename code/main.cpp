@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -32,34 +31,26 @@ void printRoomItem(std::map<string, Item*>& roomItems);
 int main()
 {
 	string command;
-<<<<<<< HEAD
-
-	//Parser hParser;  // new Parser Object
-    //testParseVal("Default Values: ", hParser); // default values set to -1
-    //hParser.parse("move"); // will parse input.  For now, just updating to dummy values
-    //testParseVal("After Parse: ", hParser);
-=======
 	string itemFile = "./items";
 	std::map <string, Item*> itemList;
 	std::map <string, Item*> inventory;
 	std::map <string, Item*> roomItems;
-	
+
 	Item testItem = makeItem(itemFile);
-	
+
 /*
 	Parser hParser;  // new Parser Object
     testParseVal("Default Values: ", hParser); // default values set to -1
     hParser.parse("any input"); // will parse input.  For now, just updating to dummy values
     testParseVal("After Parse: ", hParser);
 */
-	
+
 	// load game items
 	loadItems(itemList, itemFile);
->>>>>>> 3fc1d81abe10626f87b12f6276790fa5161ee3a7
 
 	// start game with club in inventory
 	addInventory(inventory, itemList, "club");
-		
+
 	// start game in throne room
 	Room current = loadRoom(itemList, roomItems, "throne");
 
@@ -93,7 +84,7 @@ int main()
 			}
 		}
 		else if (command.find("inventory") != std::string::npos) {
-			printInventory(inventory);		
+			printInventory(inventory);
 		}
 		else if (command.compare("look club") == 0) {
 			// check if "club" in inventory
@@ -121,14 +112,14 @@ int main()
 				addRoomItems(roomItems, itemList, "club");
 				//cout << "Number of clubs in room = " << roomItems["club"]->getQuantity() << endl;
 				//cout << "Number of clubs in room = " << roomItems.size() << endl;
-				
+
 				//inventory.insert(std::make_pair("club", itemList["club"]));
-				
+
 				if (inventory["club"]->getQuantity() == 0)
 					inventory.erase("club");
 				cout << "You dropped a club on to the ground." << endl;
 			}
-			else { 
+			else {
 				cout << "You dropped a club but it vanishes before it hit the ground. " << endl;
 			    cout << "You realized you were hallucinating it all this time" << endl;
 			}
@@ -141,7 +132,7 @@ int main()
 			}
 			else
 				cout << "You can't pick that up!" << endl;
-				
+
 
 		}
 /*
@@ -151,13 +142,13 @@ int main()
 				testItem.drop(current.getName());
 				cout << "You dropped a " << testItem.getName() << " on to the ground." << endl;
 			}
-			else { 
+			else {
 				cout << "You dropped a " << testItem.getName() << " but it vanishes before it hit the ground. " << endl;
 			    cout << "You realized you were hallucinating it all this time" << endl;
 			}
 		}
 */
-		
+
 		else if (command.compare("quit") != 0)
 			cout << "I don't understand that command!" << endl;
 	}
@@ -190,7 +181,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 	save_path.append(roomFile);
 	save_path.append(".room");
 
-	
+
 	// convert room_path to c-string for fstream open() and open save file
 	save_room.open(save_path.c_str(), std::ios::out | std::ios::in);
 
@@ -199,7 +190,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 	if (!save_room) {
 //		cout << "Cannot find save room file, creating file : [" << save_path << "]" << endl;
 		save_room.close();
-		
+
 		// convert room_path to c-string for fstream open() and open room file
 		room_file.open(room_path.c_str(), std::ios::out | std::ios::in);
 
@@ -209,22 +200,22 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		src.close();
 		dest.close();
 		room_file.close();
-		
+
 		if (!(src && dest))
 			cout << "Cannot create save room file" << endl;
 /*		else {
 			cout << "Save room file created" << endl;
 			//save_room.open(save_path.c_str(), std::ios::out | std::ios::in );
 		}
-*/		
+*/
 	}
-	
+
 	room_path = "./save/";   // original room directory
 	room_path.append(roomFile);
 	room_path.append(".room");
 	room_file.open(room_path.c_str(), std::ios::out | std::ios::in);
 
-	if(room_file) {		
+	if(room_file) {
 		// get 1st line of text which is the room's name
 		std::getline(room_file, data);
 		string name = data;
@@ -234,13 +225,13 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 			std::getline(room_file, data);
 		}
 		std::getline(room_file, data);
-		
+
 		if (data.compare("true") == 0)
 				current.setVisited(true);
 			else
 				current.setVisited(false);
-		
-		
+
+
 		// get lines of text until exits section is reached
 		while (data.compare("exits") != 0) {
 			std::getline(room_file, data);
@@ -268,7 +259,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 			}
 			std::getline(room_file, data);
 		}
-		
+
 		current.setDescLong(desc_long);
 
 		std::getline(room_file, data);
@@ -282,7 +273,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		}
 
 		current.setDescShort(desc_short);
-		
+
 		// all the lines of text in the "items" section and add them to
 		// the roomItems map
 		while (std::getline(room_file, data)) {
@@ -313,7 +304,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 
 
 void saveRoom(std::map<string, Item*>& roomItems, Room current) {
-	std::ofstream save_room;	
+	std::ofstream save_room;
 	string roomFile = current.getName();
 
 	// convert roomFile to lowercase
@@ -330,7 +321,7 @@ void saveRoom(std::map<string, Item*>& roomItems, Room current) {
 	// convert room_path to c-string for fstream open() and open save file
 	save_room.open(save_path.c_str(), std::ios::out | std::ios::trunc);
 
-	if(save_room) {		
+	if(save_room) {
 		// 1st line of text which is the room's name
 		save_room << current.getName() << "\n\n";
 
@@ -344,23 +335,23 @@ void saveRoom(std::map<string, Item*>& roomItems, Room current) {
 			save_room << current.getExit(j) << "\n";
 		}
 		save_room << "\n";
-		
+
 		// long description section
 		save_room << "long description\n";
-		
+
 		// set visited to false so that look() returns long description
 		current.setVisited(false);
 		save_room << current.look();
 		save_room << "\n";
-		
+
 		// short description section
 		save_room << "short description\n";
-		
+
 		// set visited to true so that look() returns short description
 		current.setVisited(true);
 		save_room << current.look();
 		save_room << "\n";
-		
+
 		// items section
 		save_room << "items\n";
 		for(map<string,Item*>::iterator it = roomItems.begin(); it != roomItems.end(); ++it) {
@@ -413,9 +404,9 @@ Item makeItem(string itemFile) {
 	testClub.setUse("You swing the club");
 	testClub.setMovable(true);
 	testClub.setQuantity(1);
-	
+
 	return testClub;
-	
+
 }
 
 
@@ -427,11 +418,11 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 	bool movable;
 	int quantity;
 	bool available;
-	
+
 	Item * tempItem;
-	
+
 	std::fstream item_file;
-	
+
 	// convert itemFile to lowercase
 	for(unsigned int i = 0; i < itemFile.length(); i++) {
 		itemFile[i] = tolower(itemFile[i]);
@@ -441,7 +432,7 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 	item_file.open(itemFile.c_str(), std::ios::out | std::ios::in);
 
 //	cout << "Item file opened = " << item_file << endl;
-	
+
 	if(item_file) {
 		while(std::getline(item_file, data)) {
 	//		data = "";
@@ -449,11 +440,11 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 			desc = "";
 			use = "";
 			movable = true;
-			   
+
 			while (data.compare("[name]") != 0) {
 				std::getline(item_file, data);
 			}
-			   
+
 			// get 1st line of text which is the item's name
 			std::getline(item_file, data);
 			name = data;
@@ -491,10 +482,10 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 			}
 			// remove last 2 newline char
 			use.erase(use.length() - 2);
-				
+
 			// store next line after "movable" into variable, movable
 			std::getline(item_file, data);
-			
+
 			if (data.compare("true") == 0)
 				movable = true;
 			else
@@ -511,7 +502,7 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 			// store the value into the variable, quantity
 			std::getline(item_file, data);
 			quantity = atoi(data.c_str());
-				
+
 			// get line of text until available section is reached
 			std::getline(item_file, data);
 			while(data.compare("[available]") != 0)
@@ -526,9 +517,9 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 				available = true;
 			else
 				available = false;
- 
+
 			 itemMap.insert(std::make_pair(name, new Item(name, desc, use, movable, quantity, available)));
-			 
+
 		}
 
        }
@@ -536,7 +527,7 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
        {
          cout << "could not find item file" << endl;
        }
-	   
+
 	item_file.close();
 
 }
@@ -549,7 +540,7 @@ void addInventory(std::map<string, Item*>& inventory, std::map<string, Item*>& i
 		cout << it->first << "\n"; }
 	cout << "]" << endl;
 */
-	
+
 	if (itemMap.find(itemName) == itemMap.end()) {
 		cout << "Cannot add [" << itemName << "] because it does not exist!" << endl;
 	}
@@ -571,8 +562,8 @@ void addInventory(std::map<string, Item*>& inventory, std::map<string, Item*>& i
 	cout << "New inventory Items:" << endl << "[";
 	for(map<string,Item*>::iterator it = inventory.begin(); it != inventory.end(); ++it) {
 		cout << it->first << "\n"; }
-	cout << "]" << endl;	
-*/	
+	cout << "]" << endl;
+*/
 }
 
 
@@ -601,7 +592,7 @@ void addRoomItems(std::map<string, Item*>& roomItems, std::map<string, Item*>& i
 		cout << it->first << "\n"; }
 	cout << "]" << endl;
 */
-	
+
 	if (itemMap.find(itemName) == itemMap.end()) {
 		cout << "Cannot add [" << itemName << "] because it does not exist!" << endl;
 	}
@@ -623,18 +614,18 @@ void addRoomItems(std::map<string, Item*>& roomItems, std::map<string, Item*>& i
 	cout << "New Room Items:" << endl << "[";
 	for(map<string,Item*>::iterator it = roomItems.begin(); it != roomItems.end(); ++it) {
 		cout << it->first << "\n"; }
-	cout << "]" << endl;	
-*/	
+	cout << "]" << endl;
+*/
 }
 
 
 bool removeRoomItems(std::map<string, Item*>& roomItems, string itemName) {
 	//check if is in the room
 	if (!roomItems.empty()) {
-		if(roomItems.find(itemName) != roomItems.end()) {			
+		if(roomItems.find(itemName) != roomItems.end()) {
 			//check if item is movable and available and in the room
 			if (roomItems[itemName]->isMovable() &&  roomItems[itemName]->isAvailable() &&
-				roomItems[itemName]->getQuantity() > 0) {			
+				roomItems[itemName]->getQuantity() > 0) {
 					roomItems[itemName]->drop();
 					if (roomItems[itemName]->getQuantity() == 0)
 						roomItems.erase(itemName);
@@ -645,8 +636,8 @@ bool removeRoomItems(std::map<string, Item*>& roomItems, string itemName) {
 	}
 	else
 		return false;
-	
-	return true;	
+
+	return true;
 }
 
 // This test function is just printing out the contents of the Parse obj variables
@@ -657,5 +648,4 @@ void testParseVal(string label, Parser p){
     << "Indirect Value: " << p.getIndirect() << endl;
 
 }
-
 
