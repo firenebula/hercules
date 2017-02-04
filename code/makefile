@@ -3,7 +3,7 @@ all: main
 main: main.o Room.o Parser.o Item.o
 	g++ -g main.o Parser.o Room.o Item.o -o main
 
-main.o: main.cpp Parser.h Room.hpp Item.cpp
+main.o: main.cpp Parser.hpp Room.hpp Item.cpp
 	g++ -c main.cpp
 
 Item.o: Item.cpp Item.hpp
@@ -12,7 +12,7 @@ Item.o: Item.cpp Item.hpp
 Room.o: Room.cpp Room.hpp
 	g++ -c Room.cpp
 
-Parser.o: Parser.cpp Parser.h
+Parser.o: Parser.cpp Parser.hpp
 	g++ -c Parser.cpp
 
 clean:

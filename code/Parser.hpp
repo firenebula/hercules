@@ -21,7 +21,7 @@ private:
     void setObject(string object);
     void setIndirect(string indirect);
     void dictionaryLoad();
-    void addEntry(map <string, string> curMap, std::vector<string> cmds, string value);
+    void addEntry(map <string, string>& curMap, std::vector<string>& cmds, string value);
     bool checkAction(string checkVal);
 
 public:

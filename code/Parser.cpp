@@ -5,9 +5,9 @@
 // Parser constructor
 Parser::Parser()
 {
-    action = "none";
-    object = "none";
-    indirect = "none";
+    setAction("none");
+    setObject("none");
+    setIndirect("none");
     dictionaryLoad();
 
 }
@@ -47,13 +47,15 @@ void Parser::dictionaryLoad(){
 }
 
 
-void Parser::addEntry(map <string, string> curMap, std::vector<string> cmd, string value){
+void Parser::addEntry(map<string, string>& curMap, std::vector<string>& cmd, string value){
 
 
 
-    for(int i = 0; i < cmd.size(); i++) {
+    for(unsigned int i = 0; i < cmd.size(); i++) {
 
-        curMap.insert(std::pair<string, string>(cmd[i], value));
+        //std::cout << "current command: " << cmd[i] << " current value: " << value << std::endl;
+      curMap.insert(std::make_pair(cmd[i], value));
+
 
     }
 
@@ -61,13 +63,19 @@ void Parser::addEntry(map <string, string> curMap, std::vector<string> cmd, stri
 
 bool Parser::checkAction(string checkVal){
 
+
+    //std::cout << "requested: " << checkVal << " retrieved: " << (actionMap.find(checkVal))->second << std::endl;
+
+
     bool found = true;
-    std::map<string, string>::iterator it;
+    map<string, string>::iterator it;
     it = actionMap.find(checkVal);
+    //std::cout << "value returned" << it->second << std::endl;
     if(it != actionMap.end())
         setAction(it->second);
     else
         found = false;
+
 
     return found;
 
