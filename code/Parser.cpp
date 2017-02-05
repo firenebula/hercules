@@ -6,9 +6,9 @@
 // Parser constructor
 Parser::Parser()
 {
-    setAction("none");
-    setObject("none");
-    setIndirect("none");
+    setAction(NONE);
+    setObject(NONE);
+    setIndirect(NONE);
     dictionaryLoad();
 
 }
@@ -33,18 +33,30 @@ void Parser::setIndirect(string indirect)
 
 void Parser::parse(string inPut){
 
-    unsigned int i;
+    unsigned int i =0;
+    setAction(NONE);
+    setObject(NONE);
+    setIndirect(NONE);
+
     std::vector<string> splitVec;
     splitWords(splitVec, inPut);
     bool doneProcessing = false;
 
-    this->action = "none";
+    while(i < splitVec.size() && !doneProcessing){
+       // std::cout << "Word " << i + 1 << " : " << splitVec[i] << std::endl;
 
-    for(i = 0; i < splitVec.size(); i++ && !doneProcessing){
-        std::cout << "Word " << i + 1 << " : " << splitVec[i] << std::endl;
-         if(checkAction(inPut))
-            doneProcessing = true;
+            if(checkMovObj(splitVec[i]))
+                doneProcessing = true;
 
+            else if(checkAction(splitVec[i])){
+                i++; //checking next word
+                doneProcessing = true;
+                while(i < splitVec.size() && this->object == "$none")
+                    if(!checkIgnore(splitVec[i]))
+                        setObject(splitVec[i]);
+
+            }
+            i++;
     }
 
 //    checkAction(inPut);
@@ -57,6 +69,7 @@ void Parser::dictionaryLoad(){
 
     addEntry(actionMap, MOVE_CMDS, MOVE);
     addEntry(actionMap, LOOK_CMDS, LOOK);
+    addEntry(actMovMap, NORTH_CMDS, NORTH);
 
 }
 
@@ -85,8 +98,10 @@ bool Parser::checkAction(string checkVal){
     map<string, string>::iterator it;
     it = actionMap.find(checkVal);
     //std::cout << "value returned" << it->second << std::endl;
-    if(it != actionMap.end())
+    if(it != actionMap.end()){
         setAction(it->second);
+
+    }
     else
         found = false;
 
@@ -95,6 +110,49 @@ bool Parser::checkAction(string checkVal){
 
 
 }
+
+bool Parser::checkMovObj(string checkVal){
+
+
+    //std::cout << "requested: " << checkVal << " retrieved: " << (actionMap.find(checkVal))->second << std::endl;
+
+
+    bool found = true;
+    map<string, string>::iterator it;
+    it = actMovMap.find(checkVal);
+    //std::cout << "value returned" << it->second << std::endl;
+    if(it != actMovMap.end()){
+        setObject(it->second);
+        setAction(MOVE);
+
+    }
+    else
+        found = false;
+
+
+    return found;
+
+
+}
+
+
+bool Parser::checkIgnore(string checkVal){
+
+
+    //std::cout << "requested: " << checkVal << " retrieved: " << (actionMap.find(checkVal))->second << std::endl;
+    bool found = false;
+
+    if( std::find(IGNORE_WORDS.begin(), IGNORE_WORDS.end(), checkVal) != IGNORE_WORDS.end()){
+
+        found = true;
+    }
+
+
+    return found;
+
+}
+
+
 
 
 void Parser::splitWords(std::vector<string>& splitVec, string inPut){

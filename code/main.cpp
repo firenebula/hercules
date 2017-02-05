@@ -41,7 +41,7 @@ int main()
 
 	Parser hParser;  // new Parser Object
     testParseVal("Default Values: ", hParser); // default values set to -1
-    hParser.parse("hello world"); // will parse input.  For now, just updating to dummy values
+    hParser.parse("l tomorrow night"); // will parse input.  For now, just updating to dummy values
     testParseVal("After Parse: ", hParser);
 
 
