@@ -1,5 +1,6 @@
-#include "Parser.h"
-#include "Definitions.h"
+#include "Parser.hpp"
+#include "Definitions.hpp"
+
 
 
 // Parser constructor
@@ -32,10 +33,23 @@ void Parser::setIndirect(string indirect)
 
 void Parser::parse(string inPut){
 
+    unsigned int i;
+    std::vector<string> splitVec;
+    splitWords(splitVec, inPut);
+    bool doneProcessing = false;
 
-    checkAction(inPut);
-    if(!checkAction(inPut))
     this->action = "none";
+
+    for(i = 0; i < splitVec.size(); i++ && !doneProcessing){
+        std::cout << "Word " << i + 1 << " : " << splitVec[i] << std::endl;
+         if(checkAction(inPut))
+            doneProcessing = true;
+
+    }
+
+//    checkAction(inPut);
+//    if(!checkAction(inPut))
+//    this->action = "none";
 
 }
 
@@ -80,10 +94,20 @@ bool Parser::checkAction(string checkVal){
     return found;
 
 
+}
+
+
+void Parser::splitWords(std::vector<string>& splitVec, string inPut){
+
+
+     std::istringstream inStream(inPut);
+    copy(std::istream_iterator<string>(inStream),
+                 std::istream_iterator<string>(),
+                 back_inserter(splitVec));
+
 
 
 }
-
 
 
 

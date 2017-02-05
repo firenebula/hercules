@@ -5,8 +5,10 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <sstream>
 using std::string;
 using std::map;
+
 
 
 class Parser
@@ -23,6 +25,7 @@ private:
     void dictionaryLoad();
     void addEntry(map <string, string>& curMap, std::vector<string>& cmds, string value);
     bool checkAction(string checkVal);
+    void splitWords(std::vector<string>& splitVec, string inPut);
 
 public:
     Parser();

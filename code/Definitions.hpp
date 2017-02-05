@@ -8,9 +8,7 @@ using std::string;
 
 
 
-//ACTION DEFINITIONS
-
-
+//ACTION DEFINITIONS That use Objects
 
 const string MOVE = "move";
 const char* moveArr[] = {"go", "move"};
@@ -22,7 +20,7 @@ const char* lookArr[] = {"l", "look"};
 std::vector<std::string> LOOK_CMDS(lookArr, lookArr + 2);
 
 
-//OBJECT DEFINITIONS
+//Commands that stand for an action and an object
 
 const string NORTH = "north";
 string NORTH_CMDS[] = {"n", "north"};
