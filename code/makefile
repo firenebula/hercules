@@ -1,7 +1,7 @@
-all: hercules
+all: main
 
-hercules: main.o Room.o Parser.o Item.o
-	g++ -g main.o Parser.o Room.o Item.o -o hercules
+main: main.o Room.o Parser.o Item.o
+	g++ -g main.o Parser.o Room.o Item.o -o main
 
 main.o: main.cpp Parser.hpp Room.hpp Item.cpp
 	g++ -c main.cpp
@@ -16,7 +16,7 @@ Parser.o: Parser.cpp Parser.hpp
 	g++ -c Parser.cpp
 
 clean:
-	rm -f *.o hercules
+	rm -f *.o main
 
 
 
