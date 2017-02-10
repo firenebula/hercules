@@ -51,9 +51,11 @@ void Parser::parse(string inPut){
             else if(checkAction(splitVec[i])){
                 i++; //checking next word
                 doneProcessing = true;
-                while(i < splitVec.size() && this->object == "$none")
+                while(i < splitVec.size() && this->object == "$none"){
                     if(!checkIgnore(splitVec[i]))
                         setObject(splitVec[i]);
+                    i++;
+                }
 
             }
             i++;
@@ -69,16 +71,26 @@ void Parser::dictionaryLoad(){
 
     addEntry(actionMap, MOVE_CMDS, MOVE);
     addEntry(actionMap, LOOK_CMDS, LOOK);
+    addEntry(actionMap, USE_CMDS, USE);
+    addEntry(actionMap, DROP_CMDS, DROP);
+    addEntry(actionMap, GET_CMDS, GET);
+
     addEntry(actMovMap, NORTH_CMDS, NORTH);
+    addEntry(actMovMap, SOUTH_CMDS, SOUTH);
+    addEntry(actMovMap, WEST_CMDS, WEST);
+    addEntry(actMovMap, EAST_CMDS, EAST);
+
+    addEntry(actMovMap, QUIT_CMDS,  QUIT);
+
 
 }
 
 
-void Parser::addEntry(map<string, string>& curMap, std::vector<string>& cmd, string value){
+void Parser::addEntry(map<string, string>& curMap, std::vector<string> cmd, string value){
 
 
 
-    for(unsigned int i = 0; i < cmd.size(); i++) {
+    for(unsigned int i = 0; i < cmd.size() ; i++) {
 
         //std::cout << "current command: " << cmd[i] << " current value: " << value << std::endl;
       curMap.insert(std::make_pair(cmd[i], value));
@@ -145,6 +157,7 @@ bool Parser::checkIgnore(string checkVal){
     if( std::find(IGNORE_WORDS.begin(), IGNORE_WORDS.end(), checkVal) != IGNORE_WORDS.end()){
 
         found = true;
+
     }
 
 
@@ -163,6 +176,12 @@ void Parser::splitWords(std::vector<string>& splitVec, string inPut){
                  std::istream_iterator<string>(),
                  back_inserter(splitVec));
 
+
+    for (unsigned int i = 0; i < splitVec.size(); i++){
+            for(unsigned int j = 0; j < splitVec[i].length(); j++) {
+                splitVec[i][j] = tolower(splitVec[i][j]);
+		}
+    }
 
 
 }

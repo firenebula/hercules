@@ -26,7 +26,7 @@ private:
     void setObject(string object);
     void setIndirect(string indirect);
     void dictionaryLoad();
-    void addEntry(map <string, string>& curMap, std::vector<string>& cmds, string value);
+    void addEntry(map <string, string>& curMap, std::vector<string>, string value);
     bool checkAction(string checkVal);
     bool checkMovObj(string checkVal);
     void splitWords(std::vector<string>& splitVec, string inPut);

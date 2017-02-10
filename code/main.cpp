@@ -39,7 +39,20 @@ int main()
 	Item testItem = makeItem(itemFile);
 
 
-//	Parser hParser;  // new Parser Object
+	Parser hParser;
+	testParseVal("Default Values: ", hParser);
+	std::cout << "\n****Testing Parser.  Type quit to start game.****" << std::endl;
+    while (hParser.getObject().compare("quit") != 0) {
+		cout << endl << "What do you want to do?  ";
+		std::getline(cin, command);
+		hParser.parse(command);
+		testParseVal("Current Values:", hParser);
+
+
+    }
+
+    command = "";
+
 //    testParseVal("Default Values: ", hParser); // default values set to -1
 //    hParser.parse("l tomorrow night"); // will parse input.  For now, just updating to dummy values
 //    testParseVal("After Parse: ", hParser);
