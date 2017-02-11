@@ -74,13 +74,16 @@ void Parser::dictionaryLoad(){
     addEntry(actionMap, USE_CMDS, USE);
     addEntry(actionMap, DROP_CMDS, DROP);
     addEntry(actionMap, GET_CMDS, GET);
+    addEntry(actionMap, ATTACK_CMDS, ATTACK);
+    addEntry(actionMap, QUIT_CMDS,  QUIT);
 
     addEntry(actMovMap, NORTH_CMDS, NORTH);
     addEntry(actMovMap, SOUTH_CMDS, SOUTH);
     addEntry(actMovMap, WEST_CMDS, WEST);
     addEntry(actMovMap, EAST_CMDS, EAST);
 
-    addEntry(actMovMap, QUIT_CMDS,  QUIT);
+    addEntry(actMovMap, START_CMDS,  START);
+
 
 
 }

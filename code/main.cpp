@@ -41,8 +41,8 @@ int main()
 
 	Parser hParser;
 	testParseVal("Default Values: ", hParser);
-	std::cout << "\n****Testing Parser.  Type quit to start game.****" << std::endl;
-    while (hParser.getObject().compare("quit") != 0) {
+	std::cout << "\n****Testing Parser.  Type start to start game.****" << std::endl;
+    while (hParser.getObject().compare("start") != 0) {
 		cout << endl << "What do you want to do?  ";
 		std::getline(cin, command);
 		hParser.parse(command);
@@ -67,23 +67,24 @@ int main()
 	// start game in throne room
 	Room current = loadRoom(itemList, roomItems, "throne");
 
-	while (command.compare("quit") != 0) {
+	while (hParser.getAction().compare("quit") != 0) {
 		cout << endl << "What do you want to do?  ";
 		std::getline(cin, command);
+		hParser.parse(command);
 
 		// convert command to lowercase
-		for(unsigned int i = 0; i < command.length(); i++) {
-			command[i] = tolower(command[i]);
-		}
+//		for(unsigned int i = 0; i < command.length(); i++) {
+//			command[i] = tolower(command[i]);
+//		}
 
 		//cout << command << endl;
 
-		if (command.compare("look") == 0) {
+		if (hParser.getAction().compare("look") == 0) {
 			cout << current.look();
 			printRoomItem(roomItems);
 		}
-		else if (command.find("go") != std::string::npos) {
-			string destination = command.substr(3);
+		else if (hParser.getAction().compare("move") == 0) {
+			string destination = hParser.getObject();
 			//cout << destination << endl;
 			//cout << command << endl;
 			destination = move(current, destination);
