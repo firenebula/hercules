@@ -118,28 +118,29 @@ int main()
 				cout << "You look at the club but realize that it's not really there. It was just a mirage!" << endl;
 			}
 		}
-		else if (command.compare("drop club") == 0) {
+		else if (hParser.getAction().compare("drop") == 0) {
 			// check if item is in inventory
-			if(inventory.find("club") != inventory.end())
+			string dropObj = hParser.getObject();
+			if(inventory.find(dropObj) != inventory.end())
 			{
-				inventory["club"]->drop();
-				addRoomItems(roomItems, itemList, "club");
+				inventory[dropObj]->drop();
+				addRoomItems(roomItems, itemList, dropObj);
 				//cout << "Number of clubs in room = " << roomItems["club"]->getQuantity() << endl;
 				//cout << "Number of clubs in room = " << roomItems.size() << endl;
 
 				//inventory.insert(std::make_pair("club", itemList["club"]));
 
-				if (inventory["club"]->getQuantity() == 0)
-					inventory.erase("club");
-				cout << "You dropped a club on to the ground." << endl;
+				if (inventory[dropObj]->getQuantity() == 0)
+					inventory.erase(dropObj);
+				cout << "You dropped " << dropObj << " on to the ground." << endl;
 			}
 			else {
 				cout << "You dropped a club but it vanishes before it hit the ground. " << endl;
 			    cout << "You realized you were hallucinating it all this time" << endl;
 			}
 		}
-		else if (command.compare("take club") == 0) {
-			string itemName = "club";
+		else if (hParser.getAction().compare("get") == 0) {
+			string itemName = hParser.getObject();
 			if (removeRoomItems(roomItems, itemName)) {
 				addInventory(inventory, itemList, itemName);
 				cout << "You picked up the " << itemName << endl;

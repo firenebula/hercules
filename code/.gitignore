@@ -26,5 +26,5 @@ bin/*
 
 #saves  #
 ###################
-save/*
+save/*.room
 
