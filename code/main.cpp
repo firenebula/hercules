@@ -590,23 +590,6 @@ void printInventory(std::map<string, Item*>& inventory) {
 	}
 }
 
-void saveInventory(std::map<string, Item*>& inventory) {
-	//std::fstream save_inventory;
-	string save_path = "./save/inventory.inventory";
-	std::ofstream dest(save_path.c_str(), std::ios::binary);
-	//iterate through inventory. write item name to file (one name per line and one name per quantity owned)
-	for(map<string,Item*>::iterator it = inventory.begin(); it != inventory.end(); ++it) {
-		if (it == inventory.begin()) {
-			dest << it->first;
-		} else {
-			dest << "\n" << it->first;
-		}
-		for(int i = 1; i < inventory[it->first]->getQuantity(); i++) {
-			dest << "\n" << it->first;
-		}
-	}
-	dest.close();
-}
 
 void printRoomItem(std::map<string, Item*>& roomItems) {
 	cout << "Room Inventory:" << endl;

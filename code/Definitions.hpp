@@ -20,7 +20,7 @@ string lookArr[] = {"l", "look"};
 std::vector<std::string> LOOK_CMDS(lookArr, lookArr + sizeof(lookArr) / sizeof(lookArr[0]));
 
 const string GET = "get";
-string getArr[] = {"get", "take", "grab"};
+string getArr[] = {"get", "take", "grab", "pick"};
 std::vector<std::string> GET_CMDS(getArr, getArr + sizeof(getArr) / sizeof(getArr[0]));
 
 
@@ -70,7 +70,7 @@ std::vector<std::string> EAST_CMDS(eastArr, eastArr + sizeof(eastArr) / sizeof(e
 
 
 //commands to ignore
-const char* ignoreArr[] = {"the", "of", "a", "and", "to", "around", "at", "in", "on", "with"};
+const char* ignoreArr[] = {"the", "of", "a", "an", "to", "around", "at", "in", "on", "with", "up", "down", "from", "into", "onto"};
 std::vector<std::string> IGNORE_WORDS(ignoreArr, ignoreArr + sizeof(ignoreArr) / sizeof(ignoreArr[0]));
 
 
