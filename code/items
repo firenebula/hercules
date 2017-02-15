@@ -18,7 +18,7 @@ true
 1
 
 [available]
-true
+false
 
 
 [name]
@@ -29,6 +29,25 @@ It's wrapped in barbed wire. I call her 'Lucille' and she is thirsty for blood.
 
 [use]
 Batter up! You swing the club
+
+[movable]
+true
+
+[quantity]
+1
+
+[available]
+true
+
+
+[name]
+lion pelt
+	
+[description]
+The pelt of a lion. It's mane is a dark brown color and it has a scar across one of its eyes.
+
+[use]
+You wear the pelt on your shoulders and suddenly you hear laughing hyenas in the distance.
 
 [movable]
 true
