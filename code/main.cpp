@@ -3,7 +3,9 @@
 #include <fstream>
 #include <cstring>
 #include <map>
+#include <vector>
 #include <stdlib.h>
+#include <dirent.h>
 
 #include "Room.hpp"
 #include "Item.hpp"
@@ -35,7 +37,10 @@ void checkForEvent(LABORS currentLabor, string currentRoom, string command, std:
 
 void setLabor(LABORS &currentLabor, string newLabor);
 
-
+void saveInventory(std::map<string, Item*>& inventory);
+void loadInventory(std::map<string, Item*>& itemList, std::map<string, Item*>& inventory);
+void saveLabor(LABORS currentLabor);
+void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string saveAs = "");
 
 int main()
 {
@@ -779,4 +784,119 @@ void setLabor(LABORS &currentLabor, string newLabor) {
 	else if (newLabor.compare("ceryneia") == 0)
 		currentLabor = CERYNEIA;
 	
+}
+
+void saveInventory(std::map<string, Item*>& inventory) {
+	string save_path = "./save/inventory.inventory";
+	std::ofstream dest(save_path.c_str(), std::ios::binary);
+	//iterate through inventory. write item name to file (one name per line and one name per quantity owned)
+	for(map<string,Item*>::iterator it = inventory.begin(); it != inventory.end(); ++it) {
+		if (it == inventory.begin()) {
+			dest << it->first;
+		} else {
+			dest << "\n" << it->first;
+		}
+		for(int i = 1; i < inventory[it->first]->getQuantity(); i++) {
+			dest << "\n" << it->first;
+		}
+	}
+	dest.close();
+}
+
+void loadInventory(std::map<string, Item*>& itemList, std::map<string, Item*>& inventory) {
+	string item;
+	std::fstream inventory_file;
+	string inventory_path = "./save/inventory.inventory";
+	inventory_file.open(inventory_path.c_str(), std::ios::out | std::ios::in);
+	
+	if (inventory_file) {
+		//get each line of file which contains items to be added to inventory
+		while (std::getline(inventory_file, item)) {
+			addInventory(inventory, itemList, item);
+		}
+	} else {
+		cout << "could not find/open inventory file.\n";
+	}
+	inventory_file.close();
+}
+
+void saveLabor(LABORS currentLabor) {
+	string save_path = "./save/labor.labor";
+	std::ofstream dest(save_path.c_str(), std::ios::binary);
+	dest << currentLabor;
+	dest.close();
+}
+
+void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string saveAs) {
+	int i, j, k;
+	int save = 1, overwrite = 1;
+	string yes_no;
+	
+	//search through saved_games directory for names of saved games and store them in a vector
+	std::vector<string> game_names;
+	game_names.clear();
+	string top_dir = "saved_games";
+	DIR *dir = NULL;
+	struct dirent *drnt = NULL;
+	
+	dir = opendir(top_dir.c_str());
+	if (dir) {
+		while(drnt = readdir(dir)) {
+			game_names.push_back(drnt->d_name);
+		}
+		closedir(dir);
+	} else {
+		cout << "cannot open directory: " << top_dir << endl;
+	}
+	
+	//save current room, inventory, and labor to save folder before copying
+	saveRoom(roomItems, current);
+	saveInventory(inventory);
+	saveLabor(currentLabor);
+	
+	if (saveAs != "") {
+		cout << "You either loaded or previously saved the game titled: " << saveAs << ".\nWould you like to save with this same name and overwrite the game files?\n";
+		std::getline(cin, yes_no);
+		for(i = 0; i < yes_no.length(); i++) {
+			yes_no[i] = tolower(yes_no[i]);
+		}
+		if ((yes_no == "y") || (yes_no == "yes")) {
+			save = 0;
+			overwrite = 0;
+			cout << "overwrite command received.\n";
+		}
+	}
+
+	while (save == 1) {
+		save = 0;
+		cout << "What name would you like to save the game under?: ";
+		std::getline(cin, saveAs);
+		for (j = 0; j < game_names.size(); j++) {
+			if (saveAs == game_names.at(j)) {
+				cout << saveAs << " already exists. Would you like to overwrite the game files?\n";
+				std::getline(cin, yes_no);
+				for(i = 0; i < yes_no.length(); i++) {
+					yes_no[i] = tolower(yes_no[i]);
+				}
+				if ((yes_no == "y") || (yes_no == "yes")) {
+					save = 0;
+					overwrite = 0;
+				} else {
+					save = 1;
+				}
+			}
+		}
+	}
+	
+	if (overwrite == 0) { //need to delete current directory before saving
+		string remove = "rm -r -f saved_games/";
+		remove.append(saveAs);
+		remove.append("/");
+		system(remove.c_str());
+	}
+	string copy = "cp -r save/ saved_games/";
+	copy.append(saveAs);
+	copy.append("/");
+	system(copy.c_str());
+	cout << "Game saved successfully as " << saveAs << ".\n";
 }
