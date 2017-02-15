@@ -14,6 +14,9 @@ using std::cin;
 using std::cout;
 using std::endl;
 
+
+enum LABORS {NEMEAN, LERNA, CERYNEIA};
+
 void testParseVal(string, Parser);
 Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile);
 void loadItems(std::map<string, Item*>& itemMap, string itemFile);
@@ -27,35 +30,31 @@ bool removeRoomItems(std::map<string, Item*>& roomItems, string itemName);
 void saveRoom(std::map<string, Item*>& roomItems, Room current);
 void printRoomItem(std::map<string, Item*>& roomItems);
 
+void checkForEvent(LABORS currentLabor, string currentRoom, string command, std::map<string, string>& eventActions);
+
+void setLabor(LABORS &currentLabor, string newLabor);
+
+
 
 int main()
 {
+
 	string command;
 	string itemFile = "./items";
 	std::map <string, Item*> itemList;
 	std::map <string, Item*> inventory;
 	std::map <string, Item*> roomItems;
+	
+	std::map <string, string> eventActions;
 
 	Item testItem = makeItem(itemFile);
 
+	LABORS currentLabor = NEMEAN;
 
-	Parser hParser;
-	testParseVal("Default Values: ", hParser);
-	std::cout << "\n****Testing Parser.  Type quit to start game.****" << std::endl;
-    while (hParser.getObject().compare("quit") != 0) {
-		cout << endl << "What do you want to do?  ";
-		std::getline(cin, command);
-		hParser.parse(command);
-		testParseVal("Current Values:", hParser);
-
-
-    }
-
-    command = "";
-
-//    testParseVal("Default Values: ", hParser); // default values set to -1
-//    hParser.parse("l tomorrow night"); // will parse input.  For now, just updating to dummy values
-//    testParseVal("After Parse: ", hParser);
+	Parser hParser;  // new Parser Object
+    testParseVal("Default Values: ", hParser); // default values set to -1
+    hParser.parse("l tomorrow night"); // will parse input.  For now, just updating to dummy values
+    testParseVal("After Parse: ", hParser);
 
 
 	// load game items
@@ -145,9 +144,34 @@ int main()
 			}
 			else
 				cout << "You can't pick that up!" << endl;
-
-
 		}
+		
+		else if (command.compare("drop lion pelt") == 0) {
+			// check if item is in inventory
+			if(inventory.find("lion pelt") != inventory.end())
+			{
+				inventory["lion pelt"]->drop();
+				addRoomItems(roomItems, itemList, "lion pelt");
+
+				if (inventory["lion pelt"]->getQuantity() == 0)
+					inventory.erase("lion pelt");
+				cout << "You dropped a lion pelt on to the ground." << endl;
+			}
+			else {
+				cout << "You dropped a lion pelt but it vanishes before it hit the ground. " << endl;
+			    cout << "You realized you were hallucinating it all this time" << endl;
+			}
+		}
+		else if (command.compare("take lion pelt") == 0) {
+			string itemName = "lion pelt";
+			if (removeRoomItems(roomItems, itemName)) {
+				addInventory(inventory, itemList, itemName);
+				cout << "You picked up the " << itemName << endl;
+			}
+			else
+				cout << "You can't pick that up!" << endl;
+		}
+		
 /*
 		else if (command.compare("look pokeball") == 0) {
 			// check if item is in inventory
@@ -164,6 +188,33 @@ int main()
 
 		else if (command.compare("quit") != 0)
 			cout << "I don't understand that command!" << endl;
+
+		
+		checkForEvent(currentLabor, current.getName(), command, eventActions);
+		
+		if (!eventActions.empty()) {
+			for(map<string, string>::iterator it = eventActions.begin(); it != eventActions.end(); ++it) {
+				//cout << it->first << " : " << eventActions[it->first] << endl; 
+				if ((it->first).compare("display") == 0) {
+					cout << eventActions[it->first] << endl;
+				}
+				else if ((it->first).compare("change state") == 0) {
+					setLabor(currentLabor, eventActions[it->first]);
+				}
+				else if ((it->first).compare("add exit south") == 0) {
+					current.setExits(1, eventActions[it->first]);
+				}
+				else if ((it->first).compare("add item") == 0) {
+					addRoomItems(roomItems, itemList, eventActions[it->first]);
+				}
+			}
+			eventActions.clear();
+		}
+//		else 
+//			cout << "No event triggered!" << endl;
+		
+		
+		
 	}
 
 	saveRoom(roomItems, current);
@@ -592,8 +643,10 @@ void printInventory(std::map<string, Item*>& inventory) {
 void printRoomItem(std::map<string, Item*>& roomItems) {
 	cout << "Room Inventory:" << endl;
 	for(map<string,Item*>::iterator it = roomItems.begin(); it != roomItems.end(); ++it) {
-		cout << it->first << "\t";
-		cout << roomItems[it->first]->getQuantity() << "\n";
+		if (roomItems[it->first]->getQuantity() > 0) {
+			cout << it->first << "\t";
+			cout << roomItems[it->first]->getQuantity() << "\n";
+		}
 	}
 }
 
@@ -661,4 +714,33 @@ void testParseVal(string label, Parser p){
     << "Indirect Value: " << p.getIndirect() << endl;
 
 }
+
+
+void checkForEvent(LABORS currentLabor, string currentRoom, string command, std::map<string, string>& eventActions) {
+	if (currentLabor == NEMEAN && command.compare("kill lion") == 0 && currentRoom.compare("nemean") == 0) {
+		eventActions.insert(std::make_pair("display", "You killed the lion! You hear a loin club cry out for its father \nwhile another lion with scars and a dark mane roars in approval!"));
+		eventActions.insert(std::make_pair("add item", "lion pelt"));
+	}
+	
+	
+	
+	if (currentLabor == NEMEAN && command.compare("drop lion pelt") == 0 && currentRoom.compare("throne") == 0) {
+		eventActions.insert(std::make_pair("change state", "lerna"));
+		eventActions.insert(std::make_pair("add exit south", "lerna"));
+		eventActions.insert(std::make_pair("display", "The king ordered you to go kill the hydra of lerna!\n"));
+	}
+
+	
+	
+}
+
+void setLabor(LABORS &currentLabor, string newLabor) {
+	// enum LABORS {NEMEAN, LERNA, CERYNEIA};
+	if (newLabor.compare("lerna") == 0)
+		currentLabor = LERNA;
+	else if (newLabor.compare("ceryneia") == 0)
+		currentLabor = CERYNEIA;
+	
+}
+
 
