@@ -1,11 +1,13 @@
 nemean
 
 visited
-false
+true
 
 exits
 null
-Throne
+throne
+null
+null
 null
 null
 
@@ -17,4 +19,3 @@ It's the circle of life....
 Hakuna matata
 
 items
-
