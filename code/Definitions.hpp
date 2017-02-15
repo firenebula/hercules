@@ -20,25 +20,34 @@ string lookArr[] = {"l", "look"};
 std::vector<std::string> LOOK_CMDS(lookArr, lookArr + sizeof(lookArr) / sizeof(lookArr[0]));
 
 const string GET = "get";
-string getArr[] = {"get", "take", "grab"};
+string getArr[] = {"get", "take", "grab", "pick"};
 std::vector<std::string> GET_CMDS(getArr, getArr + sizeof(getArr) / sizeof(getArr[0]));
 
 
 const string USE = "use";
-string useArr[] = {"use", "activate", "attack", "shoot"};
+string useArr[] = {"use", "activate"};
 std::vector<std::string> USE_CMDS(useArr, useArr + sizeof(useArr) / sizeof(useArr[0]));
 
 const string DROP = "drop";
 string dropArr[] = {"drop", "leave"};
 std::vector<std::string> DROP_CMDS(dropArr, dropArr + sizeof(dropArr) / sizeof(dropArr[0]));
 
-
-
-//Commands that stand for an action and an object
+const string ATTACK = "attack";
+string attackArr[] = {"hit", "kill", "attack", "bash", "shoot"};
+std::vector<std::string> ATTACK_CMDS(attackArr, attackArr + sizeof(attackArr) / sizeof(attackArr[0]));
 
 const string QUIT = "quit";
 string quitArr[] = {"q", "quit"};
 std::vector<std::string> QUIT_CMDS(quitArr, quitArr + sizeof(quitArr) / sizeof(quitArr[0]));
+
+//Commands that stand for an action and an object
+
+
+
+const string START = "start";
+string startArr[] = {"start"};
+std::vector<std::string> START_CMDS(startArr, startArr + sizeof(startArr) / sizeof(startArr[0]));
+
 
 
 const string NORTH = "north";
@@ -61,7 +70,7 @@ std::vector<std::string> EAST_CMDS(eastArr, eastArr + sizeof(eastArr) / sizeof(e
 
 
 //commands to ignore
-const char* ignoreArr[] = {"the", "of", "a", "and", "to"};
+const char* ignoreArr[] = {"the", "of", "a", "an", "to", "around", "at", "in", "on", "with", "up", "down", "from", "into", "onto"};
 std::vector<std::string> IGNORE_WORDS(ignoreArr, ignoreArr + sizeof(ignoreArr) / sizeof(ignoreArr[0]));
 
 

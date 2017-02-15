@@ -37,6 +37,7 @@ void Parser::parse(string inPut){
     setAction(NONE);
     setObject(NONE);
     setIndirect(NONE);
+    string tempStr = "$none";
 
     std::vector<string> splitVec;
     splitWords(splitVec, inPut);
@@ -51,21 +52,53 @@ void Parser::parse(string inPut){
             else if(checkAction(splitVec[i])){
                 i++; //checking next word
                 doneProcessing = true;
-                while(i < splitVec.size() && this->object == "$none"){
+                while(i < splitVec.size() && tempStr == "$none"){
                     if(!checkIgnore(splitVec[i]))
-                        setObject(splitVec[i]);
+                        tempStr = splitVec[i];
                     i++;
                 }
+                while(i < splitVec.size() && !checkIgnore(splitVec[i])){
+                      tempStr += " ";
+                      tempStr += splitVec[i];
+                      i++;
+                      }
+
+                   setObject(tempStr);
+                   tempStr = "$none";
+
+
+
+
+             while(i < splitVec.size() && tempStr == "$none"){
+                    if(!checkIgnore(splitVec[i]))
+                        tempStr = splitVec[i];
+                    i++;
+                }
+                while(i < splitVec.size() && !checkIgnore(splitVec[i])){
+                      tempStr += " ";
+                      tempStr += splitVec[i];
+                      i++;
+                      }
+
+                   setIndirect(tempStr);
+
+            }//end else if
+
+                i++; // main loop incrementer
 
             }
-            i++;
+
+
+
+
+
     }
 
 //    checkAction(inPut);
 //    if(!checkAction(inPut))
 //    this->action = "none";
 
-}
+
 
 void Parser::dictionaryLoad(){
 
@@ -74,13 +107,16 @@ void Parser::dictionaryLoad(){
     addEntry(actionMap, USE_CMDS, USE);
     addEntry(actionMap, DROP_CMDS, DROP);
     addEntry(actionMap, GET_CMDS, GET);
+    addEntry(actionMap, ATTACK_CMDS, ATTACK);
+    addEntry(actionMap, QUIT_CMDS,  QUIT);
 
     addEntry(actMovMap, NORTH_CMDS, NORTH);
     addEntry(actMovMap, SOUTH_CMDS, SOUTH);
     addEntry(actMovMap, WEST_CMDS, WEST);
     addEntry(actMovMap, EAST_CMDS, EAST);
 
-    addEntry(actMovMap, QUIT_CMDS,  QUIT);
+    addEntry(actMovMap, START_CMDS,  START);
+
 
 
 }
