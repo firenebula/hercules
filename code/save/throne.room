@@ -4,10 +4,12 @@ visited
 true
 
 exits
-Nemean
+nemean
+lerna
 null
-Mt. Olympus
-Oracle
+null
+null
+null
 
 long description
 This is the throne of King E. In the center of the rooms sits a golden throne.
@@ -22,6 +24,8 @@ There's a border wall to the South but you're free to go North to Nemean.
 
 items
 club
+1
+lion pelt
 1
 pokeball
 1
