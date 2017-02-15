@@ -40,12 +40,13 @@ void setLabor(LABORS &currentLabor, string newLabor);
 void saveInventory(std::map<string, Item*>& inventory);
 void loadInventory(std::map<string, Item*>& itemList, std::map<string, Item*>& inventory);
 void saveLabor(LABORS currentLabor);
-void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string saveAs = "");
+void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs);
 
 int main()
 {
 
 	string command;
+	string saveAs = "";
 	string itemFile = "./items";
 	std::map <string, Item*> itemList;
 	std::map <string, Item*> inventory;
@@ -227,7 +228,9 @@ int main()
 			}
 		}
 */
-
+		else if (command.find("save") != std::string::npos)
+			saveGame(roomItems, current, inventory, currentLabor, saveAs);
+			
 		else if (command.compare("quit") != 0)
 			cout << "I don't understand that command!" << endl;
 
@@ -827,7 +830,7 @@ void saveLabor(LABORS currentLabor) {
 	dest.close();
 }
 
-void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string saveAs) {
+void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs) {
 	int i, j, k;
 	int save = 1, overwrite = 1;
 	string yes_no;
@@ -863,7 +866,6 @@ void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string,
 		if ((yes_no == "y") || (yes_no == "yes")) {
 			save = 0;
 			overwrite = 0;
-			cout << "overwrite command received.\n";
 		}
 	}
 
