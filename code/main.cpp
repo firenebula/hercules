@@ -40,9 +40,11 @@ void setLabor(LABORS &currentLabor, string newLabor);
 void saveInventory(std::map<string, Item*>& inventory);
 void loadInventory(std::map<string, Item*>& itemList, std::map<string, Item*>& inventory);
 void saveLabor(LABORS currentLabor);
+void saveCurrentRoom(Room current);
 void scanDirectory(std::vector<string>& dir_contents, string dir_path);
 int cleanInput(string& input, int& valid);
 void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs);
+void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory);
 
 int main()
 {
@@ -230,12 +232,15 @@ int main()
 			}
 		}
 */
-		else if (command.find("save") != std::string::npos)
+		else if (command.find("save") != std::string::npos) {
 			saveGame(roomItems, current, inventory, currentLabor, saveAs);
-			
-		else if (command.compare("quit") != 0)
+		}
+		else if (command.find("load") != std::string::npos) {
+			loadGame(itemList, roomItems, current, currentLabor, itemList, inventory);
+		}		
+		else if (command.compare("quit") != 0) {
 			cout << "I don't understand that command!" << endl;
-
+		}
 		
 		checkForEvent(currentLabor, current.getName(), command, eventActions);
 		
@@ -832,6 +837,13 @@ void saveLabor(LABORS currentLabor) {
 	dest.close();
 }
 
+void saveCurrentRoom(Room current) {
+	string save_path = "./save/currentRoom.currentRoom";
+	std::ofstream dest(save_path.c_str(), std::ios::binary);
+	dest << current.getName();
+	dest.close();
+}
+
 void scanDirectory(std::vector<string>& dir_contents, string dir_path) {
 	DIR *dir = NULL;
 	struct dirent *drnt = NULL;
@@ -840,7 +852,9 @@ void scanDirectory(std::vector<string>& dir_contents, string dir_path) {
 	dir = opendir(dir_path.c_str());
 	if (dir) {
 		while(drnt = readdir(dir)) {
-			dir_contents.push_back(drnt->d_name);
+			if ((strcmp(drnt->d_name, ".") != 0) && (strcmp(drnt->d_name, "..")) != 0) {
+				dir_contents.push_back(drnt->d_name);
+			}
 		}
 		closedir(dir);
 	} else {
@@ -906,6 +920,7 @@ void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string,
 	
 	//save current room, inventory, and labor to save folder before copying
 	saveRoom(roomItems, current);
+	saveCurrentRoom(current);
 	saveInventory(inventory);
 	saveLabor(currentLabor);
 	
@@ -962,4 +977,100 @@ void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string,
 	copy.append("/");
 	system(copy.c_str());
 	cout << "Game saved successfully as " << saveAs << ".\n";
+}
+
+void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory){
+	int i, loadFrom, load = 1, all_digits = 0;
+	string input;
+	string::size_type sz;
+	//search through saved_games directory for names of saved games and store them in a vector
+	std::vector<string> game_names;
+	scanDirectory(game_names, "saved_games");
+	
+	//get user input for which game to load. validate and if bad input iterate until acceptable
+	cout << "Please enter a number corresponding to the saved game you would like to load:\n";
+	for (i = 0; i < game_names.size(); i++) {
+		cout << i + 1 << ". " << game_names.at(i) << endl;
+	}
+	std::getline(cin, input);
+	for (i = 0; i < input.length(); i++) {
+		if (!isdigit(input[i])) {
+			all_digits = 1;
+		}
+	}
+	if (all_digits == 0) {
+		loadFrom = std::atoi(input.c_str());
+		if ((loadFrom <= game_names.size()) && (loadFrom > 0)) {
+			load = 0;
+		}
+	}
+	while (load == 1) {
+		all_digits = 0;
+		cout << "Your input was either not a number or not a number corresponding to a saved game. Please enter a number corresponding to the saved game you would like to load:\n";
+		for (i = 0; i < game_names.size(); i++) {
+			cout << i + 1 << ". " << game_names.at(i) << endl;
+		}
+		std::getline(cin, input);
+		for (i = 0; i < input.length(); i++) {
+			if (!isdigit(input[i])) {
+				all_digits = 1;
+			}
+		}
+		if (all_digits == 0) {
+			loadFrom = std::atoi(input.c_str());
+			if ((loadFrom <= game_names.size()) && (loadFrom > 0)) {
+				load = 0;
+			}
+		}
+	}
+	
+	//clear inventory, clear room items, remove all files from save/ directory, and copy all files from saved game to save/ directory
+	inventory.clear();
+	rmItems.clear();
+	string remove = "rm -r -f save/";
+	system(remove.c_str());
+	string copy = "cp -r saved_games/";
+	copy.append(game_names.at(loadFrom-1));
+	copy.append("/ save/");
+	system(copy.c_str());
+	
+	cout << "Loaded game: " << game_names.at(loadFrom-1) << endl;
+	
+	//load inventory
+	loadInventory(itemList, inventory);
+	
+	//load current room
+	string current_room_name;
+	string current_room_path = "./save/currentRoom.currentRoom";
+	std::fstream current_room_file;
+	current_room_file.open(current_room_path.c_str(), std::ios::out | std::ios::in);
+	if (current_room_file) {
+		//get each line of file which contains the current room name
+		std::getline(current_room_file, current_room_name);
+		current = loadRoom(itemList, rmItems, current_room_name);
+	} else {
+		cout << "could not find/open current room file.\n";
+	}
+	current_room_file.close();
+	
+	//load labor
+	string current_labor_string;
+	int current_labor_int;
+	string current_labor_path = "./save/labor.labor";
+	std::fstream current_labor_file;
+	current_labor_file.open(current_labor_path.c_str(), std::ios::out | std::ios::in);
+	if (current_labor_file) {
+		//get each line of file which contains the current room name
+		std::getline(current_labor_file, current_labor_string);
+		current_labor_int = std::atoi(current_labor_string.c_str());;
+		if (current_labor_int == 0) {
+			currentLabor = NEMEAN;
+		} else if (current_labor_int == 1) {
+			currentLabor = LERNA;
+		} else if (current_labor_int == 2) {
+			currentLabor = CERYNEIA;
+		}
+	} else {
+		cout << "could not find/open current labor file.\n";
+	}
 }
