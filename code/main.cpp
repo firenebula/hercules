@@ -987,26 +987,9 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 	std::vector<string> game_names;
 	scanDirectory(game_names, "saved_games");
 	
-	//get user input for which game to load. validate and if bad input iterate until acceptable
-	cout << "Please enter a number corresponding to the saved game you would like to load:\n";
-	for (i = 0; i < game_names.size(); i++) {
-		cout << i + 1 << ". " << game_names.at(i) << endl;
-	}
-	std::getline(cin, input);
-	for (i = 0; i < input.length(); i++) {
-		if (!isdigit(input[i])) {
-			all_digits = 1;
-		}
-	}
-	if (all_digits == 0) {
-		loadFrom = std::atoi(input.c_str());
-		if ((loadFrom <= game_names.size()) && (loadFrom > 0)) {
-			load = 0;
-		}
-	}
-	while (load == 1) {
-		all_digits = 0;
-		cout << "Your input was either not a number or not a number corresponding to a saved game. Please enter a number corresponding to the saved game you would like to load:\n";
+	if (game_names.size() > 0) {
+		//get user input for which game to load. validate and if bad input iterate until acceptable
+		cout << "Please enter a number corresponding to the saved game you would like to load:\n";
 		for (i = 0; i < game_names.size(); i++) {
 			cout << i + 1 << ". " << game_names.at(i) << endl;
 		}
@@ -1022,55 +1005,76 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 				load = 0;
 			}
 		}
-	}
-	
-	//clear inventory, clear room items, remove all files from save/ directory, and copy all files from saved game to save/ directory
-	inventory.clear();
-	rmItems.clear();
-	string remove = "rm -r -f save/";
-	system(remove.c_str());
-	string copy = "cp -r saved_games/";
-	copy.append(game_names.at(loadFrom-1));
-	copy.append("/ save/");
-	system(copy.c_str());
-	
-	cout << "Loaded game: " << game_names.at(loadFrom-1) << endl;
-	
-	//load inventory
-	loadInventory(itemList, inventory);
-	
-	//load current room
-	string current_room_name;
-	string current_room_path = "./save/currentRoom.currentRoom";
-	std::fstream current_room_file;
-	current_room_file.open(current_room_path.c_str(), std::ios::out | std::ios::in);
-	if (current_room_file) {
-		//get each line of file which contains the current room name
-		std::getline(current_room_file, current_room_name);
-		current = loadRoom(itemList, rmItems, current_room_name);
-	} else {
-		cout << "could not find/open current room file.\n";
-	}
-	current_room_file.close();
-	
-	//load labor
-	string current_labor_string;
-	int current_labor_int;
-	string current_labor_path = "./save/labor.labor";
-	std::fstream current_labor_file;
-	current_labor_file.open(current_labor_path.c_str(), std::ios::out | std::ios::in);
-	if (current_labor_file) {
-		//get each line of file which contains the current room name
-		std::getline(current_labor_file, current_labor_string);
-		current_labor_int = std::atoi(current_labor_string.c_str());;
-		if (current_labor_int == 0) {
-			currentLabor = NEMEAN;
-		} else if (current_labor_int == 1) {
-			currentLabor = LERNA;
-		} else if (current_labor_int == 2) {
-			currentLabor = CERYNEIA;
+		while (load == 1) {
+			all_digits = 0;
+			cout << "Your input was either not a number or not a number corresponding to a saved game. Please enter a number corresponding to the saved game you would like to load:\n";
+			for (i = 0; i < game_names.size(); i++) {
+				cout << i + 1 << ". " << game_names.at(i) << endl;
+			}
+			std::getline(cin, input);
+			for (i = 0; i < input.length(); i++) {
+				if (!isdigit(input[i])) {
+					all_digits = 1;
+				}
+			}
+			if (all_digits == 0) {
+				loadFrom = std::atoi(input.c_str());
+				if ((loadFrom <= game_names.size()) && (loadFrom > 0)) {
+					load = 0;
+				}
+			}
+		}
+		
+		//clear inventory, clear room items, remove all files from save/ directory, and copy all files from saved game to save/ directory
+		inventory.clear();
+		rmItems.clear();
+		string remove = "rm -r -f save/";
+		system(remove.c_str());
+		string copy = "cp -r saved_games/";
+		copy.append(game_names.at(loadFrom-1));
+		copy.append("/ save/");
+		system(copy.c_str());
+		
+		cout << "Loaded game: " << game_names.at(loadFrom-1) << endl;
+		
+		//load inventory
+		loadInventory(itemList, inventory);
+		
+		//load current room
+		string current_room_name;
+		string current_room_path = "./save/currentRoom.currentRoom";
+		std::fstream current_room_file;
+		current_room_file.open(current_room_path.c_str(), std::ios::out | std::ios::in);
+		if (current_room_file) {
+			//get each line of file which contains the current room name
+			std::getline(current_room_file, current_room_name);
+			current = loadRoom(itemList, rmItems, current_room_name);
+		} else {
+			cout << "could not find/open current room file.\n";
+		}
+		current_room_file.close();
+		
+		//load labor
+		string current_labor_string;
+		int current_labor_int;
+		string current_labor_path = "./save/labor.labor";
+		std::fstream current_labor_file;
+		current_labor_file.open(current_labor_path.c_str(), std::ios::out | std::ios::in);
+		if (current_labor_file) {
+			//get each line of file which contains the current room name
+			std::getline(current_labor_file, current_labor_string);
+			current_labor_int = std::atoi(current_labor_string.c_str());;
+			if (current_labor_int == 0) {
+				currentLabor = NEMEAN;
+			} else if (current_labor_int == 1) {
+				currentLabor = LERNA;
+			} else if (current_labor_int == 2) {
+				currentLabor = CERYNEIA;
+			}
+		} else {
+			cout << "could not find/open current labor file.\n";
 		}
 	} else {
-		cout << "could not find/open current labor file.\n";
+		cout << "I'm sorry, but there are no saved games available to load.\n";
 	}
 }
