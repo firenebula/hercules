@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -6,6 +5,7 @@
 #include <vector>
 #include <stdlib.h>
 #include <dirent.h>
+#include <ctype.h>
 
 #include "Room.hpp"
 #include "Item.hpp"
@@ -40,6 +40,8 @@ void setLabor(LABORS &currentLabor, string newLabor);
 void saveInventory(std::map<string, Item*>& inventory);
 void loadInventory(std::map<string, Item*>& itemList, std::map<string, Item*>& inventory);
 void saveLabor(LABORS currentLabor);
+void scanDirectory(std::vector<string>& dir_contents, string dir_path);
+int cleanInput(string& input, int& valid);
 void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs);
 
 int main()
@@ -830,27 +832,77 @@ void saveLabor(LABORS currentLabor) {
 	dest.close();
 }
 
+void scanDirectory(std::vector<string>& dir_contents, string dir_path) {
+	DIR *dir = NULL;
+	struct dirent *drnt = NULL;
+	
+	dir_contents.clear();
+	dir = opendir(dir_path.c_str());
+	if (dir) {
+		while(drnt = readdir(dir)) {
+			dir_contents.push_back(drnt->d_name);
+		}
+		closedir(dir);
+	} else {
+		cout << "cannot open directory: " << dir_path << endl;
+	}
+}
+
+int cleanInput(string& input, int& valid) {
+	int i, j = 0, k = 0;
+	int first_char = 1, modified = 1;
+	string checks = "_ -";
+	
+	for (i = 0; i < input.length(); i++) {
+		if (isalpha(input[i])) {
+			input[j] = input[i];
+			first_char = 0;
+			valid = 0;
+			k = j;
+			j++;
+		} else if (isdigit(input[i])) {
+			input[j] = input[i];
+			first_char = 0;
+			valid = 0;
+			k = j;
+			j++;
+		} else if (input[i] == checks[0]) {
+			if (first_char == 0) {
+				input[j] = input[i];
+				j++;
+			} else {
+				modified = 0;
+			}
+		} else if (input[i] == checks[1]) {
+			if (first_char == 0) {
+				input[j] = checks[0];
+				j++;
+				modified = 0;
+			} else {
+				modified = 0;
+			}
+		} else if (input[i] == checks[2]) {
+			if (first_char == 0) {
+				input[j] = input[i];
+				j++;
+			} else {
+				modified = 0;
+			}
+		}
+	}
+	input.resize(k + 1);
+	cout << input << endl;
+	return modified;
+}
+
 void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs) {
 	int i, j, k;
-	int save = 1, overwrite = 1;
+	int save = 1, overwrite = 1, validInput = 1, modified = 1;
 	string yes_no;
 	
 	//search through saved_games directory for names of saved games and store them in a vector
 	std::vector<string> game_names;
-	game_names.clear();
-	string top_dir = "saved_games";
-	DIR *dir = NULL;
-	struct dirent *drnt = NULL;
-	
-	dir = opendir(top_dir.c_str());
-	if (dir) {
-		while(drnt = readdir(dir)) {
-			game_names.push_back(drnt->d_name);
-		}
-		closedir(dir);
-	} else {
-		cout << "cannot open directory: " << top_dir << endl;
-	}
+	scanDirectory(game_names, "saved_games");
 	
 	//save current room, inventory, and labor to save folder before copying
 	saveRoom(roomItems, current);
@@ -873,6 +925,15 @@ void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string,
 		save = 0;
 		cout << "What name would you like to save the game under?: ";
 		std::getline(cin, saveAs);
+		modified = cleanInput(saveAs, validInput);
+		while (validInput == 1) {
+			cout << "Your saved game name was not valid. It must contain at least one alphanumeric character. Please enter a new name: ";
+			std::getline(cin, saveAs);
+			modified = cleanInput(saveAs, validInput);
+		}
+		if (modified == 0) {
+			cout << "FYI... The name you input was revised to " << saveAs << ".\n";
+		}
 		for (j = 0; j < game_names.size(); j++) {
 			if (saveAs == game_names.at(j)) {
 				cout << saveAs << " already exists. Would you like to overwrite the game files?\n";
