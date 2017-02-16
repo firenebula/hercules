@@ -86,7 +86,7 @@ std::vector<std::string> DOWN_CMDS(downArr, downArr + sizeof(downArr) / sizeof(d
 
 
 //commands to ignore
-const char* ignoreArr[] = {"the", "of", "a", "an", "to", "around", "at", "in", "on", "with", "up", "down", "from", "into", "onto"};
+const char* ignoreArr[] = {"the", "of", "a", "an", "to", "around", "at", "in", "on", "with", "from", "into", "onto"};
 std::vector<std::string> IGNORE_WORDS(ignoreArr, ignoreArr + sizeof(ignoreArr) / sizeof(ignoreArr[0]));
 
 
