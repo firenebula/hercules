@@ -1057,6 +1057,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		//load labor
 		string current_labor_string;
 		int current_labor_int;
+		LABORS labors_list[] = {NEMEAN, LERNA, CERYNEIA};
 		string current_labor_path = "./save/labor.labor";
 		std::fstream current_labor_file;
 		current_labor_file.open(current_labor_path.c_str(), std::ios::out | std::ios::in);
@@ -1064,13 +1065,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 			//get each line of file which contains the current room name
 			std::getline(current_labor_file, current_labor_string);
 			current_labor_int = std::atoi(current_labor_string.c_str());;
-			if (current_labor_int == 0) {
-				currentLabor = NEMEAN;
-			} else if (current_labor_int == 1) {
-				currentLabor = LERNA;
-			} else if (current_labor_int == 2) {
-				currentLabor = CERYNEIA;
-			}
+			currentLabor = labors_list[current_labor_int];
 		} else {
 			cout << "could not find/open current labor file.\n";
 		}
