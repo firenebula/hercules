@@ -36,6 +36,14 @@ const string ATTACK = "attack";
 string attackArr[] = {"hit", "kill", "attack", "bash", "shoot"};
 std::vector<std::string> ATTACK_CMDS(attackArr, attackArr + sizeof(attackArr) / sizeof(attackArr[0]));
 
+const string TALK = "talk";
+string talkArr[] = {"talk", "speak", "converse", "ask"};
+std::vector<std::string> TALK_CMDS(talkArr, talkArr + sizeof(talkArr) / sizeof(talkArr[0]));
+
+const string INVENTORY = "inventory";
+string inventoryArr[] = {"inv", "inventory"};
+std::vector<std::string> INVENTORY_CMDS(inventoryArr, inventoryArr + sizeof(inventoryArr) / sizeof(inventoryArr[0]));
+
 const string QUIT = "quit";
 string quitArr[] = {"q", "quit"};
 std::vector<std::string> QUIT_CMDS(quitArr, quitArr + sizeof(quitArr) / sizeof(quitArr[0]));
@@ -67,10 +75,18 @@ const string EAST = "east";
 string eastArr[] = {"e", "east"};
 std::vector<std::string> EAST_CMDS(eastArr, eastArr + sizeof(eastArr) / sizeof(eastArr[0]));
 
+const string UP = "up";
+string upArr[] = {"u", "up"};
+std::vector<std::string> UP_CMDS(upArr, upArr + sizeof(upArr) / sizeof(upArr[0]));
+
+const string DOWN = "down";
+string downArr[] = {"d", "down"};
+std::vector<std::string> DOWN_CMDS(downArr, downArr + sizeof(downArr) / sizeof(downArr[0]));
+
 
 
 //commands to ignore
-const char* ignoreArr[] = {"the", "of", "a", "an", "to", "around", "at", "in", "on", "with", "up", "down", "from", "into", "onto"};
+const char* ignoreArr[] = {"the", "of", "a", "an", "to", "around", "at", "in", "on", "with", "from", "into", "onto"};
 std::vector<std::string> IGNORE_WORDS(ignoreArr, ignoreArr + sizeof(ignoreArr) / sizeof(ignoreArr[0]));
 
 
