@@ -25,6 +25,7 @@ class Item
       string name;
       string description;
       string use_text;
+	  string talk_text;
       bool movable;
 	  int quantity;
 	  bool available;
@@ -32,9 +33,10 @@ class Item
 
    public:
 	  Item(string name);
-	  Item(string name, string desc, string use, bool movable, int quantity, bool available);
+	  Item(string name, string desc, string use, string talk, bool movable, int quantity, bool available);
 	  void setDesc(string description);
 	  void setUse(string use_text);
+	  void setTalk(string talk_text);
 	  void setMovable(bool movable);
 	  void setQuantity(int quantity);
 	  void setAvailable(bool available);
@@ -46,6 +48,7 @@ class Item
       string look();
 	  string use();
 	  string use(string target);
+	  string talk();
       void drop();
 
 	  void printItem();

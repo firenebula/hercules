@@ -2,10 +2,10 @@
 #include <fstream>
 #include <cstring>
 #include <map>
-#include <vector>
 #include <stdlib.h>
 #include <dirent.h>
 #include <ctype.h>
+
 
 #include "Room.hpp"
 #include "Item.hpp"
@@ -23,7 +23,7 @@ enum LABORS {NEMEAN, LERNA, CERYNEIA};
 void testParseVal(string, Parser);
 Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile);
 void loadItems(std::map<string, Item*>& itemMap, string itemFile);
-Item makeItem(string itemFile);
+
 string move(Room current, string destination);
 
 void addInventory(std::map<string, Item*>& inventory, std::map<string, Item*>& itemMap, string itemName);
@@ -31,6 +31,8 @@ void printInventory(std::map<string, Item*>& inventory);
 void addRoomItems(std::map<string, Item*>& roomItems, std::map<string, Item*>& itemMap, string itemName);
 bool removeRoomItems(std::map<string, Item*>& roomItems, string itemName);
 void saveRoom(std::map<string, Item*>& roomItems, Room current);
+bool isItemPresent(string itemName, std::map<string, Item*>& inventory, std::map<string, Item*>& roomItems);
+
 void printRoomItem(std::map<string, Item*>& roomItems);
 
 void checkForEvent(LABORS currentLabor, string currentRoom, string command, std::map<string, string>& eventActions);
@@ -46,6 +48,7 @@ int cleanInput(string& input, int& valid);
 void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs);
 void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory);
 
+
 int main()
 {
 
@@ -55,16 +58,14 @@ int main()
 	std::map <string, Item*> itemList;
 	std::map <string, Item*> inventory;
 	std::map <string, Item*> roomItems;
-
+	
 	std::map <string, string> eventActions;
-
-	Item testItem = makeItem(itemFile);
 
 	LABORS currentLabor = NEMEAN;
 
 	Parser hParser;
 //	testParseVal("Default Values: ", hParser);
-/*
+/*	
 	std::cout << "\n****Testing Parser.  Type start to start game.****" << std::endl;
     while (hParser.getObject().compare("start") != 0) {
 		cout << endl << "What do you want to do?  ";
@@ -74,10 +75,10 @@ int main()
 
 
     }
-*/
+*/	
 
 	command = "";
-
+	
 	// load game items
 	loadItems(itemList, itemFile);
 
@@ -94,32 +95,20 @@ int main()
 
 		if (hParser.getAction().compare("look") == 0) {
 			string lookItem = hParser.getObject();
-			if (lookItem.compare("$none") == 0)
+			if (lookItem.compare("$none") == 0) {
 				cout << current.look();
+				printRoomItem(roomItems);
+			}
 			else {
-				bool foundItem = false;
-
-				// check if "club" in inventory
-				if(inventory.find(lookItem) != inventory.end()) {
-					foundItem = true;
-				}
-				// if "club" not in inventory then check if in the room
-				else if(roomItems.find(lookItem) != roomItems.end()) {
-					// check if the item is unlocked
-					//if (roomItems[lookItem]->isAvailable())
-						foundItem = true;
-				}
-				if (foundItem)
+				if (isItemPresent(lookItem, inventory, roomItems))
 					cout << itemList[lookItem]->look() << endl;
 				else {
 					command = "";
 					cout << "You look at the "<< lookItem << " but realize that it's not really there. It was just a mirage!" << endl;
 				}
 			}
-
-			printRoomItem(roomItems);
 		}
-
+		
 		else if (hParser.getAction().compare("move") == 0) {
 			string destination = hParser.getObject();
 			destination = move(current, destination);
@@ -134,32 +123,10 @@ int main()
 				current = loadRoom(itemList, roomItems, destination);
 			}
 		}
-
-		else if (hParser.getAction().compare("inventory") == 0) {
+		
+		else if (command.find("inventory") != std::string::npos) {
 			printInventory(inventory);
 		}
-
-		else if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("$none") != 0) {
-			string lookItem = hParser.getObject();
-			bool foundItem = false;
-			// check if "club" in inventory
-			if(inventory.find(lookItem) != inventory.end()) {
-					foundItem = true;
-				}
-			// if "club" not in inventory then check if in the room
-			else if (!roomItems.empty()) {
-				if(roomItems.find(lookItem) != roomItems.end()) {
-					foundItem = true;
-				}
-			}
-			if (foundItem)
-				cout << itemList[lookItem]->look() << endl;
-			else {
-				command = "";
-				cout << "You look at the club but realize that it's not really there. It was just a mirage!" << endl;
-			}
-		}
-
 		else if (hParser.getAction().compare("drop") == 0) {
 			// check if item is in inventory
 			string dropObj = hParser.getObject();
@@ -179,8 +146,6 @@ int main()
 		}
 		else if (hParser.getAction().compare("get") == 0) {
 			string itemName = hParser.getObject();
-		//else if (command.compare("take club") == 0) {
-		//	string itemName = "club";
 			if (removeRoomItems(roomItems, itemName)) {
 				addInventory(inventory, itemList, itemName);
 				cout << "You picked up the " << itemName << endl;
@@ -188,6 +153,16 @@ int main()
 			else {
 				command = "";
 				cout << "You can't pick that up!" << endl;
+			}
+		}
+		else if (hParser.getAction().compare("talk") == 0) {
+			string itemName = hParser.getObject();
+			if (isItemPresent(itemName, inventory, roomItems)) {
+				cout << itemList[itemName]->talk() << endl;
+			}
+			else {
+				command = "";
+				cout << "What are you talking to?!" << endl;
 			}
 		}
 		/*
@@ -207,8 +182,8 @@ int main()
 			    cout << "You realized you were hallucinating it all this time" << endl;
 			}
 		}
-
-
+		
+		
 		else if (command.compare("take lion pelt") == 0) {
 			string itemName = "lion pelt";
 			if (removeRoomItems(roomItems, itemName)) {
@@ -219,34 +194,21 @@ int main()
 				cout << "You can't pick that up!" << endl;
 		}
 		*/
-/*
-		else if (command.compare("look pokeball") == 0) {
-			// check if item is in inventory
-			if (testItem.getLocation().compare("inventory") == 0) {
-				testItem.drop(current.getName());
-				cout << "You dropped a " << testItem.getName() << " on to the ground." << endl;
-			}
-			else {
-				cout << "You dropped a " << testItem.getName() << " but it vanishes before it hit the ground. " << endl;
-			    cout << "You realized you were hallucinating it all this time" << endl;
-			}
-		}
-*/
 		else if (command.find("save") != std::string::npos) {
 			saveGame(roomItems, current, inventory, currentLabor, saveAs);
 		}
 		else if (command.find("load") != std::string::npos) {
 			loadGame(itemList, roomItems, current, currentLabor, itemList, inventory);
-		}
+		}		
 		else if (command.compare("quit") != 0) {
 			cout << "I don't understand that command!" << endl;
 		}
-
+		
 		checkForEvent(currentLabor, current.getName(), command, eventActions);
-
+		
 		if (!eventActions.empty()) {
 			for(map<string, string>::iterator it = eventActions.begin(); it != eventActions.end(); ++it) {
-				//cout << it->first << " : " << eventActions[it->first] << endl;
+				//cout << it->first << " : " << eventActions[it->first] << endl; 
 				if ((it->first).compare("display") == 0) {
 					cout << eventActions[it->first] << endl;
 				}
@@ -261,13 +223,13 @@ int main()
 				}
 			}
 			eventActions.clear();
-
+			
 		}
-//		else
+//		else 
 //			cout << "No event triggered!" << endl;
-
-
-
+		
+		
+		
 	}
 
 	saveRoom(roomItems, current);
@@ -501,6 +463,10 @@ string move(Room current, string destination) {
 		return current.getExit(2);
 	else if (destination.compare("west") == 0)
 		return current.getExit(3);
+	else if (destination.compare("up") == 0)
+		return current.getExit(4);
+	else if (destination.compare("down") == 0)
+		return current.getExit(5);
 	else {
 		// search through all the room's exits and see if destination
 		// matches any of the exit's name
@@ -515,23 +481,12 @@ string move(Room current, string destination) {
 }
 
 
-Item makeItem(string itemFile) {
-	Item testClub("club");
-	testClub.setDesc("It's wrapped in barbed wire. I call her 'Lucille' and she is thirsty for blood.");
-	testClub.setUse("You swing the club");
-	testClub.setMovable(true);
-	testClub.setQuantity(1);
-
-	return testClub;
-
-}
-
-
 void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 	string data = "";
 	string name = "";
 	string desc = "";
 	string use = "";
+	string talk = "";
 	bool movable;
 	int quantity;
 	bool available;
@@ -556,6 +511,7 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 			name = "";
 			desc = "";
 			use = "";
+			talk = "";
 			movable = true;
 
 			while (data.compare("[name]") != 0) {
@@ -582,16 +538,16 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 			}
 			// remove last 2 newline char
 			desc.erase(desc.length() - 2);
-
+//cout << "Desc: " << desc << endl;
 			// get lines of text until use section is reached
 			while (data.compare("[use]") != 0) {
 				std::getline(item_file, data);
 			}
 
-			// get lines of text until movable section is reached
+			// get lines of text until talk section is reached
 			// and store those lines into variable, use
 			std::getline(item_file, data);
-			while(data.compare("[movable]") != 0)
+			while(data.compare("[talk]") != 0)
 			{
 				use.append(data);
 				use.append("\n");
@@ -599,7 +555,19 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 			}
 			// remove last 2 newline char
 			use.erase(use.length() - 2);
-
+//cout << "use: " << use << endl;
+			// get lines of text until movable section is reached
+			// and store those lines into variable, talk
+			std::getline(item_file, data);
+			while(data.compare("[movable]") != 0)
+			{
+				talk.append(data);
+				talk.append("\n");
+				std::getline(item_file, data);
+			}
+			// remove last 2 newline char
+			talk.erase(talk.length() - 2);
+//cout << "talk: " << talk << endl;
 			// store next line after "movable" into variable, movable
 			std::getline(item_file, data);
 
@@ -607,7 +575,7 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 				movable = true;
 			else
 				movable = false;
-
+//cout << "movable: " << movable << endl;
 			// get line of text until quantity section is reached
 			std::getline(item_file, data);
 			while(data.compare("[quantity]") != 0)
@@ -619,7 +587,7 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 			// store the value into the variable, quantity
 			std::getline(item_file, data);
 			quantity = atoi(data.c_str());
-
+//cout << "quantity: " << quantity << endl;
 			// get line of text until available section is reached
 			std::getline(item_file, data);
 			while(data.compare("[available]") != 0)
@@ -634,8 +602,8 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 				available = true;
 			else
 				available = false;
-
-			 itemMap.insert(std::make_pair(name, new Item(name, desc, use, movable, quantity, available)));
+//cout << "available: " << available << endl;
+			 itemMap.insert(std::make_pair(name, new Item(name, desc, use, talk, movable, quantity, available)));
 
 		}
 
@@ -648,6 +616,7 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 	item_file.close();
 
 }
+
 
 void addInventory(std::map<string, Item*>& inventory, std::map<string, Item*>& itemMap, string itemName) {
 
@@ -668,6 +637,7 @@ void addInventory(std::map<string, Item*>& inventory, std::map<string, Item*>& i
 			itemName,
 			itemMap[itemName]->look(),
 			itemMap[itemName]->use(),
+			itemMap[itemName]->talk(),
 			itemMap[itemName]->isMovable(),
 			itemMap[itemName]->getQuantity(),
 			itemMap[itemName]->isAvailable())));
@@ -722,6 +692,7 @@ void addRoomItems(std::map<string, Item*>& roomItems, std::map<string, Item*>& i
 			itemName,
 			itemMap[itemName]->look(),
 			itemMap[itemName]->use(),
+			itemMap[itemName]->talk(),
 			itemMap[itemName]->isMovable(),
 			itemMap[itemName]->getQuantity(),
 			itemMap[itemName]->isAvailable())));
@@ -769,22 +740,22 @@ void testParseVal(string label, Parser p){
 }
 
 
+
 void checkForEvent(LABORS currentLabor, string currentRoom, string command, std::map<string, string>& eventActions) {
-	if (currentLabor == NEMEAN && command.compare("kill lion") == 0 && currentRoom.compare("nemean") == 0) {
-		eventActions.insert(std::make_pair("display", "You killed the lion! You hear a loin club cry out for its father \nwhile another lion with scars and a dark mane roars in approval!"));
-		eventActions.insert(std::make_pair("add item", "lion pelt"));
+	if (currentLabor == NEMEAN) {
+		if (command.compare("kill lion") == 0 && currentRoom.compare("nemean") == 0) {
+			eventActions.insert(std::make_pair("display", "You killed the lion! You hear a loin club cry out for its father \nwhile another lion with scars and a dark mane roars in approval!"));
+			eventActions.insert(std::make_pair("add item", "lion pelt"));
+		}
+
+		if (command.compare("drop lion pelt") == 0 && currentRoom.compare("throne") == 0) {
+			eventActions.insert(std::make_pair("change state", "lerna"));
+			eventActions.insert(std::make_pair("add exit south", "lerna"));
+			eventActions.insert(std::make_pair("display", "The king ordered you to go kill the hydra of lerna!\n"));
+		}
 	}
-
-
-
-	if (currentLabor == NEMEAN && command.compare("drop lion pelt") == 0 && currentRoom.compare("throne") == 0) {
-		eventActions.insert(std::make_pair("change state", "lerna"));
-		eventActions.insert(std::make_pair("add exit south", "lerna"));
-		eventActions.insert(std::make_pair("display", "The king ordered you to go kill the hydra of lerna!\n"));
-	}
-
-
-
+	
+	
 }
 
 void setLabor(LABORS &currentLabor, string newLabor) {
@@ -793,7 +764,22 @@ void setLabor(LABORS &currentLabor, string newLabor) {
 		currentLabor = LERNA;
 	else if (newLabor.compare("ceryneia") == 0)
 		currentLabor = CERYNEIA;
+	
+}
 
+bool isItemPresent(string itemName, std::map<string, Item*>& inventory, std::map<string, Item*>& roomItems) {
+	// check if itemName in inventory
+	if(inventory.find(itemName) != inventory.end()) {
+		return true;
+	}
+	// if "club" not in inventory then check if in the room
+	else if(roomItems.find(itemName) != roomItems.end()) {
+		// check if the item is unlocked
+		//if (roomItems[itemName]->isAvailable())
+		return true;
+	}	
+	else
+		return false;
 }
 
 void saveInventory(std::map<string, Item*>& inventory) {
@@ -818,7 +804,7 @@ void loadInventory(std::map<string, Item*>& itemList, std::map<string, Item*>& i
 	std::fstream inventory_file;
 	string inventory_path = "./save/inventory.inventory";
 	inventory_file.open(inventory_path.c_str(), std::ios::out | std::ios::in);
-
+	
 	if (inventory_file) {
 		//get each line of file which contains items to be added to inventory
 		while (std::getline(inventory_file, item)) {
@@ -837,6 +823,7 @@ void saveLabor(LABORS currentLabor) {
 	dest.close();
 }
 
+
 void saveCurrentRoom(Room current) {
 	string save_path = "./save/currentRoom.currentRoom";
 	std::ofstream dest(save_path.c_str(), std::ios::binary);
@@ -847,7 +834,7 @@ void saveCurrentRoom(Room current) {
 void scanDirectory(std::vector<string>& dir_contents, string dir_path) {
 	DIR *dir = NULL;
 	struct dirent *drnt = NULL;
-
+	
 	dir_contents.clear();
 	dir = opendir(dir_path.c_str());
 	if (dir) {
@@ -866,7 +853,7 @@ int cleanInput(string& input, int& valid) {
 	int i, j = 0, k = 0;
 	int first_char = 1, modified = 1;
 	string checks = "_ -";
-
+	
 	for (i = 0; i < input.length(); i++) {
 		if (isalpha(input[i])) {
 			input[j] = input[i];
@@ -913,17 +900,17 @@ void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string,
 	int i, j, k;
 	int save = 1, overwrite = 1, validInput = 1, modified = 1;
 	string yes_no;
-
+	
 	//search through saved_games directory for names of saved games and store them in a vector
 	std::vector<string> game_names;
 	scanDirectory(game_names, "saved_games");
-
+	
 	//save current room, inventory, and labor to save folder before copying
 	saveRoom(roomItems, current);
 	saveCurrentRoom(current);
 	saveInventory(inventory);
 	saveLabor(currentLabor);
-
+	
 	if (saveAs != "") {
 		cout << "You either loaded or previously saved the game titled: " << saveAs << ".\nWould you like to save with this same name and overwrite the game files?\n";
 		std::getline(cin, yes_no);
@@ -965,7 +952,7 @@ void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string,
 			}
 		}
 	}
-
+	
 	if (overwrite == 0) { //need to delete current directory before saving
 		string remove = "rm -r -f saved_games/";
 		remove.append(saveAs);
@@ -986,7 +973,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 	//search through saved_games directory for names of saved games and store them in a vector
 	std::vector<string> game_names;
 	scanDirectory(game_names, "saved_games");
-
+	
 	if (game_names.size() > 0) {
 		//get user input for which game to load. validate and if bad input iterate until acceptable
 		cout << "Please enter a number corresponding to the saved game you would like to load:\n";
@@ -1024,7 +1011,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 				}
 			}
 		}
-
+		
 		//clear inventory, clear room items, remove all files from save/ directory, and copy all files from saved game to save/ directory
 		inventory.clear();
 		rmItems.clear();
@@ -1034,12 +1021,12 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		copy.append(game_names.at(loadFrom-1));
 		copy.append("/ save/");
 		system(copy.c_str());
-
+		
 		cout << "Loaded game: " << game_names.at(loadFrom-1) << endl;
-
+		
 		//load inventory
 		loadInventory(itemList, inventory);
-
+		
 		//load current room
 		string current_room_name;
 		string current_room_path = "./save/currentRoom.currentRoom";
@@ -1053,7 +1040,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 			cout << "could not find/open current room file.\n";
 		}
 		current_room_file.close();
-
+		
 		//load labor
 		string current_labor_string;
 		int current_labor_int;
@@ -1073,3 +1060,4 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		cout << "I'm sorry, but there are no saved games available to load.\n";
 	}
 }
+
