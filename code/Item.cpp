@@ -42,10 +42,11 @@ Item::Item(string name) {
  * It also sets the quantity to a default value of 0.
  *******************************************************/
 
-Item::Item(string name, string desc, string use, bool movable, int quantity, bool available) {
+Item::Item(string name, string desc, string use, string talk, bool movable, int quantity, bool available) {
 	this->name = name;
 	this->description = desc;
 	this->use_text = use;
+	this->talk_text = talk;
 	this->movable = movable;
 	this->quantity = quantity;
 	this->available = available;
@@ -74,6 +75,19 @@ Item::Item(string name, string desc, string use, bool movable, int quantity, boo
  void Item::setUse(std::string use_text) {
 	 this->use_text = use_text; 
  }
+ 
+ 
+/****************************************************
+ * void Item::setTalk(string talk_text)
+ * This function takes a string as a parameter and
+ * sets the member variable, action_use, to its 
+ * value.
+****************************************************/
+ 
+ void Item::setTalk(std::string talk_text) {
+	 this->talk_text = talk_text; 
+ }
+  
  
 /****************************************************
  * void Item::setMovable(bool movable)
@@ -177,11 +191,11 @@ int Item::getQuantity() {
  }
  
  /****************************************************
- * string Item::look()
+ * string Item::use()
  * This function returns the string stored in the 
  * variable, description. This function is used to
- * return what text to display when the player "look"
- * at the Item object.
+ * return what text to display when the player "use"
+ * the Item object.
 ****************************************************/
 
  string Item::use(string target) {
@@ -191,13 +205,23 @@ int Item::getQuantity() {
  } 
  
  
+  /****************************************************
+ * string Item::talk()
+ * This function returns the string stored in the 
+ * variable, talk. This function is used to
+ * return what text to display when the player "talk"
+ * to the Item object.
+****************************************************/
+
+ string Item::talk() {
+	return this->talk_text;
+ } 
+ 
  
   /****************************************************
- * string Item::look()
- * This function returns the string stored in the 
- * variable, description. This function is used to
- * return what text to display when the player "look"
- * at the Item object.
+ * void Item::drop()
+ * This function is used to decrement an Item's
+ * quantity when the player drops the Item object.
 ****************************************************/
 
  void Item::drop() {
