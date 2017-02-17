@@ -11,6 +11,9 @@ You throw the pokeball! What ferocious beast is ready to come out and fight for 
 ....
 Jigglypuff appears!
 
+[talk]
+"It's you and me, partner. We're going to be the best that ever was!"
+
 [movable]
 true
 
@@ -29,6 +32,9 @@ It's wrapped in barbed wire. I call her 'Lucille' and she is thirsty for blood.
 
 [use]
 Batter up! You swing the club
+
+[talk]
+"Easy honey! I'll let you drink your fill soon enough."
 
 [movable]
 true
@@ -49,8 +55,34 @@ The pelt of a lion. It's mane is a dark brown color and it has a scar across one
 [use]
 You wear the pelt on your shoulders and suddenly you hear laughing hyenas in the distance.
 
+[talk]
+"I am your father!"
+
 [movable]
 true
+
+[quantity]
+1
+
+[available]
+false
+
+
+[name]
+nemean lion
+	
+[description]
+The lion's golden fur glistens from the scant sunlight peeking into the cave.
+Its large claws are gouging the rock floor under it and its ferocious eyes are sizing its prey, you.
+
+[use]
+null
+
+[talk]
+You don't have time to talk to it! Fight!
+
+[movable]
+false
 
 [quantity]
 1
