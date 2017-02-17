@@ -95,8 +95,10 @@ int main()
 
 		if (hParser.getAction().compare("look") == 0) {
 			string lookItem = hParser.getObject();
-			if (lookItem.compare("$none") == 0) 
+			if (lookItem.compare("$none") == 0) {
 				cout << current.look();
+				printRoomItem(roomItems);
+			}
 			else {
 				if (isItemPresent(lookItem, inventory, roomItems))
 					cout << itemList[lookItem]->look() << endl;
@@ -105,8 +107,6 @@ int main()
 					cout << "You look at the "<< lookItem << " but realize that it's not really there. It was just a mirage!" << endl;
 				}
 			}
-			
-			printRoomItem(roomItems);
 		}
 		
 		else if (hParser.getAction().compare("move") == 0) {
@@ -158,7 +158,7 @@ int main()
 		else if (hParser.getAction().compare("talk") == 0) {
 			string itemName = hParser.getObject();
 			if (isItemPresent(itemName, inventory, roomItems)) {
-				cout << itemList[itemName]->look() << endl;
+				cout << itemList[itemName]->talk() << endl;
 			}
 			else {
 				command = "";
@@ -200,7 +200,7 @@ int main()
 		else if (command.find("load") != std::string::npos) {
 			loadGame(itemList, roomItems, current, currentLabor, itemList, inventory);
 		}		
-		else if (command.compare("quit") != 0 || command.length() != 0) {
+		else if (command.compare("quit") != 0) {
 			cout << "I don't understand that command!" << endl;
 		}
 		
@@ -463,6 +463,10 @@ string move(Room current, string destination) {
 		return current.getExit(2);
 	else if (destination.compare("west") == 0)
 		return current.getExit(3);
+	else if (destination.compare("up") == 0)
+		return current.getExit(4);
+	else if (destination.compare("down") == 0)
+		return current.getExit(5);
 	else {
 		// search through all the room's exits and see if destination
 		// matches any of the exit's name
@@ -534,7 +538,7 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 			}
 			// remove last 2 newline char
 			desc.erase(desc.length() - 2);
-cout << "Desc: " << desc << endl;
+//cout << "Desc: " << desc << endl;
 			// get lines of text until use section is reached
 			while (data.compare("[use]") != 0) {
 				std::getline(item_file, data);
@@ -551,7 +555,7 @@ cout << "Desc: " << desc << endl;
 			}
 			// remove last 2 newline char
 			use.erase(use.length() - 2);
-cout << "use: " << use << endl;
+//cout << "use: " << use << endl;
 			// get lines of text until movable section is reached
 			// and store those lines into variable, talk
 			std::getline(item_file, data);
@@ -563,7 +567,7 @@ cout << "use: " << use << endl;
 			}
 			// remove last 2 newline char
 			talk.erase(talk.length() - 2);
-cout << "talk: " << talk << endl;
+//cout << "talk: " << talk << endl;
 			// store next line after "movable" into variable, movable
 			std::getline(item_file, data);
 
@@ -571,7 +575,7 @@ cout << "talk: " << talk << endl;
 				movable = true;
 			else
 				movable = false;
-cout << "movable: " << movable << endl;
+//cout << "movable: " << movable << endl;
 			// get line of text until quantity section is reached
 			std::getline(item_file, data);
 			while(data.compare("[quantity]") != 0)
@@ -583,7 +587,7 @@ cout << "movable: " << movable << endl;
 			// store the value into the variable, quantity
 			std::getline(item_file, data);
 			quantity = atoi(data.c_str());
-cout << "quantity: " << quantity << endl;
+//cout << "quantity: " << quantity << endl;
 			// get line of text until available section is reached
 			std::getline(item_file, data);
 			while(data.compare("[available]") != 0)
@@ -598,7 +602,7 @@ cout << "quantity: " << quantity << endl;
 				available = true;
 			else
 				available = false;
-cout << "available: " << available << endl;
+//cout << "available: " << available << endl;
 			 itemMap.insert(std::make_pair(name, new Item(name, desc, use, talk, movable, quantity, available)));
 
 		}
@@ -777,6 +781,48 @@ bool isItemPresent(string itemName, std::map<string, Item*>& inventory, std::map
 	else
 		return false;
 }
+
+void saveInventory(std::map<string, Item*>& inventory) {
+	string save_path = "./save/inventory.inventory";
+	std::ofstream dest(save_path.c_str(), std::ios::binary);
+	//iterate through inventory. write item name to file (one name per line and one name per quantity owned)
+	for(map<string,Item*>::iterator it = inventory.begin(); it != inventory.end(); ++it) {
+		if (it == inventory.begin()) {
+			dest << it->first;
+		} else {
+			dest << "\n" << it->first;
+		}
+		for(int i = 1; i < inventory[it->first]->getQuantity(); i++) {
+			dest << "\n" << it->first;
+		}
+	}
+	dest.close();
+}
+
+void loadInventory(std::map<string, Item*>& itemList, std::map<string, Item*>& inventory) {
+	string item;
+	std::fstream inventory_file;
+	string inventory_path = "./save/inventory.inventory";
+	inventory_file.open(inventory_path.c_str(), std::ios::out | std::ios::in);
+	
+	if (inventory_file) {
+		//get each line of file which contains items to be added to inventory
+		while (std::getline(inventory_file, item)) {
+			addInventory(inventory, itemList, item);
+		}
+	} else {
+		cout << "could not find/open inventory file.\n";
+	}
+	inventory_file.close();
+}
+
+void saveLabor(LABORS currentLabor) {
+	string save_path = "./save/labor.labor";
+	std::ofstream dest(save_path.c_str(), std::ios::binary);
+	dest << currentLabor;
+	dest.close();
+}
+
 
 void saveCurrentRoom(Room current) {
 	string save_path = "./save/currentRoom.currentRoom";
