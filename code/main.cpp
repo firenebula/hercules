@@ -63,7 +63,7 @@ int main()
 	std::map <string, string> eventActions;
 
 	LABORS currentLabor = NEMEAN;
-
+	system("exec rm -r save/*");
 	Parser hParser;
 //	testParseVal("Default Values: ", hParser);
 /*
