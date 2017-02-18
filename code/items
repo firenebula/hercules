@@ -21,12 +21,12 @@ true
 1
 
 [available]
-false
+true
 
 
 [name]
 club
-	
+
 [description]
 It's wrapped in barbed wire. I call her 'Lucille' and she is thirsty for blood.
 
@@ -50,7 +50,8 @@ true
 lion pelt
 	
 [description]
-The pelt of a lion. It's mane is a dark brown color and it has a scar across one of its eyes.
+The pelt of a lion. It's mane is a light brown color and its claws are very sharp.
+Wait, there's a name tag on it? It reads 'Mufasa.' WHAT HAVE YOU DONE!?!
 
 [use]
 You wear the pelt on your shoulders and suddenly you hear laughing hyenas in the distance.
@@ -65,11 +66,11 @@ true
 1
 
 [available]
-false
+true
 
 
 [name]
-nemean lion
+lion
 	
 [description]
 The lion's golden fur glistens from the scant sunlight peeking into the cave.
@@ -88,4 +89,27 @@ false
 1
 
 [available]
+true
+
+
+[name]
+shadow
+
+[description]
+It's too dark in the cave to make out distinct features but the person looks feminine and is crying.
+
+[use]
+You can't use that!
+
+[talk]
+"Hello! Are you okay?"
+The only response you are getting are more crying.
+
+[movable]
 false
+
+[quantity]
+1
+
+[available]
+true
