@@ -35,7 +35,8 @@ bool isItemPresent(string itemName, std::map<string, Item*>& inventory, std::map
 
 void printRoomItem(std::map<string, Item*>& roomItems);
 
-void checkForEvent(LABORS currentLabor, string currentRoom, string command, std::map<string, string>& eventActions);
+//bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, std::map<string, string>& eventActions);
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool isPresent, std::map<string, string>& eventActions);
 
 void setLabor(LABORS &currentLabor, string newLabor);
 
@@ -58,6 +59,7 @@ int main()
 	std::map <string, Item*> itemList;
 	std::map <string, Item*> inventory;
 	std::map <string, Item*> roomItems;
+	std::map <string, string> roomStates;
 	
 	std::map <string, string> eventActions;
 
@@ -92,120 +94,112 @@ int main()
 		cout << endl << "What do you want to do?  ";
 		std::getline(cin, command);
 		hParser.parse(command);
+		
+//	cout << "[" << hParser.getAction() << "] [" << hParser.getObject() << "]" << endl;
 
-		if (hParser.getAction().compare("look") == 0) {
-			string lookItem = hParser.getObject();
-			if (lookItem.compare("$none") == 0) {
-				cout << current.look();
-				printRoomItem(roomItems);
-			}
-			else {
-				if (isItemPresent(lookItem, inventory, roomItems))
-					cout << itemList[lookItem]->look() << endl;
+
+		string lookItem = hParser.getObject();
+	// change such that isPresent checks if object and indirect object are present!!!
+		bool isPresent = isItemPresent(lookItem, inventory, roomItems);
+		if (!checkForEvent(currentLabor, current.getName(), hParser, isPresent, eventActions)) {
+
+			if (hParser.getAction().compare("look") == 0) {
+				//string lookItem = hParser.getObject();
+				if (lookItem.compare("$none") == 0) {
+					cout << current.look();
+					// for debugging
+					printRoomItem(roomItems);
+				}
 				else {
-					command = "";
-					cout << "You look at the "<< lookItem << " but realize that it's not really there. It was just a mirage!" << endl;
+					if (isItemPresent(lookItem, inventory, roomItems))
+						cout << itemList[lookItem]->look() << endl;
+						//itemList[lookItem]->printItem();
+					else {
+						command = "";
+						cout << "You look at the "<< lookItem << " but realize that it's not really there. It was just a mirage!" << endl;
+					}
 				}
 			}
-		}
-		
-		else if (hParser.getAction().compare("move") == 0) {
-			string destination = hParser.getObject();
-			destination = move(current, destination);
-			if (destination.compare("null") == 0) {
-				cout << "You cannot go there!" << endl;
-				command = "";
+			
+			else if (hParser.getAction().compare("move") == 0) {
+				string destination = hParser.getObject();
+				destination = move(current, destination);
+				if (destination.compare("null") == 0) {
+					cout << "You cannot go there!" << endl;
+					command = "";
+				}
+				else {
+					// save room data
+					saveRoom(roomItems, current);
+					roomItems.clear();
+					current = loadRoom(itemList, roomItems, destination);
+				}
 			}
-			else {
-				// save room data
-				saveRoom(roomItems, current);
-				roomItems.clear();
-				current = loadRoom(itemList, roomItems, destination);
+			
+			else if (command.find("inventory") != std::string::npos) {
+				printInventory(inventory);
 			}
-		}
-		
-		else if (command.find("inventory") != std::string::npos) {
-			printInventory(inventory);
-		}
-		else if (hParser.getAction().compare("drop") == 0) {
-			// check if item is in inventory
-			string dropObj = hParser.getObject();
-			if(inventory.find(dropObj) != inventory.end()) {
-				inventory[dropObj]->drop();
-				addRoomItems(roomItems, itemList, dropObj);
-				// remove item from inventory if quantity is 0
-				if (inventory[dropObj]->getQuantity() == 0)
-					inventory.erase(dropObj);
-				cout << "You dropped a "<< dropObj << " on to the ground." << endl;
+			else if (hParser.getAction().compare("drop") == 0) {
+				// check if item is in inventory
+				string dropObj = hParser.getObject();
+				if(inventory.find(dropObj) != inventory.end()) {
+					inventory[dropObj]->drop();
+					addRoomItems(roomItems, itemList, dropObj);
+					// remove item from inventory if quantity is 0
+					if (inventory[dropObj]->getQuantity() == 0)
+						inventory.erase(dropObj);
+					cout << "You dropped a "<< dropObj << " on to the ground." << endl;
+				}
+				else {
+					cout << "You dropped a " << dropObj << " but it vanishes before it hit the ground. " << endl;
+					cout << "You realized you were hallucinating it all this time" << endl;
+					command = "";
+				}
 			}
-			else {
-				cout << "You dropped a " << dropObj << " but it vanishes before it hit the ground. " << endl;
-			    cout << "You realized you were hallucinating it all this time" << endl;
-				command = "";
+			else if (hParser.getAction().compare("get") == 0) {
+				string itemName = hParser.getObject();
+				if (removeRoomItems(roomItems, itemName)) {
+					addInventory(inventory, itemList, itemName);
+					cout << "You picked up the " << itemName << endl;
+				}
+				else {
+					command = "";
+					cout << "You can't pick that up!" << endl;
+				}
 			}
-		}
-		else if (hParser.getAction().compare("get") == 0) {
-			string itemName = hParser.getObject();
-			if (removeRoomItems(roomItems, itemName)) {
-				addInventory(inventory, itemList, itemName);
-				cout << "You picked up the " << itemName << endl;
+			else if (hParser.getAction().compare("talk") == 0) {
+				string itemName = hParser.getObject();
+				if (isItemPresent(itemName, inventory, roomItems)) {
+					cout << itemList[itemName]->talk() << endl;
+				}
+				else {
+					command = "";
+					cout << "What are you talking to?!" << endl;
+				}
 			}
-			else {
-				command = "";
-				cout << "You can't pick that up!" << endl;
+			else if (hParser.getAction().compare("use") == 0) {
+				string itemName = hParser.getObject();
+				if (isItemPresent(itemName, inventory, roomItems)) {
+					cout << itemList[itemName]->use() << endl;
+				}
+				else {
+					command = "";
+					cout << "You can't use that?!" << endl;
+				}
 			}
-		}
-		else if (hParser.getAction().compare("talk") == 0) {
-			string itemName = hParser.getObject();
-			if (isItemPresent(itemName, inventory, roomItems)) {
-				cout << itemList[itemName]->talk() << endl;
-			}
-			else {
-				command = "";
-				cout << "What are you talking to?!" << endl;
-			}
-		}
-		/*
-		else if (command.compare("drop lion pelt") == 0) {
-			// check if item is in inventory
-			if(inventory.find("lion pelt") != inventory.end())
-			{
-				inventory["lion pelt"]->drop();
-				addRoomItems(roomItems, itemList, "lion pelt");
 
-				if (inventory["lion pelt"]->getQuantity() == 0)
-					inventory.erase("lion pelt");
-				cout << "You dropped a lion pelt on to the ground." << endl;
+			else if (command.find("save") != std::string::npos) {
+				saveGame(roomItems, current, inventory, currentLabor, saveAs);
 			}
-			else {
-				cout << "You dropped a lion pelt but it vanishes before it hit the ground. " << endl;
-			    cout << "You realized you were hallucinating it all this time" << endl;
+			else if (command.find("load") != std::string::npos) {
+				loadGame(itemList, roomItems, current, currentLabor, itemList, inventory);
+			}		
+			else if (command.compare("quit") != 0) {
+				cout << "I don't understand that command!" << endl;
 			}
-		}
 		
-		
-		else if (command.compare("take lion pelt") == 0) {
-			string itemName = "lion pelt";
-			if (removeRoomItems(roomItems, itemName)) {
-				addInventory(inventory, itemList, itemName);
-				cout << "You picked up the " << itemName << endl;
-			}
-			else
-				cout << "You can't pick that up!" << endl;
+			checkForEvent(currentLabor, current.getName(), hParser, isPresent, eventActions);
 		}
-		*/
-		else if (command.find("save") != std::string::npos) {
-			saveGame(roomItems, current, inventory, currentLabor, saveAs);
-		}
-		else if (command.find("load") != std::string::npos) {
-			loadGame(itemList, roomItems, current, currentLabor, itemList, inventory);
-		}		
-		else if (command.compare("quit") != 0) {
-			cout << "I don't understand that command!" << endl;
-		}
-		
-		checkForEvent(currentLabor, current.getName(), command, eventActions);
-		
 		if (!eventActions.empty()) {
 			for(map<string, string>::iterator it = eventActions.begin(); it != eventActions.end(); ++it) {
 				//cout << it->first << " : " << eventActions[it->first] << endl; 
@@ -220,6 +214,11 @@ int main()
 				}
 				else if ((it->first).compare("add item") == 0) {
 					addRoomItems(roomItems, itemList, eventActions[it->first]);
+				}
+				else if ((it->first).compare("remove item") == 0) {
+					// make item movable so it can be removed
+					roomItems[eventActions[it->first]]->setMovable(true);
+					removeRoomItems(roomItems, eventActions[it->first]);
 				}
 			}
 			eventActions.clear();
@@ -360,8 +359,13 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 				itemName = data;
 				addRoomItems(rmItems, itemMap, itemName);
 				std::getline(room_file, data);
+		// debugging
+				if (atoi(data.c_str()) == 0)
+					cout << "\n\nMISSING QUANTITY FOR " << itemName << " IN " << roomFile << " ROOM FILE!" << endl;
+				
 				rmItems[itemName]->setQuantity(atoi(data.c_str()));
-			}
+
+				}
 			//cout << "data line from room file = [" << data << "]" << endl;
 		}
     }
@@ -664,12 +668,10 @@ void printInventory(std::map<string, Item*>& inventory) {
 
 
 void printRoomItem(std::map<string, Item*>& roomItems) {
-	cout << "Room Inventory:" << endl;
+	//cout << "Room Inventory:" << endl;
 	for(map<string,Item*>::iterator it = roomItems.begin(); it != roomItems.end(); ++it) {
-		if (roomItems[it->first]->getQuantity() > 0) {
-			cout << it->first << "\t";
-			cout << roomItems[it->first]->getQuantity() << "\n";
-		}
+		cout << it->first << "\t";
+		cout << roomItems[it->first]->getQuantity() << "\n";
 	}
 }
 
@@ -703,7 +705,8 @@ void addRoomItems(std::map<string, Item*>& roomItems, std::map<string, Item*>& i
 /*
 	cout << "New Room Items:" << endl << "[";
 	for(map<string,Item*>::iterator it = roomItems.begin(); it != roomItems.end(); ++it) {
-		cout << it->first << "\n"; }
+		cout << it->first << "\t" << roomItems[it->first]->getQuantity() << "\n"; }
+		
 	cout << "]" << endl;
 */
 }
@@ -713,21 +716,17 @@ bool removeRoomItems(std::map<string, Item*>& roomItems, string itemName) {
 	//check if is in the room
 	if (!roomItems.empty()) {
 		if(roomItems.find(itemName) != roomItems.end()) {
-			//check if item is movable and available and in the room
-			if (roomItems[itemName]->isMovable() &&  roomItems[itemName]->isAvailable() &&
-				roomItems[itemName]->getQuantity() > 0) {
-					roomItems[itemName]->drop();
-					if (roomItems[itemName]->getQuantity() == 0)
-						roomItems.erase(itemName);
+			// check if item is movable and has a quantity > 0
+			if (roomItems[itemName]->isMovable() && roomItems[itemName]->getQuantity() > 0) {
+				roomItems[itemName]->drop();
+				if (roomItems[itemName]->getQuantity() <= 0)
+					roomItems.erase(itemName);
+				return true;
 			}
 		}
-		else
-			return false;
 	}
-	else
-		return false;
 
-	return true;
+	return false;
 }
 
 // This test function is just printing out the contents of the Parse obj variables
@@ -740,21 +739,40 @@ void testParseVal(string label, Parser p){
 }
 
 
-
-void checkForEvent(LABORS currentLabor, string currentRoom, string command, std::map<string, string>& eventActions) {
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool isPresent, std::map<string, string>& eventActions) {
 	if (currentLabor == NEMEAN) {
-		if (command.compare("kill lion") == 0 && currentRoom.compare("nemean") == 0) {
+		if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("shadow") == 0 && isPresent
+				&& currentRoom.compare("nemean") == 0) {
+			eventActions.insert(std::make_pair("display", "You stop and stare as the shadow starts changing.\nThe woman's hair suddenly starts growing and her body begins to enlarge.\nThe very large shadow lets out a large roar and rushes at you!"));
+			eventActions.insert(std::make_pair("add item", "lion"));
+			eventActions.insert(std::make_pair("remove item", "shadow"));
+			return true;
+		}
+// 	parser does not interpret "lion" as indirect !!
+		if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("club") == 0 && isPresent
+				&& hParser.getIndirect().compare("lion") && currentRoom.compare("nemean") == 0) {
+			eventActions.insert(std::make_pair("display", "You swing the club at the lion but to your surprise the lion shrugs off the blow and rushes at you again."));
+			return true;
+		}
+		
+		if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && isPresent
+				&& currentRoom.compare("nemean") == 0) {
 			eventActions.insert(std::make_pair("display", "You killed the lion! You hear a loin club cry out for its father \nwhile another lion with scars and a dark mane roars in approval!"));
+			eventActions.insert(std::make_pair("remove item", "lion"));
 			eventActions.insert(std::make_pair("add item", "lion pelt"));
+			return true;
 		}
 
-		if (command.compare("drop lion pelt") == 0 && currentRoom.compare("throne") == 0) {
+		if (hParser.getAction().compare("drop") == 0 && hParser.getObject().compare("lion pelt") == 0 && isPresent
+				&& currentRoom.compare("throne") == 0) {
 			eventActions.insert(std::make_pair("change state", "lerna"));
 			eventActions.insert(std::make_pair("add exit south", "lerna"));
 			eventActions.insert(std::make_pair("display", "The king ordered you to go kill the hydra of lerna!\n"));
+			return true;
 		}
 	}
 	
+	return false;
 	
 }
 
