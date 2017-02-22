@@ -184,7 +184,7 @@ int main()
 
 		else if (hParser.getAction().compare("use") == 0) {
 				string itemName = hParser.getObject();
-				if (isItemPresent(itemName, inventory, roomItems)) {
+				if (isItemPresent(itemName, inventory)) {
 					cout << itemList[itemName]->use() << endl;
 				}
 				else {
@@ -756,11 +756,13 @@ void testParseVal(string label, Parser p){
 
 bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool isPresent, std::map<string, string>& eventActions, std::map<string, Item*>& inventory) {
 	if (currentLabor == NEMEAN) {
-		if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("shadow") == 0 && isPresent
+		if (hParser.getAction().compare("move") == 0 && (hParser.getObject().compare("shadow") == 0 || hParser.getObject().compare("person") == 0)&& isPresent
 				&& currentRoom.compare("nemean") == 0) {
 			eventActions.insert(std::make_pair("display", "You stop and stare as the shadow starts changing.\nThe woman's hair suddenly starts growing and her body begins to enlarge.\nThe very large shadow lets out a large roar and rushes at you!"));
 			eventActions.insert(std::make_pair("add item", "lion"));
 			eventActions.insert(std::make_pair("remove item", "shadow"));
+            eventActions.insert(std::make_pair("change long", "This is the den of the Nemean lion. It stinks of death and lion breath.\n"));
+
 			return true;
 		}
 // 	parser does not interpret "lion" as indirect !!
