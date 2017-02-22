@@ -19,6 +19,7 @@ using std::endl;
 
 
 enum LABORS {NEMEAN, LERNA, CERYNEIA};
+enum EXISTANCE {OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND};
 
 void testParseVal(string, Parser);
 Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile);
@@ -37,7 +38,7 @@ bool isItemPresent(string itemName, std::map<string, Item*>& inventory);
 void printRoomItem(std::map<string, Item*>& roomItems);
 
 //bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, std::map<string, string>& eventActions);
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool isPresent, std::map<string, string>& eventActions, std::map<string, Item*>& inventory);
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& eventActions);
 
 void setLabor(LABORS &currentLabor, string newLabor);
 
@@ -62,6 +63,7 @@ int main()
 	std::map <string, Item*> roomItems;
 	std::map <string, string> roomStates;
 	std::map <string, string> eventActions;
+	bool existsArr[4];
 
 	LABORS currentLabor = NEMEAN;
 	system("exec rm -r save/*");
@@ -98,13 +100,19 @@ int main()
 //	cout << "[" << hParser.getAction() << "] [" << hParser.getObject() << "]" << endl;
 
 
-		string lookItem = hParser.getObject();
+		string objItem = hParser.getObject();
+		string indItem = hParser.getIndirect();
 	// change such that isPresent checks if object and indirect object are present!!!
-		bool isPresent = isItemPresent(lookItem, inventory, roomItems);
-		if (!checkForEvent(currentLabor, current.getName(), hParser, isPresent, eventActions, inventory)) {
+		existsArr[OBJ_EXISTS] = isItemPresent(objItem, inventory, roomItems);
+		existsArr[HOLDING_OBJ] = isItemPresent(objItem, inventory);
+		existsArr[IND_EXISTS] = isItemPresent(indItem, inventory, roomItems);
+        existsArr[HOLDING_IND] = isItemPresent(indItem, inventory);
+
+
+		if (!checkForEvent(currentLabor, current.getName(), hParser, existsArr, eventActions)) {
 
 			if (hParser.getAction().compare("look") == 0) {
-				//string lookItem = hParser.getObject();
+				string lookItem = hParser.getObject();
 				if (lookItem.compare("$none") == 0) {
 					cout << current.longLook();
 					// for debugging
@@ -203,7 +211,7 @@ int main()
 				cout << "I don't understand that command!" << endl;
 			}
 
-			checkForEvent(currentLabor, current.getName(), hParser, isPresent, eventActions, inventory);
+			checkForEvent(currentLabor, current.getName(), hParser, existsArr, eventActions);
 		}
 
 		if (!eventActions.empty()) {
@@ -754,10 +762,13 @@ void testParseVal(string label, Parser p){
 }
 
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool isPresent, std::map<string, string>& eventActions, std::map<string, Item*>& inventory) {
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& eventActions) {
+
+    //existsArr positions OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND
+
 	if (currentLabor == NEMEAN) {
-		if (hParser.getAction().compare("move") == 0 && (hParser.getObject().compare("shadow") == 0 || hParser.getObject().compare("person") == 0)&& isPresent
-				&& currentRoom.compare("nemean") == 0) {
+		if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("shadow") == 0
+				&& existsArr[OBJ_EXISTS] && currentRoom.compare("nemean") == 0) {
 			eventActions.insert(std::make_pair("display", "You stop and stare as the shadow starts changing.\nThe woman's hair suddenly starts growing and her body begins to enlarge.\nThe very large shadow lets out a large roar and rushes at you!"));
 			eventActions.insert(std::make_pair("add item", "lion"));
 			eventActions.insert(std::make_pair("remove item", "shadow"));
@@ -766,19 +777,19 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 // 	parser does not interpret "lion" as indirect !!
-		if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("club") == 0 && isPresent
-				&& isItemPresent("club", inventory) && hParser.getIndirect().compare("lion") == 0 && currentRoom.compare("nemean") == 0) {
+		if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("club") == 0
+				&& existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("lion") == 0 && currentRoom.compare("nemean") == 0) {
 			eventActions.insert(std::make_pair("display", "You swing the club at the lion but to your surprise the lion shrugs off the blow and rushes at you again."));
 			return true;
 		}
 
-        else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && isPresent
-				&& hParser.getIndirect().compare("club") == 0 && isItemPresent("club", inventory) && currentRoom.compare("nemean") == 0) {
+        else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS]
+				&& hParser.getIndirect().compare("club") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("nemean") == 0) {
 			eventActions.insert(std::make_pair("display", "You swing the club at the lion but to your surprise the lion shrugs off the blow and rushes at you again."));
 			return true;
 		}
 
-		else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && isPresent
+		else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS]
 				 && currentRoom.compare("nemean") == 0) {
 			eventActions.insert(std::make_pair("display", "You killed the lion! You hear a loin club cry out for its father \nwhile another lion with scars and a dark mane roars in approval!"));
 			eventActions.insert(std::make_pair("remove item", "lion"));
@@ -786,7 +797,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 
-		if (hParser.getAction().compare("drop") == 0 && hParser.getObject().compare("lion pelt") == 0 && isPresent
+		if (hParser.getAction().compare("drop") == 0 && hParser.getObject().compare("lion pelt") == 0 && existsArr[HOLDING_OBJ]
 				&& currentRoom.compare("throne") == 0) {
 			eventActions.insert(std::make_pair("change state", "lerna"));
 			eventActions.insert(std::make_pair("add exit south", "lerna"));
