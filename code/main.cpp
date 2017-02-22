@@ -37,7 +37,7 @@ bool isItemPresent(string itemName, std::map<string, Item*>& inventory);
 void printRoomItem(std::map<string, Item*>& roomItems);
 
 //bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, std::map<string, string>& eventActions);
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool isPresent, std::map<string, string>& eventActions);
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool isPresent, std::map<string, string>& eventActions, std::map<string, Item*>& inventory);
 
 void setLabor(LABORS &currentLabor, string newLabor);
 
@@ -94,19 +94,19 @@ int main()
 		cout << endl << "What do you want to do?  ";
 		std::getline(cin, command);
 		hParser.parse(command);
-		
+
 //	cout << "[" << hParser.getAction() << "] [" << hParser.getObject() << "]" << endl;
 
 
 		string lookItem = hParser.getObject();
 	// change such that isPresent checks if object and indirect object are present!!!
 		bool isPresent = isItemPresent(lookItem, inventory, roomItems);
-		if (!checkForEvent(currentLabor, current.getName(), hParser, isPresent, eventActions)) {
+		if (!checkForEvent(currentLabor, current.getName(), hParser, isPresent, eventActions, inventory)) {
 
 			if (hParser.getAction().compare("look") == 0) {
 				//string lookItem = hParser.getObject();
 				if (lookItem.compare("$none") == 0) {
-					cout << current.look();
+					cout << current.longLook();
 					// for debugging
 					printRoomItem(roomItems);
 				}
@@ -137,10 +137,10 @@ int main()
 
 			}
 
-			else if (command.find("inventory") != std::string::npos) {
+			else if (hParser.getAction().compare("inventory") == 0) {
 				printInventory(inventory);
 			}
-			
+
 			else if (hParser.getAction().compare("drop") == 0) {
 				// check if item is in inventory
 				string dropObj = hParser.getObject();
@@ -158,7 +158,7 @@ int main()
 					command = "";
 				}
 			}
-			
+
 			else if (hParser.getAction().compare("get") == 0) {
 				string itemName = hParser.getObject();
 				if (removeRoomItems(roomItems, itemName)) {
@@ -170,7 +170,7 @@ int main()
 					cout << "You can't pick that up!" << endl;
 				}
 			}
-			
+
 			else if (hParser.getAction().compare("talk") == 0) {
 				string itemName = hParser.getObject();
 				if (isItemPresent(itemName, inventory, roomItems)) {
@@ -181,8 +181,8 @@ int main()
 					cout << "What are you talking to?!" << endl;
 				}
 			}
-			
-			else if (hParser.getAction().compare("use") == 0) {
+
+		else if (hParser.getAction().compare("use") == 0) {
 				string itemName = hParser.getObject();
 				if (isItemPresent(itemName, inventory, roomItems)) {
 					cout << itemList[itemName]->use() << endl;
@@ -203,7 +203,7 @@ int main()
 				cout << "I don't understand that command!" << endl;
 			}
 
-			checkForEvent(currentLabor, current.getName(), hParser, isPresent, eventActions);
+			checkForEvent(currentLabor, current.getName(), hParser, isPresent, eventActions, inventory);
 		}
 
 		if (!eventActions.empty()) {
@@ -226,6 +226,18 @@ int main()
 					roomItems[eventActions[it->first]]->setMovable(true);
 					removeRoomItems(roomItems, eventActions[it->first]);
 				}
+
+				else if ((it->first).compare("change short") == 0) {
+					current.setDescShort(eventActions[it->first]);
+
+				}
+
+				else if ((it->first).compare("change long") == 0) {
+					current.setDescLong(eventActions[it->first]);
+				}
+
+
+
 			}
 			eventActions.clear();
 
@@ -365,7 +377,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		// debugging
 				if (atoi(data.c_str()) == 0)
 					cout << "\n\nMISSING QUANTITY FOR " << itemName << " IN " << roomFile << " ROOM FILE!" << endl;
-				
+
 				rmItems[itemName]->setQuantity(atoi(data.c_str()));
 
 				}
@@ -709,7 +721,7 @@ void addRoomItems(std::map<string, Item*>& roomItems, std::map<string, Item*>& i
 	cout << "New Room Items:" << endl << "[";
 	for(map<string,Item*>::iterator it = roomItems.begin(); it != roomItems.end(); ++it) {
 		cout << it->first << "\t" << roomItems[it->first]->getQuantity() << "\n"; }
-		
+
 	cout << "]" << endl;
 */
 }
@@ -742,7 +754,7 @@ void testParseVal(string label, Parser p){
 }
 
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool isPresent, std::map<string, string>& eventActions) {
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool isPresent, std::map<string, string>& eventActions, std::map<string, Item*>& inventory) {
 	if (currentLabor == NEMEAN) {
 		if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("shadow") == 0 && isPresent
 				&& currentRoom.compare("nemean") == 0) {
@@ -753,13 +765,19 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 		}
 // 	parser does not interpret "lion" as indirect !!
 		if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("club") == 0 && isPresent
-				&& hParser.getIndirect().compare("lion") && currentRoom.compare("nemean") == 0) {
+				&& isItemPresent("club", inventory) && hParser.getIndirect().compare("lion") == 0 && currentRoom.compare("nemean") == 0) {
 			eventActions.insert(std::make_pair("display", "You swing the club at the lion but to your surprise the lion shrugs off the blow and rushes at you again."));
 			return true;
 		}
-		
-		if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && isPresent
-				&& currentRoom.compare("nemean") == 0) {
+
+        else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && isPresent
+				&& hParser.getIndirect().compare("club") == 0 && isItemPresent("club", inventory) && currentRoom.compare("nemean") == 0) {
+			eventActions.insert(std::make_pair("display", "You swing the club at the lion but to your surprise the lion shrugs off the blow and rushes at you again."));
+			return true;
+		}
+
+		else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && isPresent
+				 && currentRoom.compare("nemean") == 0) {
 			eventActions.insert(std::make_pair("display", "You killed the lion! You hear a loin club cry out for its father \nwhile another lion with scars and a dark mane roars in approval!"));
 			eventActions.insert(std::make_pair("remove item", "lion"));
 			eventActions.insert(std::make_pair("add item", "lion pelt"));
@@ -770,7 +788,11 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 				&& currentRoom.compare("throne") == 0) {
 			eventActions.insert(std::make_pair("change state", "lerna"));
 			eventActions.insert(std::make_pair("add exit south", "lerna"));
-			eventActions.insert(std::make_pair("display", "The king ordered you to go kill the hydra of lerna!\n"));
+			eventActions.insert(std::make_pair("display", "The king ordered you to go kill the hydra of lerna!\nThe south wall comes crashing down!\n"));
+            eventActions.insert(std::make_pair("change short", "BIGLY, YUUGE PLACE!\n"
+                                      "Exits North and South.\n"));
+            eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\n"
+                                              "The border wall to the south had been torn down!\n"));
 			return true;
 		}
 	}

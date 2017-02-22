@@ -2,7 +2,7 @@
  * Author: Phuc Vo
  * Date: 01/24/2017
  * Description:
- *    The Room class is used to create a Room object 
+ *    The Room class is used to create a Room object
  * for the text adventure game.
  *    Room.hpp is the class specification file.
  *
@@ -31,8 +31,8 @@ class Room
       bool visited;
       std::string exits[NUM_OF_EXITS];  // index 0 = north, 1 = south, 2 = east, 3 = west, 4 = up, 5 = down
 
-	  
-	  
+
+
    public:
 	Room(std::string name);
 	void setDescLong(std::string desc_long);
@@ -44,5 +44,6 @@ class Room
     string getExit(int exit_index);
     void printRoom();
     string look();
+    string longLook();
 };
 #endif

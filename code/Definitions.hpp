@@ -12,7 +12,7 @@ const char* NONE = "$none";
 //ACTION DEFINITIONS That use Objects
 
 const string MOVE = "move";
-string moveArr[] = {"go", "move"};
+string moveArr[] = {"go", "move", "approach"};
 std::vector<std::string> MOVE_CMDS(moveArr, moveArr+ sizeof(moveArr) / sizeof(moveArr[0]));
 
 const string LOOK = "look";
@@ -25,7 +25,7 @@ std::vector<std::string> GET_CMDS(getArr, getArr + sizeof(getArr) / sizeof(getAr
 
 
 const string USE = "use";
-string useArr[] = {"use", "activate"};
+string useArr[] = {"use", "activate", "shoot", "swing"};
 std::vector<std::string> USE_CMDS(useArr, useArr + sizeof(useArr) / sizeof(useArr[0]));
 
 const string DROP = "drop";
@@ -33,7 +33,7 @@ string dropArr[] = {"drop", "leave"};
 std::vector<std::string> DROP_CMDS(dropArr, dropArr + sizeof(dropArr) / sizeof(dropArr[0]));
 
 const string ATTACK = "attack";
-string attackArr[] = {"hit", "kill", "attack", "bash", "shoot"};
+string attackArr[] = {"hit", "kill", "attack", "bash"};
 std::vector<std::string> ATTACK_CMDS(attackArr, attackArr + sizeof(attackArr) / sizeof(attackArr[0]));
 
 const string TALK = "talk";
