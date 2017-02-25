@@ -113,3 +113,67 @@ false
 
 [available]
 true
+
+[name]
+bow
+
+[description]
+A simple wooden bow paired with a quiver full of arrows.
+
+[use]
+You quickly draw an arrow from the quiver, notch it and let it fly!
+
+[talk]
+You are talking to a bow. Lonely much?
+
+[movable]
+true
+
+[quantity]
+1
+
+[available]
+true
+
+[name]
+king
+
+[description]
+King Eurystheus is the king of Mycenae.
+
+[use]
+You move the king one square forward. Your opponent move their knight. Checkmate!
+
+[talk]
+"Can someone tell this stinking, lumbering buffon to go kill the Nemean lion!"
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true
+
+[name]
+boulder
+
+[description]
+The boulder is nearly as tall as the entrance of the cave. A hero with Herculean
+strength might be able to move it.
+
+[use]
+You pet the boulder. It's a good pet rock. You named it Snorlax.
+
+[talk]
+"You're a good pet rock! You just sit there and be there in the way!"
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true
