@@ -12,7 +12,8 @@ null
 null
 
 long description
-This is the throne of King E. In the center of the rooms sits a golden throne.
+This is the throne room of King Eurystheus. 
+In the center of the room the king is sitting on a golden throne.
 This is where your quests begin.
 If you go North you'll reach Nemean.
 
@@ -26,4 +27,6 @@ items
 pokeball
 1
 club
+1
+king
 1
