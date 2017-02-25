@@ -1,16 +1,16 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <sstream>
 #include <map>
 #include <stdlib.h>
 #include <dirent.h>
 #include <ctype.h>
-
+#include <cstdlib>
 
 #include "Room.hpp"
 #include "Item.hpp"
 #include "Parser.hpp"
-
 
 
 using std::cin;
@@ -24,6 +24,7 @@ enum EXISTANCE {OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND};
 void testParseVal(string, Parser);
 Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile);
 void loadItems(std::map<string, Item*>& itemMap, string itemFile);
+void loadGameData(std::map<string, string>& gameData, string dataFile);
 
 string move(Room current, string destination);
 
@@ -37,8 +38,10 @@ bool isItemPresent(string itemName, std::map<string, Item*>& inventory);
 
 void printRoomItem(std::map<string, Item*>& roomItems);
 
-//bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, std::map<string, string>& eventActions);
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& eventActions);
+
+//bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& eventActions);
+
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions);
 
 void setLabor(LABORS &currentLabor, string newLabor);
 
@@ -58,10 +61,11 @@ int main()
 	string command;
 	string saveAs = "";
 	string itemFile = "./items";
+	string dataFile = "./gamedata";
 	std::map <string, Item*> itemList;
 	std::map <string, Item*> inventory;
 	std::map <string, Item*> roomItems;
-	std::map <string, string> roomStates;
+	std::map <string, string> gameData;
 	std::map <string, string> eventActions;
 	bool existsArr[4];
 
@@ -86,8 +90,12 @@ int main()
 	// load game items
 	loadItems(itemList, itemFile);
 
-	// start game with club in inventory
+	// load game data
+	loadGameData(gameData, dataFile);
+
+	// start game with bow and club in inventory
 	addInventory(inventory, itemList, "club");
+	addInventory(inventory, itemList, "bow");
 
 	// start game in throne room
 	Room current = loadRoom(itemList, roomItems, "throne");
@@ -97,7 +105,7 @@ int main()
 		std::getline(cin, command);
 		hParser.parse(command);
 
-//	cout << "[" << hParser.getAction() << "] [" << hParser.getObject() << "]" << endl;
+//	cout << "[" << hParser.getAction() << "] [" << hParser.getObject() << "] [" << hParser.getIndirect() << "]" << endl;
 
 
 		string objItem = hParser.getObject();
@@ -109,7 +117,7 @@ int main()
         existsArr[HOLDING_IND] = isItemPresent(indItem, inventory);
 
 
-		if (!checkForEvent(currentLabor, current.getName(), hParser, existsArr, eventActions)) {
+		if (!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions)) {
 
 			if (hParser.getAction().compare("look") == 0) {
 				string lookItem = hParser.getObject();
@@ -119,9 +127,10 @@ int main()
 					printRoomItem(roomItems);
 				}
 				else {
-					if (isItemPresent(lookItem, inventory, roomItems))
+					if (isItemPresent(lookItem, inventory, roomItems)) {
 						cout << itemList[lookItem]->look() << endl;
 						//itemList[lookItem]->printItem();
+					}
 					else {
 						command = "";
 						cout << "You look at the "<< lookItem << " but realize that it's not really there. It was just a mirage!" << endl;
@@ -190,9 +199,10 @@ int main()
 				}
 			}
 
-		else if (hParser.getAction().compare("use") == 0) {
+			else if (hParser.getAction().compare("use") == 0) {
 				string itemName = hParser.getObject();
-				if (isItemPresent(itemName, inventory)) {
+//				if (isItemPresent(itemName, inventory)) {
+				if (isItemPresent(itemName, inventory, roomItems)) {
 					cout << itemList[itemName]->use() << endl;
 				}
 				else {
@@ -211,7 +221,7 @@ int main()
 				cout << "I don't understand that command!" << endl;
 			}
 
-			checkForEvent(currentLabor, current.getName(), hParser, existsArr, eventActions);
+			checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions);
 		}
 
 		if (!eventActions.empty()) {
@@ -223,8 +233,40 @@ int main()
 				else if ((it->first).compare("change state") == 0) {
 					setLabor(currentLabor, eventActions[it->first]);
 				}
-				else if ((it->first).compare("add exit south") == 0) {
-					current.setExits(1, eventActions[it->first]);
+				else if ((it->first).compare("add exit") == 0) {
+					string newExit = eventActions[it->first];
+				//cout << "Add exit [" << newExit << "]" << endl;
+					if (newExit.compare("north") == 0)
+						current.setExits(0, eventActions[newExit]);
+					else if (newExit.compare("south") == 0)
+						current.setExits(1, eventActions[newExit]);
+					else if (newExit.compare("east") == 0)
+						current.setExits(2, eventActions[newExit]);
+					else if (newExit.compare("west") == 0)
+						current.setExits(3, eventActions[newExit]);
+					else if (newExit.compare("up") == 0)
+						current.setExits(4, eventActions[newExit]);
+					else if (newExit.compare("down") == 0)
+						current.setExits(5, eventActions[newExit]);
+				}
+				else if ((it->first).compare("remove exit") == 0) {
+					string rmExit = eventActions[it->first];
+					int exitIndex = -1;
+					if (rmExit.compare("north") == 0)
+						exitIndex = 0;
+					else if (rmExit.compare("south") == 0)
+						exitIndex = 1;
+					else if (rmExit.compare("east") == 0)
+						exitIndex = 2;
+					else if (rmExit.compare("west") == 0)
+						exitIndex = 3;
+					else if (rmExit.compare("up") == 0)
+						exitIndex = 4;
+					else if (rmExit.compare("down") == 0)
+						exitIndex = 5;
+					
+					if (exitIndex > 0)
+						current.setExits(exitIndex, "null");
 				}
 				else if ((it->first).compare("add item") == 0) {
 					addRoomItems(roomItems, itemList, eventActions[it->first]);
@@ -234,16 +276,25 @@ int main()
 					roomItems[eventActions[it->first]]->setMovable(true);
 					removeRoomItems(roomItems, eventActions[it->first]);
 				}
-
+				// drop item from inventory
+				else if ((it->first).compare("drop item") == 0) {
+					inventory[eventActions[it->first]]->drop();
+					addRoomItems(roomItems, itemList, eventActions[it->first]);
+					// remove item from inventory if quantity is 0
+					if (inventory[eventActions[it->first]]->getQuantity() == 0)
+						inventory.erase(eventActions[it->first]);
+				}
 				else if ((it->first).compare("change short") == 0) {
 					current.setDescShort(eventActions[it->first]);
-
 				}
 
 				else if ((it->first).compare("change long") == 0) {
 					current.setDescLong(eventActions[it->first]);
 				}
-
+				else if ((it->first).compare("change talk") == 0) {
+					string modifiedItem = eventActions[it->first];
+					itemList[modifiedItem]->setTalk(eventActions[modifiedItem]);
+				}
 
 
 			}
@@ -548,7 +599,7 @@ void loadItems(std::map<string, Item*>& itemMap, string itemFile) {
 			// get 1st line of text which is the item's name
 			std::getline(item_file, data);
 			name = data;
-
+//cout << "Name: " << name << endl;
 			// get lines of text until description section is reached
 			while (data.compare("[description]") != 0) {
 				std::getline(item_file, data);
@@ -693,6 +744,7 @@ void printInventory(std::map<string, Item*>& inventory) {
 void printRoomItem(std::map<string, Item*>& roomItems) {
 	//cout << "Room Inventory:" << endl;
 	for(map<string,Item*>::iterator it = roomItems.begin(); it != roomItems.end(); ++it) {
+		//cout << "[" << it->first << "]" << "\t";
 		cout << it->first << "\t";
 		cout << roomItems[it->first]->getQuantity() << "\n";
 	}
@@ -762,35 +814,103 @@ void testParseVal(string label, Parser p){
 }
 
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& eventActions) {
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions) {
 
     //existsArr positions OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND
 
 	if (currentLabor == NEMEAN) {
 		if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("shadow") == 0
-				&& existsArr[OBJ_EXISTS] && currentRoom.compare("nemean") == 0) {
+				&& existsArr[OBJ_EXISTS] && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You stop and stare as the shadow starts changing.\nThe woman's hair suddenly starts growing and her body begins to enlarge.\nThe very large shadow lets out a large roar and rushes at you!"));
 			eventActions.insert(std::make_pair("add item", "lion"));
 			eventActions.insert(std::make_pair("remove item", "shadow"));
             eventActions.insert(std::make_pair("change long", "This is the den of the Nemean lion. It stinks of death and lion breath.\n"));
-
 			return true;
 		}
-// 	parser does not interpret "lion" as indirect !!
-		if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("club") == 0
-				&& existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("lion") == 0 && currentRoom.compare("nemean") == 0) {
+		
+		else if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("boulder") == 0
+				&& existsArr[OBJ_EXISTS] && currentRoom.compare("trail") == 0) {
+			if (gameData["caveBlocked"].compare("false") == 0) {
+				gameData["caveBlocked"] = "true";
+				eventActions.insert(std::make_pair("display", "You pushed on the boulder and it starts to tip over. You jump out of the way as the boulder falls over and completely blocks the cave entrance."));
+				eventActions.insert(std::make_pair("remove exit", "east"));
+				eventActions.insert(std::make_pair("change long", "The trail is covered broken branches and animal tracks of a very large animal. A large boulder is completely blocking the cave entrance. The sounds of a woman crying is emanating from the cave.\n"));
+				eventActions.insert(std::make_pair("change short", "A trail leading to a cave. Go up the trail to head back up the canyon.\n"));
+				eventActions.insert(std::make_pair("change look", "boulder"));
+				eventActions.insert(std::make_pair("boulder", "You tried to push the boulder but it will not budge."));
+			}
+			else {
+				eventActions.insert(std::make_pair("display", "The boulder is fully settled in front of the cave entrance."));
+			}
+			return true;
+		}
+		// if the lion escaped and the hero goes another location, set flag, lionEscaped to signify the lion will return
+		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") != 0 
+				&& gameData["lionEscaped"].compare("true") == 0) {
+			gameData["lionEscaped"] = "lionReturns";
+			return false;
+		}
+		// if the flag, lionEscaped is lionReturns, and the hero goes back to the cave then add the lion 
+		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") == 0 
+				&& gameData["lionEscaped"].compare("lionReturns") == 0) {
+			gameData["lionEscaped"] = "false";
+			eventActions.insert(std::make_pair("add item", "lion"));			
+			return true;
+		}
+
+		
+		else if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("club") == 0
+				&& existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("lion") == 0 && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You swing the club at the lion but to your surprise the lion shrugs off the blow and rushes at you again."));
 			return true;
 		}
 
         else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS]
-				&& hParser.getIndirect().compare("club") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("nemean") == 0) {
+				&& hParser.getIndirect().compare("club") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You swing the club at the lion but to your surprise the lion shrugs off the blow and rushes at you again."));
+			return true;
+		}
+		else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS]
+				&& hParser.getIndirect().compare("$none") == 0 && currentRoom.compare("cave") == 0) {
+			if (atoi(gameData["lionAttacks"].c_str()) < 2) {
+				eventActions.insert(std::make_pair("display", "You quickly duck under the outstretched claws of the lion and wrap your arms around the lion's throat. You began squeezing. The lion starts to thrash around the cave slamming you into the cave walls. You eventually lose your grip and let go of the lion. It is now breathing harder and moving slower but it does not let up and lunges at you again."));
+				int lionAttacks = atoi(gameData["lionAttacks"].c_str()) + 1;
+				std::stringstream ss;
+				ss << lionAttacks;
+				ss >> gameData["lionAttacks"];
+			}
+			else {
+				if (gameData["caveBlocked"].compare("false") == 0){
+					eventActions.insert(std::make_pair("display", "You once again wrestle with the lion grabbing the lion's throat.  The lion breaks free once more but this time it has enough of fighting with you. The lion starts retreating and runs toward the exit at the back of the cave. You chase after it but it is too late and the beast has already put too much distance between you. It doesn't look like it will be back here for a few days."));
+					eventActions.insert(std::make_pair("remove item", "lion"));
+					gameData["lionEscaped"] = "true";
+					gameData["lionAttacks"] = "0";
+				}
+				else {
+					eventActions.insert(std::make_pair("display", "You once again wrestle with the lion grabbing the lion's throat.  The lion breaks free once more but this time it has enough of fighting with you. It starts retreating and runs toward the exit at the back of the cave. However, the exit has been blocked. You seize the moment of confusion to jump on the lion once again and begin to squeeze its throat. It is too weak to fight back and finally succumbs to your death grip. The lion's body finally drops to the ground at your feet. You killed the lion!"));
+					eventActions.insert(std::make_pair("remove item", "lion"));
+					eventActions.insert(std::make_pair("add item", "lion pelt"));
+				}
+			}
 			return true;
 		}
 
 		else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS]
-				 && currentRoom.compare("nemean") == 0) {
+				&& hParser.getIndirect().compare("bow") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("cave") == 0) {
+			if ((rand() % 10) > 6) {
+				eventActions.insert(std::make_pair("display", "SWHUP! The arrow shoots straight through the lion's mouth and into the back of its head. It lets out a welp before crashing into the ground. The lion's body spasm for a second or two before finally coming to a complete stop. You killed the lion! You hear a loin club cry out for its father while another lion with scars and a dark mane roars in approval!"));
+				eventActions.insert(std::make_pair("remove item", "lion"));
+				eventActions.insert(std::make_pair("add item", "lion pelt"));
+			}
+			else {
+				eventActions.insert(std::make_pair("display", "To your amazement your arrows bounce off the body of the lion. You barely dodge the lion's attack but the lion has already recovered and is coming at you again."));
+			}
+			
+			return true;
+		}
+		
+		else if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("hyperbeam") == 0 && hParser.getIndirect().compare("lion")
+				 && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You killed the lion! You hear a loin club cry out for its father \nwhile another lion with scars and a dark mane roars in approval!"));
 			eventActions.insert(std::make_pair("remove item", "lion"));
 			eventActions.insert(std::make_pair("add item", "lion pelt"));
@@ -800,14 +920,18 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 		if (hParser.getAction().compare("drop") == 0 && hParser.getObject().compare("lion pelt") == 0 && existsArr[HOLDING_OBJ]
 				&& currentRoom.compare("throne") == 0) {
 			eventActions.insert(std::make_pair("change state", "lerna"));
-			eventActions.insert(std::make_pair("add exit south", "lerna"));
-			eventActions.insert(std::make_pair("display", "The king ordered you to go kill the hydra of lerna!\nThe south wall comes crashing down!\n"));
+			eventActions.insert(std::make_pair("drop item", "lion pelt"));
+			eventActions.insert(std::make_pair("add exit", "south"));
+			eventActions.insert(std::make_pair("south", "lerna"));
+			eventActions.insert(std::make_pair("display", "GAH! You actually killed it! How did you...!?! I mean, of course you did. I am such a compassionate ruler that I gave you a very easy task. Here is another simple labour for you to perform, go kill the hydra to the south! And take that scary, I mean, disgusting lion skin with you!"));
             eventActions.insert(std::make_pair("change short", "BIGLY, YUUGE PLACE!\n"
                                       "Exits North and South.\n"));
-            eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\n"
-                                              "The border wall to the south had been torn down!\n"));
+            eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nThe border wall to the south had been torn down!\n"));
+			eventActions.insert(std::make_pair("change talk", "king"));
+			eventActions.insert(std::make_pair("king", "Do you not understand Greek? Go kill the hydra of Lerna!"));
 			return true;
 		}
+		
 	}
 
 	return false;
@@ -837,6 +961,7 @@ bool isItemPresent(string itemName, std::map<string, Item*>& inventory, std::map
 		return false;
 }
 
+
 bool isItemPresent(string itemName, std::map<string, Item*>& inventory) {
 	// check if itemName in inventory only
 	if(inventory.find(itemName) != inventory.end()) {
@@ -846,6 +971,7 @@ bool isItemPresent(string itemName, std::map<string, Item*>& inventory) {
 	else
 		return false;
 }
+
 
 void saveInventory(std::map<string, Item*>& inventory) {
 	string save_path = "./save/inventory.inventory";
@@ -864,6 +990,7 @@ void saveInventory(std::map<string, Item*>& inventory) {
 	dest.close();
 }
 
+
 void loadInventory(std::map<string, Item*>& itemList, std::map<string, Item*>& inventory) {
 	string item;
 	std::fstream inventory_file;
@@ -881,6 +1008,7 @@ void loadInventory(std::map<string, Item*>& itemList, std::map<string, Item*>& i
 	inventory_file.close();
 }
 
+
 void saveLabor(LABORS currentLabor) {
 	string save_path = "./save/labor.labor";
 	std::ofstream dest(save_path.c_str(), std::ios::binary);
@@ -895,6 +1023,7 @@ void saveCurrentRoom(Room current) {
 	dest << current.getName();
 	dest.close();
 }
+
 
 void scanDirectory(std::vector<string>& dir_contents, string dir_path) {
 	DIR *dir = NULL;
@@ -913,6 +1042,7 @@ void scanDirectory(std::vector<string>& dir_contents, string dir_path) {
 		cout << "cannot open directory: " << dir_path << endl;
 	}
 }
+
 
 int cleanInput(string& input, int& valid) {
 	int i, j = 0, k = 0;
@@ -960,6 +1090,7 @@ int cleanInput(string& input, int& valid) {
 	cout << input << endl;
 	return modified;
 }
+
 
 void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs) {
 	int i, j, k;
@@ -1030,6 +1161,7 @@ void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string,
 	system(copy.c_str());
 	cout << "Game saved successfully as " << saveAs << ".\n";
 }
+
 
 void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory){
 	int i, loadFrom, load = 1, all_digits = 0;
@@ -1126,3 +1258,33 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 	}
 }
 
+
+void loadGameData(std::map<string, string>& gameData, string dataFile) {
+	string key = "";
+	string data = "";
+	std::fstream data_file;
+
+	// convert dataFile to lowercase
+	for(unsigned int i = 0; i < dataFile.length(); i++) {
+		dataFile[i] = tolower(dataFile[i]);
+	}
+
+	// convert dataFile to c-string for fstream open()
+	data_file.open(dataFile.c_str(), std::ios::out | std::ios::in);
+
+//	cout << "Data file opened = " << dataFile << endl;
+
+	if(data_file) {
+		while(std::getline(data_file, data)) {
+			key = data;
+			std::getline(data_file, data);
+			gameData.insert(std::make_pair(key, data));
+			//cout << "[" << key << "] : [" << data << "]" << endl;
+		}
+	}
+	/*
+	cout << "Game Data:" << endl;
+	for(map<string,string>::iterator it = gameData.begin(); it != gameData.end(); ++it) {
+		cout << "[" << it->first << "] : [" << gameData[it->first] << "]" << endl; }
+	*/
+}
