@@ -4,21 +4,23 @@ visited
 false
 
 exits
-null
+cave
 throne
 null
 null
 null
-null
+trail
+
 
 long description
-This is the den of the Nemean lion. 
-Towards the back of the cave you can see a shadow of a person.
+You are standing above a canyon just outside the city-state of Nemean.
+The locals said that if you continue to go north you'll reach the lion's
+cave. There also appears to be a trail leading down the canyon. If you
+head back south you'll reach the throne room of King Eurystheus. 
 
 short description
-It's the circle of life....
-Hakuna matata
+The countryside of Nemean. To the north is the lion's cave, to the south
+is the throne room of King Eurystheus. There is also a trail the leads
+down.
 
 items
-shadow
-1
