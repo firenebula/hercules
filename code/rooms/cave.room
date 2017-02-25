@@ -1,0 +1,24 @@
+cave
+
+visited
+false
+
+exits
+null
+nemean
+null
+trail
+null
+null
+
+long description
+This is the den of the Nemean lion. 
+Towards the back of the cave you can see a shadow of a person.
+
+short description
+It's the circle of life....
+Hakuna matata
+
+items
+shadow
+1
