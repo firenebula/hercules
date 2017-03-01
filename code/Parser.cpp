@@ -108,6 +108,7 @@ void Parser::dictionaryLoad(){
     addEntry(actionMap, DROP_CMDS, DROP);
     addEntry(actionMap, GET_CMDS, GET);
     addEntry(actionMap, ATTACK_CMDS, ATTACK);
+    addEntry(actionMap, PUSH_CMDS,  PUSH);
     addEntry(actionMap, QUIT_CMDS,  QUIT);
 
     addEntry(actionMap, TALK_CMDS,  TALK);

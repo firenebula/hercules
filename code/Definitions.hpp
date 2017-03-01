@@ -15,6 +15,10 @@ const string MOVE = "move";
 string moveArr[] = {"go", "move", "approach"};
 std::vector<std::string> MOVE_CMDS(moveArr, moveArr+ sizeof(moveArr) / sizeof(moveArr[0]));
 
+const string PUSH = "push";
+string pushArr[] = {"push", "shove"};
+std::vector<std::string> PUSH_CMDS(pushArr, pushArr+ sizeof(pushArr) / sizeof(pushArr[0]));
+
 const string LOOK = "look";
 string lookArr[] = {"l", "look"};
 std::vector<std::string> LOOK_CMDS(lookArr, lookArr + sizeof(lookArr) / sizeof(lookArr[0]));

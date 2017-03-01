@@ -1,0 +1,25 @@
+swamp1
+
+visited
+false
+
+exits
+null
+swamp3
+swamp2
+lerna
+null
+null
+
+
+long description
+You are standing at the edge of a stinking swamp. You are ankle deep in murky water.  
+Swarms of insects fill the air.  To the west lies the relative safety and slightly 
+less stench of Lerna.  If you are feeling brave head south or east to delve further
+into the swamp. 
+
+short description
+Swamp Edge.  Exits West, East and South 
+
+items
+

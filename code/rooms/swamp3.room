@@ -1,0 +1,21 @@
+swamp3
+
+visited
+false
+
+exits
+swamp1
+null
+swamp4
+null
+null
+null
+
+
+long description
+You are standing knee deep in murky swamp water. 
+
+short description
+Swamp Sw.  Exits North and East
+
+items

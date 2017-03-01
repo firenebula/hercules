@@ -264,7 +264,7 @@ int main()
 						exitIndex = 4;
 					else if (rmExit.compare("down") == 0)
 						exitIndex = 5;
-					
+
 					if (exitIndex > 0)
 						current.setExits(exitIndex, "null");
 				}
@@ -827,8 +827,8 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
             eventActions.insert(std::make_pair("change long", "This is the den of the Nemean lion. It stinks of death and lion breath.\n"));
 			return true;
 		}
-		
-		else if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("boulder") == 0
+
+		else if ((hParser.getAction().compare("move") == 0 || hParser.getAction().compare("push") == 0)&& hParser.getObject().compare("boulder") == 0
 				&& existsArr[OBJ_EXISTS] && currentRoom.compare("trail") == 0) {
 			if (gameData["caveBlocked"].compare("false") == 0) {
 				gameData["caveBlocked"] = "true";
@@ -845,20 +845,20 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 		// if the lion escaped and the hero goes another location, set flag, lionEscaped to signify the lion will return
-		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") != 0 
+		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") != 0
 				&& gameData["lionEscaped"].compare("true") == 0) {
 			gameData["lionEscaped"] = "lionReturns";
 			return false;
 		}
-		// if the flag, lionEscaped is lionReturns, and the hero goes back to the cave then add the lion 
-		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") == 0 
+		// if the flag, lionEscaped is lionReturns, and the hero goes back to the cave then add the lion
+		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") == 0
 				&& gameData["lionEscaped"].compare("lionReturns") == 0) {
 			gameData["lionEscaped"] = "false";
-			eventActions.insert(std::make_pair("add item", "lion"));			
+			eventActions.insert(std::make_pair("add item", "lion"));
 			return true;
 		}
 
-		
+
 		else if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("club") == 0
 				&& existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("lion") == 0 && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You swing the club at the lion but to your surprise the lion shrugs off the blow and rushes at you again."));
@@ -905,10 +905,10 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			else {
 				eventActions.insert(std::make_pair("display", "To your amazement your arrows bounce off the body of the lion. You barely dodge the lion's attack but the lion has already recovered and is coming at you again."));
 			}
-			
+
 			return true;
 		}
-		
+
 		else if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("hyperbeam") == 0 && hParser.getIndirect().compare("lion")
 				 && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You killed the lion! You hear a loin club cry out for its father \nwhile another lion with scars and a dark mane roars in approval!"));
@@ -928,10 +928,10 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
                                       "Exits North and South.\n"));
             eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nThe border wall to the south had been torn down!\n"));
 			eventActions.insert(std::make_pair("change talk", "king"));
-			eventActions.insert(std::make_pair("king", "Do you not understand Greek? Go kill the hydra of Lerna!"));
+			eventActions.insert(std::make_pair("king", "Do you not understand Greek? Go kill the hydra of Lerna! Oh and your cousin wanted to talk to you about some nonsense now that the lion is gone.  He went for a walk"));
 			return true;
 		}
-		
+
 	}
 
 	return false;

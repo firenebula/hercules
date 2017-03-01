@@ -177,3 +177,24 @@ false
 
 [available]
 true
+
+[name]
+Iolaus
+
+[description]
+Iolaus is always good for a torch or too.  He is now staring listlessly into space.
+
+[use]
+Poor Iolaus, always so used and abused!
+
+[talk]
+"Cool story bro! Go slay some stuff"
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true

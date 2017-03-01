@@ -1,0 +1,21 @@
+swamp1
+
+visited
+false
+
+exits
+swamp2
+swamp3
+null
+lerna
+null
+null
+
+
+long description
+You are at the lair of the Hydra
+
+short description
+Hydra Lair.  Exits West and North 
+
+items

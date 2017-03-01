@@ -6,17 +6,21 @@ false
 exits
 throne
 null
-null
+swamp1
 null
 null
 null
 
 long description
-This is the where the Lernean hydra lives.
+You arrive at the quaint little village of Lerna. Folks pass one another on the street without looking up.  
+Everyones got somewhere to go and everyone 
+is minding their own business. There is a damp smell of too much 
+livestock in too little space.  To the north lies the road
+back to palace.  To the east lies a road that looks vaguely swampy. 
+To the south and west lies a wooden fence in disrepair.
 
 short description
-Down by the river of the Hanky Panky
-Where the Hydras jump from banky to bank
+The Village of Lerna. Exits to the North and East.
 
 items
 
