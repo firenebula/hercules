@@ -141,6 +141,7 @@ int main()
 			else if (hParser.getAction().compare("move") == 0) {
 				string destination = hParser.getObject();
 				destination = move(current, destination);
+
 				if (destination.compare("null") == 0) {
 					cout << "You cannot go there!" << endl;
 					command = "";
@@ -456,6 +457,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 
 
 	cout << endl << current.look();
+	printRoomItem(rmItems);
 	current.setVisited(true);
 
 	return current;
@@ -748,8 +750,14 @@ void printRoomItem(std::map<string, Item*>& roomItems) {
 	//cout << "Room Inventory:" << endl;
 	for(map<string,Item*>::iterator it = roomItems.begin(); it != roomItems.end(); ++it) {
 		//cout << "[" << it->first << "]" << "\t";
-		cout << it->first << "\t";
-		cout << roomItems[it->first]->getQuantity() << "\n";
+
+		if (roomItems[it->first]->getQuantity() == 1)
+            cout << it->first << " is here.\n";
+        else
+            cout << "There are " << roomItems[it->first]->getQuantity() << " " << it->first << " here.\n";
+
+	//	cout << it->first << "\t";
+	//	cout << roomItems[it->first]->getQuantity() << "\n";
 	}
 }
 

@@ -114,6 +114,7 @@ false
 [available]
 true
 
+
 [name]
 bow
 
@@ -135,6 +136,7 @@ true
 [available]
 true
 
+
 [name]
 king
 
@@ -155,6 +157,7 @@ false
 
 [available]
 true
+
 
 [name]
 boulder
@@ -178,8 +181,9 @@ false
 [available]
 true
 
+
 [name]
-Iolaus
+iolaus
 
 [description]
 Iolaus is always good for a torch or too.  He is now staring listlessly into space.

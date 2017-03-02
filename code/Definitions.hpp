@@ -20,7 +20,7 @@ string pushArr[] = {"push", "shove"};
 std::vector<std::string> PUSH_CMDS(pushArr, pushArr+ sizeof(pushArr) / sizeof(pushArr[0]));
 
 const string LOOK = "look";
-string lookArr[] = {"l", "look"};
+string lookArr[] = {"l", "look", "examine"};
 std::vector<std::string> LOOK_CMDS(lookArr, lookArr + sizeof(lookArr) / sizeof(lookArr[0]));
 
 const string GET = "get";
