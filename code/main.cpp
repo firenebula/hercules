@@ -215,7 +215,10 @@ int main()
 				saveGame(roomItems, current, inventory, currentLabor, saveAs);
 			}
 			else if (command.find("load") != std::string::npos) {
-				loadGame(itemList, roomItems, current, currentLabor, itemList, inventory);
+				loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs);
+
+
+
 			}
 			else if (command.compare("quit") != 0) {
 				cout << "I don't understand that command!" << endl;
