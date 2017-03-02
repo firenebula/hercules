@@ -192,7 +192,73 @@ Iolaus is always good for a torch or too.  He is now staring listlessly into spa
 Poor Iolaus, always so used and abused!
 
 [talk]
-"Cool story bro! Go slay some stuff"
+"How's the journey going bud? I gotta admit, I'm kind of depressed.  Lost me lucky charm the other day, but I don't remember where./n"
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true
+
+
+[name]
+torch
+
+[description]
+A lit torch that casts a cheery glow all around you.
+
+[use]
+You light the way with a flourish.
+
+[talk]
+"Crackle, crackle"
+
+[movable]
+true
+
+[quantity]
+1
+
+[available]
+true
+
+
+[name]
+silver coin
+
+[description]
+Shinny!
+
+[use]
+Sadly nothing to buy.
+
+[talk]
+"Huh?!"
+
+[movable]
+true
+
+[quantity]
+1
+
+[available]
+true
+
+
+[name]
+shimmer
+
+[description]
+Something is shimmering through the gloom.
+
+[use]
+No use for this
+
+[talk]
+No response
 
 [movable]
 false

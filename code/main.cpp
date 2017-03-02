@@ -928,10 +928,11 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 
-		if (hParser.getAction().compare("drop") == 0 && hParser.getObject().compare("lion pelt") == 0 && existsArr[HOLDING_OBJ]
-				&& currentRoom.compare("throne") == 0) {
+		if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("lion pelt") == 0 && existsArr[HOLDING_OBJ]
+				&& hParser.getIndirect().compare("king") == 0 && currentRoom.compare("throne") == 0) {
 			eventActions.insert(std::make_pair("change state", "lerna"));
 			eventActions.insert(std::make_pair("drop item", "lion pelt"));
+			eventActions.insert(std::make_pair("remove item", "lion pelt"));
 			eventActions.insert(std::make_pair("add exit", "south"));
 			eventActions.insert(std::make_pair("south", "lerna"));
 			eventActions.insert(std::make_pair("display", "GAH! You actually killed it! How did you...!?! I mean, of course you did. I am such a compassionate ruler that I gave you a very easy task. Here is another simple labour for you to perform, go kill the hydra to the south! And take that scary, I mean, disgusting lion skin with you!"));
@@ -944,6 +945,31 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 		}
 
 	}
+
+    else if (currentLabor == LERNA){
+
+
+            if (hParser.getAction().compare("look") == 0 && hParser.getObject().compare("shimmer") == 0
+				&& existsArr[OBJ_EXISTS] && currentRoom.compare("swamp2") == 0) {
+			eventActions.insert(std::make_pair("display", "This is your lucky day!  Someone dropped a coin here."));
+			eventActions.insert(std::make_pair("add item", "silver coin"));
+			eventActions.insert(std::make_pair("remove item", "shimmer"));
+			return true;
+
+
+    }
+
+    if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("silver coin") == 0 && existsArr[HOLDING_OBJ]
+				&& hParser.getIndirect().compare("iolaus") == 0 && currentRoom.compare("trail") == 0) {
+			eventActions.insert(std::make_pair("drop item", "silver coin"));
+			eventActions.insert(std::make_pair("remove item", "silver coin"));
+			eventActions.insert(std::make_pair("display", "You found it!  Take my torch as thanks!"));
+            eventActions.insert(std::make_pair("add item", "torch"));
+			return true;
+				}
+
+    }
+
 
 	return false;
 }

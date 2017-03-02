@@ -1,19 +1,19 @@
-swamp1
+swamp4
 
 visited
 false
 
 exits
 swamp2
-swamp3
 null
-lerna
+null
+swamp3
 null
 null
 
 
 long description
-You are at the lair of the Hydra
+You are at the lair of the Hydra.  It is dark here and you can feel eyes on you.
 
 short description
 Hydra Lair.  Exits West and North 

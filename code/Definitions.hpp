@@ -11,6 +11,10 @@ const char* NONE = "$none";
 
 //ACTION DEFINITIONS That use Objects
 
+const string GIVE = "give";
+string giveArr[] = {"give"};
+std::vector<std::string> GIVE_CMDS(giveArr, giveArr+ sizeof(giveArr) / sizeof(giveArr[0]));
+
 const string MOVE = "move";
 string moveArr[] = {"go", "move", "approach"};
 std::vector<std::string> MOVE_CMDS(moveArr, moveArr+ sizeof(moveArr) / sizeof(moveArr[0]));
