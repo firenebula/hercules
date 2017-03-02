@@ -52,7 +52,7 @@ void saveCurrentRoom(Room current);
 void scanDirectory(std::vector<string>& dir_contents, string dir_path);
 int cleanInput(string& input, int& valid);
 void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs);
-void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory);
+void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string& saveAs);
 
 
 int main()
@@ -1163,7 +1163,7 @@ void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string,
 }
 
 
-void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory){
+void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string& saveAs){
 	int i, loadFrom, load = 1, all_digits = 0;
 	string input;
 	string::size_type sz;
@@ -1220,6 +1220,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		system(copy.c_str());
 
 		cout << "Loaded game: " << game_names.at(loadFrom-1) << endl;
+		saveAs = game_names.at(loadFrom-1);
 
 		//load inventory
 		loadInventory(itemList, inventory);
