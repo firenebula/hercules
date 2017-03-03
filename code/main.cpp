@@ -70,7 +70,11 @@ int main()
 	bool existsArr[4];
 
 	LABORS currentLabor = NEMEAN;
-	system("exec rm -r save/*");
+	std::vector<string> save_files;
+	scanDirectory(save_files, "save");
+	if (save_files.size() > 0) {
+		system("exec rm -r save/*");
+	}
 	Parser hParser;
 //	testParseVal("Default Values: ", hParser);
 /*
@@ -86,20 +90,20 @@ int main()
 */
 
 	command = "";
-
+	
 	// load game items
 	loadItems(itemList, itemFile);
 
 	// load game data
 	loadGameData(gameData, dataFile);
-
+	
 	// start game with bow and club in inventory
 	addInventory(inventory, itemList, "club");
 	addInventory(inventory, itemList, "bow");
-
+	
 	// start game in throne room
 	Room current = loadRoom(itemList, roomItems, "throne");
-
+	
 	while (hParser.getAction().compare("quit") != 0) {
 		cout << endl << "What do you want to do?  ";
 		std::getline(cin, command);
