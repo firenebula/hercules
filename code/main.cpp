@@ -22,7 +22,7 @@ enum LABORS {NEMEAN, LERNA, CERYNEIA};
 enum EXISTANCE {OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND};
 
 void testParseVal(string, Parser);
-Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile);
+Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile, int newGame = 1);
 void loadItems(std::map<string, Item*>& itemMap, string itemFile);
 void loadGameData(std::map<string, string>& gameData, string dataFile);
 
@@ -62,19 +62,23 @@ int main()
 	string saveAs = "";
 	string itemFile = "./items";
 	string dataFile = "./gamedata";
+	int i, all_digits = 0, valid = 1, selection;
+	LABORS currentLabor;
 	std::map <string, Item*> itemList;
 	std::map <string, Item*> inventory;
 	std::map <string, Item*> roomItems;
 	std::map <string, string> gameData;
 	std::map <string, string> eventActions;
 	bool existsArr[4];
+	
+	// load game items
+	loadItems(itemList, itemFile);
 
-	LABORS currentLabor = NEMEAN;
-	std::vector<string> save_files;
-	scanDirectory(save_files, "save");
-	if (save_files.size() > 0) {
-		system("exec rm -r save/*");
-	}
+	// load game data
+	loadGameData(gameData, dataFile);
+	
+	Room current = loadRoom(itemList, roomItems, "throne", 0);
+	
 	Parser hParser;
 //	testParseVal("Default Values: ", hParser);
 /*
@@ -88,21 +92,58 @@ int main()
 
     }
 */
-
-	command = "";
 	
-	// load game items
-	loadItems(itemList, itemFile);
-
-	// load game data
-	loadGameData(gameData, dataFile);
+	cout << "\nWelcome Hercules! What would you like to do?\n\nPlease type the number corresponding to your choice:\n1.Start a new game\n2.Load a saved game\n\n";
+	std::getline(cin, command);
+	for (i = 0; i < command.length(); i++) {
+		if (!isdigit(command[i])) {
+			all_digits = 1;
+		}
+	}
+	if (all_digits == 0) {
+		selection = std::atoi(command.c_str());
+		if ((selection <= 2) && (selection > 0)) {
+			valid = 0;
+		}
+	}
+	while (valid == 1) {
+		all_digits = 0;
+		cout << "Your input was invalid. Please type the number corresponding to what you want to do:\n1.Start a new game\n2.Load a saved game\n\n";
+		std::getline(cin, command);
+		for (i = 0; i < command.length(); i++) {
+			if (!isdigit(command[i])) {
+				all_digits = 1;
+			}
+		}
+		if (all_digits == 0) {
+			selection = std::atoi(command.c_str());
+			if ((selection <= 2) && (selection > 0)) {
+				valid = 0;
+			}
+		}
+	}
+	if (selection == 1) { //new game: set current labor, clear out save directory, start with club and bow, load throne room
+		
+		cout << "\nHercules, welcome to Mycenae. I am King Eurystheus and\nper the Oracle's decree you will complete the labors I\nassign to you as penance for your follies. To aid you\non your way I gift you an olive wood club and a bow\nwith quiver of arrows. These should serve you well as\nyour first task is to bring me the Nemean lion - dead or alive.\n";
+		
+		currentLabor = NEMEAN;
+		
+		std::vector<string> save_files;
+		scanDirectory(save_files, "save");
+		if (save_files.size() > 0) {
+			system("exec rm -r save/*");
+		}
 	
-	// start game with bow and club in inventory
-	addInventory(inventory, itemList, "club");
-	addInventory(inventory, itemList, "bow");
+		// start game with bow and club in inventory
+		addInventory(inventory, itemList, "club");
+		addInventory(inventory, itemList, "bow");
+		
+		// start game in throne room
+		current = loadRoom(itemList, roomItems, "throne");
+	} else { //selection == 2; load game
+		loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs);
+	}
 	
-	// start game in throne room
-	Room current = loadRoom(itemList, roomItems, "throne");
 	
 	while (hParser.getAction().compare("quit") != 0) {
 		cout << endl << "What do you want to do?  ";
@@ -317,7 +358,7 @@ int main()
     return 0;
 }
 
-Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile) {
+Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile, int newGame) {
 	string data;
 //	bool visited;
 	string desc_long = "";
@@ -459,11 +500,12 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 	//current.printRoom();
 	room_file.close();
 
-
-	cout << endl << current.look();
-	printRoomItem(rmItems);
-	current.setVisited(true);
-
+	if (newGame == 1) {
+		cout << endl << current.look();
+		printRoomItem(rmItems);
+		current.setVisited(true);
+	}
+	
 	return current;
 
 }
@@ -910,10 +952,9 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 
-		else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS]
-				&& hParser.getIndirect().compare("bow") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("cave") == 0) {
+		else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS] && hParser.getIndirect().compare("bow") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("cave") == 0) {
 			if ((rand() % 10) > 6) {
-				eventActions.insert(std::make_pair("display", "SWHUP! The arrow shoots straight through the lion's mouth and into the back of its head. It lets out a welp before crashing into the ground. The lion's body spasm for a second or two before finally coming to a complete stop. You killed the lion! You hear a loin club cry out for its father while another lion with scars and a dark mane roars in approval!"));
+				eventActions.insert(std::make_pair("display", "SWHUP! The arrow shoots straight through the lion's mouth and into the back of its head. It lets out a welp before crashing into the ground. The lion's body spasms for a second or two before finally coming to a complete stop. You killed the lion! You hear a lion cub cry out for its father while another lion with scars and a dark mane roars in approval!"));
 				eventActions.insert(std::make_pair("remove item", "lion"));
 				eventActions.insert(std::make_pair("add item", "lion pelt"));
 			}
@@ -926,7 +967,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 
 		else if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("hyperbeam") == 0 && hParser.getIndirect().compare("lion")
 				 && currentRoom.compare("cave") == 0) {
-			eventActions.insert(std::make_pair("display", "You killed the lion! You hear a loin club cry out for its father \nwhile another lion with scars and a dark mane roars in approval!"));
+			eventActions.insert(std::make_pair("display", "You killed the lion! You hear a lion cub cry out for its father while another lion with scars and a dark mane roars in approval!"));
 			eventActions.insert(std::make_pair("remove item", "lion"));
 			eventActions.insert(std::make_pair("add item", "lion pelt"));
 			return true;
@@ -939,7 +980,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			eventActions.insert(std::make_pair("remove item", "lion pelt"));
 			eventActions.insert(std::make_pair("add exit", "south"));
 			eventActions.insert(std::make_pair("south", "lerna"));
-			eventActions.insert(std::make_pair("display", "GAH! You actually killed it! How did you...!?! I mean, of course you did. I am such a compassionate ruler that I gave you a very easy task. Here is another simple labour for you to perform, go kill the hydra to the south! And take that scary, I mean, disgusting lion skin with you!"));
+			eventActions.insert(std::make_pair("display", "GAH! You actually killed it! How did you...!?! I mean, of course you did. I am such a compassionate ruler that I gave you a very easy task. Here is another simple labor for you to perform, go kill the hydra to the south! And take that scary, I mean, disgusting lion skin with you!"));
             eventActions.insert(std::make_pair("change short", "BIGLY, YUUGE PLACE!\n"
                                       "Exits North and South.\n"));
             eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nThe border wall to the south had been torn down!\n"));
@@ -1324,9 +1365,9 @@ void loadGameData(std::map<string, string>& gameData, string dataFile) {
 			//cout << "[" << key << "] : [" << data << "]" << endl;
 		}
 	}
-	/*
-	cout << "Game Data:" << endl;
+	
+/*	cout << "Game Data:" << endl;
 	for(map<string,string>::iterator it = gameData.begin(); it != gameData.end(); ++it) {
 		cout << "[" << it->first << "] : [" << gameData[it->first] << "]" << endl; }
-	*/
+*/
 }
