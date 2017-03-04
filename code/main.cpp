@@ -122,6 +122,16 @@ int main()
 			}
 		}
 	}
+	if (selection == 2) { //check for saved games. If any exist ask user which to load
+		std::vector<string> saved_games;
+		scanDirectory(saved_games, "saved_games");
+		if (saved_games.size() > 0) {
+			loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs);
+		} else {
+			cout << "Sorry, but there are no saved games. You'll have to start your adventure from the beginning!\n";
+			selection = 1;
+		}
+	} 
 	if (selection == 1) { //new game: set current labor, clear out save directory, start with club and bow, load throne room
 		
 		cout << "\nHercules, welcome to Mycenae. I am King Eurystheus and\nper the Oracle's decree you will complete the labors I\nassign to you as penance for your follies. To aid you\non your way I gift you an olive wood club and a bow\nwith quiver of arrows. These should serve you well as\nyour first task is to bring me the Nemean lion - dead or alive.\n";
@@ -140,10 +150,7 @@ int main()
 		
 		// start game in throne room
 		current = loadRoom(itemList, roomItems, "throne");
-	} else { //selection == 2; load game
-		loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs);
-	}
-	
+	}	
 	
 	while (hParser.getAction().compare("quit") != 0) {
 		cout << endl << "What do you want to do?  ";
