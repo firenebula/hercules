@@ -71,15 +71,15 @@ int main()
 	std::map <string, string> gameData;
 	std::map <string, string> eventActions;
 	bool existsArr[4];
-	
+
 	// load game items
 	loadItems(itemList, itemFile);
 
 	// load game data
 	loadGameData(gameData, dataFile);
-	
+
 	Room current = loadRoom(itemList, roomItems, "throne", 0);
-	
+
 	Parser hParser;
 //	testParseVal("Default Values: ", hParser);
 /*
@@ -93,7 +93,7 @@ int main()
 
     }
 */
-	
+
 	cout << "\nWelcome Hercules! What would you like to do?\n\nPlease type the number corresponding to your choice:\n1.Start a new game\n2.Load a saved game\n\n";
 	std::getline(cin, command);
 	for (i = 0; i < command.length(); i++) {
@@ -132,27 +132,27 @@ int main()
 			cout << "Sorry, but there are no saved games. You'll have to start your adventure from the beginning!\n";
 			selection = 1;
 		}
-	} 
+	}
 	if (selection == 1) { //new game: set current labor, clear out save directory, start with club and bow, load throne room
-		
+
 		cout << "\nHercules, welcome to Mycenae. I am King Eurystheus and\nper the Oracle's decree you will complete the labors I\nassign to you as penance for your follies. To aid you\non your way I gift you an olive wood club and a bow\nwith quiver of arrows. These should serve you well as\nyour first task is to bring me the Nemean lion - dead or alive.\n";
-		
+
 		currentLabor = NEMEAN;
-		
+
 		std::vector<string> save_files;
 		scanDirectory(save_files, "save");
 		if (save_files.size() > 0) {
 			system("exec rm -r save/*");
 		}
-	
+
 		// start game with bow and club in inventory
 		addInventory(inventory, itemList, "club");
 		addInventory(inventory, itemList, "bow");
-		
+
 		// start game in throne room
 		current = loadRoom(itemList, roomItems, "throne");
-	}	
-	
+	}
+
 	while (hParser.getAction().compare("quit") != 0) {
 		cout << endl << "What do you want to do?  ";
 		std::getline(cin, command);
@@ -513,7 +513,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		printRoomItem(rmItems);
 		current.setVisited(true);
 	}
-	
+
 	return current;
 
 }
@@ -960,7 +960,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 
-		else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS] && hParser.getIndirect().compare("bow") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("cave") == 0) {
+		else if (hParser.getAction().compare("shoot") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS] && hParser.getIndirect().compare("bow") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("cave") == 0) {
 			if ((rand() % 10) > 6) {
 				eventActions.insert(std::make_pair("display", "SWHUP! The arrow shoots straight through the lion's mouth and into the back of its head. It lets out a welp before crashing into the ground. The lion's body spasms for a second or two before finally coming to a complete stop. You killed the lion! You hear a lion cub cry out for its father while another lion with scars and a dark mane roars in approval!"));
 				eventActions.insert(std::make_pair("remove item", "lion"));
@@ -972,6 +972,20 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 
 			return true;
 		}
+
+        else if (hParser.getAction().compare("shoot") == 0 && hParser.getObject().compare("bow") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("lion") == 0 && existsArr[IND_EXISTS] && currentRoom.compare("cave") == 0) {
+			if ((rand() % 10) > 6) {
+				eventActions.insert(std::make_pair("display", "SWHUP! The arrow shoots straight through the lion's mouth and into the back of its head. It lets out a welp before crashing into the ground. The lion's body spasms for a second or two before finally coming to a complete stop. You killed the lion! You hear a lion cub cry out for its father while another lion with scars and a dark mane roars in approval!"));
+				eventActions.insert(std::make_pair("remove item", "lion"));
+				eventActions.insert(std::make_pair("add item", "lion pelt"));
+			}
+			else {
+				eventActions.insert(std::make_pair("display", "To your amazement your arrows bounce off the body of the lion. You barely dodge the lion's attack but the lion has already recovered and is coming at you again."));
+			}
+
+			return true;
+		}
+
 
 		else if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("hyperbeam") == 0 && hParser.getIndirect().compare("lion")
 				 && currentRoom.compare("cave") == 0) {
@@ -1315,7 +1329,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 
 		//load inventory
 		loadInventory(itemList, inventory);
-		
+
 		//load gameData
 		string data_path = "./save/gameData.data";
 		loadGameData(gameData, data_path);
@@ -1390,7 +1404,7 @@ void loadGameData(std::map<string, string>& gameData, string dataFile) {
 			//cout << "[" << key << "] : [" << data << "]" << endl;
 		}
 	}
-	
+
 /*	cout << "Game Data:" << endl;
 	for(map<string,string>::iterator it = gameData.begin(); it != gameData.end(); ++it) {
 		cout << "[" << it->first << "] : [" << gameData[it->first] << "]" << endl; }
