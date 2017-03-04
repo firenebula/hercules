@@ -1191,7 +1191,6 @@ int cleanInput(string& input, int& valid) {
 		}
 	}
 	input.resize(k + 1);
-	cout << input << endl;
 	return modified;
 }
 
