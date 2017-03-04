@@ -49,10 +49,11 @@ void saveInventory(std::map<string, Item*>& inventory);
 void loadInventory(std::map<string, Item*>& itemList, std::map<string, Item*>& inventory);
 void saveLabor(LABORS currentLabor);
 void saveCurrentRoom(Room current);
+void saveGameData(std::map<string, string>& gameData);
 void scanDirectory(std::vector<string>& dir_contents, string dir_path);
 int cleanInput(string& input, int& valid);
-void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs);
-void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string& saveAs);
+void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs, std::map<string, string>& gameData);
+void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string& saveAs, std::map<string, string>& gameData);
 
 
 int main()
@@ -126,7 +127,7 @@ int main()
 		std::vector<string> saved_games;
 		scanDirectory(saved_games, "saved_games");
 		if (saved_games.size() > 0) {
-			loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs);
+			loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs, gameData);
 		} else {
 			cout << "Sorry, but there are no saved games. You'll have to start your adventure from the beginning!\n";
 			selection = 1;
@@ -265,10 +266,10 @@ int main()
 			}
 
 			else if (command.find("save") != std::string::npos) {
-				saveGame(roomItems, current, inventory, currentLabor, saveAs);
+				saveGame(roomItems, current, inventory, currentLabor, saveAs, gameData);
 			}
 			else if (command.find("load") != std::string::npos) {
-				loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs);
+				loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs, gameData);
 
 
 
@@ -1181,7 +1182,7 @@ int cleanInput(string& input, int& valid) {
 }
 
 
-void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs) {
+void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs, std::map<string, string>& gameData) {
 	int i, j, k;
 	int save = 1, overwrite = 1, validInput = 1, modified = 1;
 	string yes_no;
@@ -1195,6 +1196,7 @@ void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string,
 	saveCurrentRoom(current);
 	saveInventory(inventory);
 	saveLabor(currentLabor);
+	saveGameData(gameData);
 
 	if (saveAs != "") {
 		cout << "You either loaded or previously saved the game titled: " << saveAs << ".\nWould you like to save with this same name and overwrite the game files?\n";
@@ -1252,7 +1254,7 @@ void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string,
 }
 
 
-void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string& saveAs){
+void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string& saveAs, std::map<string, string>& gameData){
 	int i, loadFrom, load = 1, all_digits = 0;
 	string input;
 	string::size_type sz;
@@ -1313,6 +1315,10 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 
 		//load inventory
 		loadInventory(itemList, inventory);
+		
+		//load gameData
+		string data_path = "./save/gameData.data";
+		loadGameData(gameData, data_path);
 
 		//load current room
 		string current_room_name;
@@ -1346,6 +1352,18 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 	} else {
 		cout << "I'm sorry, but there are no saved games available to load.\n";
 	}
+}
+
+
+void saveGameData(std::map<string, string>& gameData) {
+	string save_path = "./save/gameData.data";
+	std::ofstream dest(save_path.c_str(), std::ios::binary);
+	for(map<string,string>::iterator it = gameData.begin(); it != gameData.end(); ++it) {
+		if (it->first != "") {
+			dest << it->first << endl << gameData[it->first] << endl;
+		}
+	}
+	dest.close();
 }
 
 
