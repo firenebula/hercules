@@ -57,6 +57,9 @@ int cleanInput(string& input, int& valid);
 void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs, std::map<string, string>& gameData);
 void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string& saveAs, std::map<string, string>& gameData);
 
+void printGameData(std::map<string, string>& gameData);
+
+
 
 int main()
 {
@@ -77,24 +80,16 @@ int main()
 	// load game items
 	loadItems(itemList, itemFile);
 
-	// load game data
-	loadGameData(gameData, dataFile);
-
+	//create a Room object
 	Room current = loadRoom(itemList, roomItems, "throne", 0);
 
 	Parser hParser;
-//	testParseVal("Default Values: ", hParser);
-/*
-	std::cout << "\n****Testing Parser.  Type start to start game.****" << std::endl;
-    while (hParser.getObject().compare("start") != 0) {
-		cout << endl << "What do you want to do?  ";
-		std::getline(cin, command);
-		hParser.parse(command);
-		testParseVal("Current Values:", hParser);
 
-
-    }
-*/
+	std::vector<string> save_files;
+	scanDirectory(save_files, "save");
+	if (save_files.size() > 0) {
+		system("exec rm -r save/*");
+	}
 
 	cout << "\nWelcome Hercules! What would you like to do?\n\nPlease type the number corresponding to your choice:\n1.Start a new game\n2.Load a saved game\n\n";
 	std::getline(cin, command);
@@ -139,13 +134,11 @@ int main()
 
 		cout << "\nHercules, welcome to Mycenae. I am King Eurystheus and\nper the Oracle's decree you will complete the labors I\nassign to you as penance for your follies. To aid you\non your way I gift you an olive wood club and a bow\nwith quiver of arrows. These should serve you well as\nyour first task is to bring me the Nemean lion - dead or alive.\n";
 
+		// load game data
+		loadGameData(gameData, dataFile);
+		
+		// set initial labor
 		currentLabor = NEMEAN;
-
-		std::vector<string> save_files;
-		scanDirectory(save_files, "save");
-		if (save_files.size() > 0) {
-			system("exec rm -r save/*");
-		}
 
 		// start game with bow and club in inventory
 		addInventory(inventory, itemList, "club");
@@ -1347,7 +1340,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 
 		//clear inventory, clear gameData, clear room items, remove all files from save/ directory, and copy all files from saved game to save/ directory
 		inventory.clear();
-		//gameData.clear();
+		gameData.clear();
 		rmItems.clear();
 		string remove = "rm -r -f save/";
 		system(remove.c_str());
@@ -1365,7 +1358,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		//load gameData
 		string data_path = "./save/gameData.data";
 		loadGameData(gameData, data_path);
-
+		
 		//load current room
 		string current_room_name;
 		string current_room_path = "./save/currentRoom.currentRoom";
@@ -1418,15 +1411,8 @@ void loadGameData(std::map<string, string>& gameData, string dataFile) {
 	string data = "";
 	std::fstream data_file;
 
-	// convert dataFile to lowercase
-	for(unsigned int i = 0; i < dataFile.length(); i++) {
-		dataFile[i] = tolower(dataFile[i]);
-	}
-
 	// convert dataFile to c-string for fstream open()
 	data_file.open(dataFile.c_str(), std::ios::out | std::ios::in);
-
-//	cout << "Data file opened = " << dataFile << endl;
 
 	if(data_file) {
 		while(std::getline(data_file, data)) {
@@ -1435,10 +1421,14 @@ void loadGameData(std::map<string, string>& gameData, string dataFile) {
 			gameData.insert(std::make_pair(key, data));
 			//cout << "[" << key << "] : [" << data << "]" << endl;
 		}
+	} else {
+		cout << "Could not open data_file: " << dataFile << endl;
 	}
+}
 
-/*	cout << "Game Data:" << endl;
+void printGameData(std::map<string, string>& gameData) {
+	cout << "Game Data:" << endl;
 	for(map<string,string>::iterator it = gameData.begin(); it != gameData.end(); ++it) {
-		cout << "[" << it->first << "] : [" << gameData[it->first] << "]" << endl; }
-*/
+		cout << "[" << it->first << "] : [" << gameData[it->first] << "]" << endl;
+	}
 }
