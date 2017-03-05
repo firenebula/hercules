@@ -192,7 +192,8 @@ Iolaus is always good for a torch or two.  He is now staring listlessly into spa
 Poor Iolaus, always so used and abused!
 
 [talk]
-"How's the journey going bud? I gotta admit, I'm kind of depressed.  Lost me lucky charm the other day, but I don't remember where./n"
+"How's the journey going bud? I gotta admit, I'm kind of depressed.  
+Lost me lucky charm the other day, but I don't remember where."
 
 [movable]
 false
@@ -227,7 +228,7 @@ true
 
 
 [name]
-silver coin
+coin
 
 [description]
 Shiny!

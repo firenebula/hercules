@@ -1015,14 +1015,14 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 
 		if (hParser.getAction().compare("look") == 0 && hParser.getObject().compare("shimmer") == 0 && existsArr[OBJ_EXISTS] && currentRoom.compare("swamp2") == 0) {
 			eventActions.insert(std::make_pair("display", "This is your lucky day!  Someone dropped a coin here."));
-			eventActions.insert(std::make_pair("add item", "silver coin"));
+			eventActions.insert(std::make_pair("add item", "coin"));
 			eventActions.insert(std::make_pair("remove item", "shimmer"));
 			return true;
 		}
 
-		else if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("silver coin") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("iolaus") == 0 && currentRoom.compare("trail") == 0) {
-			eventActions.insert(std::make_pair("drop item", "silver coin"));
-			eventActions.insert(std::make_pair("remove item", "silver coin"));
+		else if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("coin") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("iolaus") == 0 && currentRoom.compare("trail") == 0) {
+			eventActions.insert(std::make_pair("drop item", "coin"));
+			eventActions.insert(std::make_pair("remove item", "coin"));
 			eventActions.insert(std::make_pair("display", "You found it!  Take my torch as thanks!"));
 			eventActions.insert(std::make_pair("add item", "torch"));
 			return true;
