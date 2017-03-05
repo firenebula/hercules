@@ -364,3 +364,26 @@ false
 
 [available]
 true
+
+
+[name]
+hydra head
+	
+[description]
+A scaly lizard head, with a huge limp tongue dangling from its mouth. You know its dead,
+but looking in its eyes you sometimes swear you still see a spark of something.
+
+[use]
+What are you going to with it. Put it on a stick and have a dinosaur puppet show?
+
+[talk]
+Unless you're a ventriloquist, it ain't talking back. What part of dead don't you understand?
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true

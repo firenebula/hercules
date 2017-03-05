@@ -18,7 +18,7 @@ using std::cout;
 using std::endl;
 
 
-enum LABORS {NEMEAN, LERNA, CERYNEIA};
+enum LABORS {NEMEAN, LERNA, CERYNEIA, ERYMANTHIA};
 enum EXISTANCE {OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND};
 
 void testParseVal(string, Parser);
@@ -41,7 +41,7 @@ void printRoomItem(std::map<string, Item*>& roomItems);
 
 //bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& eventActions);
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions);
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList);
 
 /*, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList); */
 
@@ -164,8 +164,7 @@ int main()
 		existsArr[IND_EXISTS] = isItemPresent(indItem, inventory, roomItems);
         existsArr[HOLDING_IND] = isItemPresent(indItem, inventory);
 
-
-		if (!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions)) {
+		if (!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList)) {
 
 			if (hParser.getAction().compare("look") == 0) {
 				string lookItem = hParser.getObject();
@@ -273,7 +272,7 @@ int main()
 				cout << "I don't understand that command!" << endl;
 			}
 
-			checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions);
+			checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList);
 		}
 
 		if (!eventActions.empty()) {
@@ -483,6 +482,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 
 		// all the lines of text in the "items" section and add them to
 		// the roomItems map
+		rmItems.clear();
 		while (std::getline(room_file, data)) {
 			if (data.compare("") != 0) {
 				itemName = data;
@@ -541,7 +541,11 @@ void saveRoom(std::map<string, Item*>& roomItems, Room current) {
 
 		// visited section
 		save_room << "visited\n";
-		save_room << "true\n\n";
+		if (current.getVisited()) {
+			save_room << "true\n\n";
+		} else { //not visited
+			save_room << "false\n\n";
+		}
 
 		// exits section
 		save_room << "exits\n";
@@ -554,16 +558,14 @@ void saveRoom(std::map<string, Item*>& roomItems, Room current) {
 		save_room << "long description\n";
 
 		// set visited to false so that look() returns long description
-		current.setVisited(false);
-		save_room << current.look();
+		save_room << current.longLook();
 		save_room << "\n";
 
 		// short description section
 		save_room << "short description\n";
 
 		// set visited to true so that look() returns short description
-		current.setVisited(true);
-		save_room << current.look();
+		save_room << current.shortLook();
 		save_room << "\n";
 
 		// items section
@@ -877,7 +879,7 @@ void testParseVal(string label, Parser p){
 }
 
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions) {//, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList) {
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList) {//, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList) {
 
     //existsArr positions OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND
 
@@ -899,6 +901,12 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 				eventActions.insert(std::make_pair("change short", "A trail leading to a cave. Go up the trail to head back up the canyon.\n"));
 				eventActions.insert(std::make_pair("change look", "boulder"));
 				eventActions.insert(std::make_pair("boulder", "You tried to push the boulder but it will not budge."));
+				//block exit in cave room as well. load rooms without text output
+				current = loadRoom(itemList, roomItems, "cave", 0);
+				current.setExits(3, "null");
+				saveRoom(roomItems, current);
+				//go back to trail room so eventActions are performed on correct room
+				current = loadRoom(itemList, roomItems, currentRoom, 0);
 			}
 			else {
 				eventActions.insert(std::make_pair("display", "The boulder is fully settled in front of the cave entrance."));
@@ -994,9 +1002,8 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			eventActions.insert(std::make_pair("add exit", "south"));
 			eventActions.insert(std::make_pair("south", "lerna"));
 			eventActions.insert(std::make_pair("display", "GAH! You actually killed it! How did you...!?! I mean, of course you did. I am such a compassionate ruler that I gave you a very easy task. Here is another simple labor for you to perform, go kill the hydra to the south! And take that scary, I mean, disgusting lion skin with you!"));
-            eventActions.insert(std::make_pair("change short", "BIGLY, YUUGE PLACE!\n"
-                                      "Exits North and South.\n"));
-            eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nThe border wall to the south had been torn down!\n"));
+            eventActions.insert(std::make_pair("change short", "BIGLY, YUUGE PLACE!\nExits North and South.\n"));
+            eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nThe border wall to the south has been torn down!\n"));
 			eventActions.insert(std::make_pair("change talk", "king"));
 			eventActions.insert(std::make_pair("king", "Do you not understand Greek? Go kill the hydra of Lerna! Oh and your cousin wanted to talk to you about some nonsense now that the lion is gone.  He went for a walk"));
 			return true;
@@ -1018,6 +1025,24 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			eventActions.insert(std::make_pair("remove item", "coin"));
 			eventActions.insert(std::make_pair("display", "You found it!  Take my torch as thanks!"));
 			eventActions.insert(std::make_pair("add item", "torch"));
+			return true;
+		}
+		
+		else if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("hydra head") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("king") == 0 && currentRoom.compare("throne") == 0) {
+			eventActions.insert(std::make_pair("change state", "ceryneia"));
+			//open exit in nemean room north to ceryneia. load rooms without text output
+			current = loadRoom(itemList, roomItems, "nemean", 0);
+			current.setExits(0, "ceryneia");
+			current.setDescShort("The countryside of Nemea. North - Ceryneia; South - King Eurystheus\nWest - Lion's Cave; Down - Trail");
+			current.setDescLong("You are standing above a canyon just outside the city-state of Nemea.\nThe road north leads to Ceryneia. If you go west you'll reach the lion's cave.\nThere also appears to be a trail down the canyon. Mycenae and the\nthrone room of King Eurystheus lie to the south.");
+			current.setVisited(false);
+			saveRoom(roomItems, current);
+			//go back to throne room to continue adventure
+			current = loadRoom(itemList, roomItems, currentRoom, 0);
+			eventActions.insert(std::make_pair("display", "How in heavens did you kill that thing? On second thought, don't answer that.\nSince you clearly are adept at killing things, for this next labor I want you to bring me\nback something alive. Go north to Ceryneia and capture the fabled Hind and return it here."));
+			eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nYou can leave town along the road either north or south.\n"));
+			eventActions.insert(std::make_pair("change talk", "king"));
+			eventActions.insert(std::make_pair("king", "The Hind won't catch itself. Get going."));
 			return true;
 		}
 	}
@@ -1062,6 +1087,25 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			}
 			return true;
 		} 
+		
+		else if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("hind") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("king") == 0 && currentRoom.compare("throne") == 0) {
+			eventActions.insert(std::make_pair("change state", "erymanthia"));
+			eventActions.insert(std::make_pair("add exit", "east"));
+			eventActions.insert(std::make_pair("east", "tiryns"));
+			eventActions.insert(std::make_pair("display", "Back so soon? With the Hind?! There appears to be no stopping you when you\nset your mind to something. Well, maybe this next task can flummox you. I need\nyou to go to Mount Erymanthian and capture the boar that is ravaging the nearby\nvillages. Think you can do that? If so, head east to the port at Tiryns to catch\na ride aboard any of the vessels heading in that direction. Oh, and here's\nsome coin to pay your way. Don't get used to my coin in your pocket, though.\nBe off!"));
+			eventActions.insert(std::make_pair("drop item", "hind"));
+			eventActions.insert(std::make_pair("remove item", "hind"));
+			eventActions.insert(std::make_pair("get item", "coin"));
+			eventActions.insert(std::make_pair("get item", "coin"));
+			eventActions.insert(std::make_pair("get item", "coin"));
+			eventActions.insert(std::make_pair("get item", "coin"));
+			eventActions.insert(std::make_pair("get item", "coin"));
+            eventActions.insert(std::make_pair("change short", "BIGLY, YUUGE PLACE!\nExits North, South, and East.\n"));
+            eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nThe road north leads to Nemea and Ceryneia; the road south leads to Lerna; and\nto the east is the port of Tiryns\n"));
+			eventActions.insert(std::make_pair("change talk", "king"));
+			eventActions.insert(std::make_pair("king", "I don't want to hear excuses. Bring me that boar!"));
+			return true;
+		}
     }
 	
 	return false;
@@ -1073,6 +1117,8 @@ void setLabor(LABORS &currentLabor, string newLabor) {
 		currentLabor = LERNA;
 	} else if (newLabor.compare("ceryneia") == 0) {
 		currentLabor = CERYNEIA;
+	} else if (newLabor.compare("erymanthia") == 0) {
+		currentLabor = ERYMANTHIA;
 	}
 }
 

@@ -152,6 +152,14 @@ string Room::getName() {
 
  }
 
+ /****************************************************
+ * string Room::shortLook()
+ * This function prints the room's short description
+****************************************************/
 
+ string Room::shortLook() {
+		return this->desc_short;
+
+ }
 
 
