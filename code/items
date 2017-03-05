@@ -103,7 +103,7 @@ You can't use that!
 
 [talk]
 "Hello! Are you okay?"
-The only response you are getting are more crying.
+The only response you hear is more crying.
 
 [movable]
 false
@@ -170,7 +170,7 @@ strength might be able to move it.
 You pet the boulder. It's a good pet rock. You named it Snorlax.
 
 [talk]
-"You're a good pet rock! You just sit there and be there in the way!"
+"You're a good pet rock! You just sit there and be in the way!"
 
 [movable]
 false
@@ -186,7 +186,7 @@ true
 iolaus
 
 [description]
-Iolaus is always good for a torch or too.  He is now staring listlessly into space.
+Iolaus is always good for a torch or two.  He is now staring listlessly into space.
 
 [use]
 Poor Iolaus, always so used and abused!
@@ -230,7 +230,7 @@ true
 silver coin
 
 [description]
-Shinny!
+Shiny!
 
 [use]
 Sadly nothing to buy.
@@ -259,6 +259,101 @@ No use for this
 
 [talk]
 No response
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true
+
+
+[name]
+townsman
+
+[description]
+A bearded man wearing leather clothes, a fur hat, and a knife strapped to his belt.
+
+[use]
+No use for this
+
+[talk]
+"Greetings, friend. I am Endymion, a hunter and trapper. If it is the Hind you seek, it
+is known to graze in the forest west of here. Good luck catching it, however. The Hind's
+speed and endurance is so great, it is said that the Hind can outrun an arrow shot by
+even the strongest of bows. Snaring this beast requires a resourceful hunter."
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true
+
+
+[name]
+townswoman
+
+[description]
+A wizened old woman with two large knitting needles holding up her hair.
+
+[use]
+The woman deftly pulls a needle from her hair and raps you on the knuckles warning,
+'Keep your hands to yourself, hot shot.'
+
+[talk]
+"What a strapping young man. My name is Arachne. What business have you with an old seamstress?"
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true
+
+
+[name]
+rope
+
+[description]
+A long coil of rope woven from the mane of the Nemean lion. This is some strong rope!
+
+[use]
+You swing the rope in a circle above your head and then let fly, lassoing
+the nearest vegetation with such aplomb Pecos Bill would be proud.
+
+[talk]
+... (did you really expect an answer?)
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true
+
+
+[name]
+hind
+	
+[description]
+An enormous deer with bronze hooves and golden antlers big enough to make a moose jealous.
+
+[use]
+You lick your lips and wipe the grease from your chin. You have never tasted venison so good.
+Unfortunately, its only a pipe dream. You can't afford to eat this deer. Not with King Eury
+wanting it demanding it brought to him.
+
+[talk]
+You were about to try and soothe the Hind when it spits on you. So much for that conversation.
 
 [movable]
 false

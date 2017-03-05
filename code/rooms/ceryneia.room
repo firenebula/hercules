@@ -1,0 +1,28 @@
+ceryneia
+
+visited
+false
+
+exits
+null
+nemean
+null
+woods1
+null
+null
+
+long description
+You have entered the town of Ceryneia. Townspeople mill about all around
+you. What an industrious people - they all walk with the purpose and focus
+of someone with a job to do. Looking around you see that the road north is
+under construction and unpassable; to the west lies an expansive forest; and
+south leads to Nemea.
+
+short description
+The town of Ceryneia. West - forest; South - Nemea
+
+items
+townsman
+1
+townswoman
+1

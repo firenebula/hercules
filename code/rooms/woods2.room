@@ -1,0 +1,24 @@
+woods2
+
+visited
+false
+
+exits
+woods5
+null
+woods1
+woods3
+null
+null
+
+
+long description
+You are in the woods which the Hind calls home. Trees crowd in
+all around you. Paths lead into more woods to the north,
+east, and west. 
+
+short description
+You are in the woods of the Hind. North - more woods;
+East - more woods; West - more woods
+
+items

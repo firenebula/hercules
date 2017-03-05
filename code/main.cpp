@@ -43,6 +43,8 @@ void printRoomItem(std::map<string, Item*>& roomItems);
 
 bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions);
 
+/*, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList); */
+
 void setLabor(LABORS &currentLabor, string newLabor);
 
 void saveInventory(std::map<string, Item*>& inventory);
@@ -340,6 +342,9 @@ int main()
 					// remove item from inventory if quantity is 0
 					if (inventory[eventActions[it->first]]->getQuantity() == 0)
 						inventory.erase(eventActions[it->first]);
+				}
+				else if ((it->first).compare("get item") == 0) {
+					addInventory(inventory, itemList, eventActions[it->first]);
 				}
 				else if ((it->first).compare("change short") == 0) {
 					current.setDescShort(eventActions[it->first]);
@@ -879,13 +884,12 @@ void testParseVal(string label, Parser p){
 }
 
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions) {
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions) {//, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList) {
 
     //existsArr positions OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND
 
 	if (currentLabor == NEMEAN) {
-		if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("shadow") == 0
-				&& existsArr[OBJ_EXISTS] && currentRoom.compare("cave") == 0) {
+		if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("shadow") == 0 && existsArr[OBJ_EXISTS] && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You stop and stare as the shadow starts changing.\nThe woman's hair suddenly starts growing and her body begins to enlarge.\nThe very large shadow lets out a large roar and rushes at you!"));
 			eventActions.insert(std::make_pair("add item", "lion"));
 			eventActions.insert(std::make_pair("remove item", "shadow"));
@@ -893,8 +897,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 
-		else if ((hParser.getAction().compare("move") == 0 || hParser.getAction().compare("push") == 0)&& hParser.getObject().compare("boulder") == 0
-				&& existsArr[OBJ_EXISTS] && currentRoom.compare("trail") == 0) {
+		else if ((hParser.getAction().compare("move") == 0 || hParser.getAction().compare("push") == 0)&& hParser.getObject().compare("boulder") == 0 && existsArr[OBJ_EXISTS] && currentRoom.compare("trail") == 0) {
 			if (gameData["caveBlocked"].compare("false") == 0) {
 				gameData["caveBlocked"] = "true";
 				eventActions.insert(std::make_pair("display", "You pushed on the boulder and it starts to tip over. You jump out of the way as the boulder falls over and completely blocks the cave entrance."));
@@ -910,28 +913,24 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 		// if the lion escaped and the hero goes another location, set flag, lionEscaped to signify the lion will return
-		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") != 0
-				&& gameData["lionEscaped"].compare("true") == 0) {
+		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") != 0 && gameData["lionEscaped"].compare("true") == 0) {
 			gameData["lionEscaped"] = "lionReturns";
 			return false;
 		}
 		// if the flag, lionEscaped is lionReturns, and the hero goes back to the cave then add the lion
-		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") == 0
-				&& gameData["lionEscaped"].compare("lionReturns") == 0) {
+		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") == 0 && gameData["lionEscaped"].compare("lionReturns") == 0) {
 			gameData["lionEscaped"] = "false";
 			eventActions.insert(std::make_pair("add item", "lion"));
 			return true;
 		}
 
 
-		else if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("club") == 0
-				&& existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("lion") == 0 && currentRoom.compare("cave") == 0) {
+		else if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("club") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("lion") == 0 && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You swing the club at the lion but to your surprise the lion shrugs off the blow and rushes at you again."));
 			return true;
 		}
 
-        else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS]
-				&& hParser.getIndirect().compare("club") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("cave") == 0) {
+        else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS] && hParser.getIndirect().compare("club") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You swing the club at the lion but to your surprise the lion shrugs off the blow and rushes at you again."));
 			return true;
 		}
@@ -995,11 +994,10 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 
-		if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("lion pelt") == 0 && existsArr[HOLDING_OBJ]
-				&& hParser.getIndirect().compare("king") == 0 && currentRoom.compare("throne") == 0) {
+		else if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("lion pelt") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("king") == 0 && currentRoom.compare("throne") == 0) {
 			eventActions.insert(std::make_pair("change state", "lerna"));
-			eventActions.insert(std::make_pair("drop item", "lion pelt"));
-			eventActions.insert(std::make_pair("remove item", "lion pelt"));
+			//eventActions.insert(std::make_pair("drop item", "lion pelt"));
+			//eventActions.insert(std::make_pair("remove item", "lion pelt"));
 			eventActions.insert(std::make_pair("add exit", "south"));
 			eventActions.insert(std::make_pair("south", "lerna"));
 			eventActions.insert(std::make_pair("display", "GAH! You actually killed it! How did you...!?! I mean, of course you did. I am such a compassionate ruler that I gave you a very easy task. Here is another simple labor for you to perform, go kill the hydra to the south! And take that scary, I mean, disgusting lion skin with you!"));
@@ -1015,39 +1013,74 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 
     else if (currentLabor == LERNA){
 
-
-            if (hParser.getAction().compare("look") == 0 && hParser.getObject().compare("shimmer") == 0
-				&& existsArr[OBJ_EXISTS] && currentRoom.compare("swamp2") == 0) {
+		if (hParser.getAction().compare("look") == 0 && hParser.getObject().compare("shimmer") == 0 && existsArr[OBJ_EXISTS] && currentRoom.compare("swamp2") == 0) {
 			eventActions.insert(std::make_pair("display", "This is your lucky day!  Someone dropped a coin here."));
 			eventActions.insert(std::make_pair("add item", "silver coin"));
 			eventActions.insert(std::make_pair("remove item", "shimmer"));
 			return true;
+		}
 
-
-    }
-
-    if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("silver coin") == 0 && existsArr[HOLDING_OBJ]
-				&& hParser.getIndirect().compare("iolaus") == 0 && currentRoom.compare("trail") == 0) {
+		else if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("silver coin") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("iolaus") == 0 && currentRoom.compare("trail") == 0) {
 			eventActions.insert(std::make_pair("drop item", "silver coin"));
 			eventActions.insert(std::make_pair("remove item", "silver coin"));
 			eventActions.insert(std::make_pair("display", "You found it!  Take my torch as thanks!"));
-            eventActions.insert(std::make_pair("add item", "torch"));
+			eventActions.insert(std::make_pair("add item", "torch"));
 			return true;
-				}
-
+		}
+	}
+	
+	else if (currentLabor == CERYNEIA){
+		
+		if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("lion pelt") == 0 && existsArr[HOLDING_OBJ] && (hParser.getIndirect().compare("townswoman") == 0 || hParser.getIndirect().compare("arachne") == 0) && currentRoom.compare("ceryneia") == 0) {
+			eventActions.insert(std::make_pair("display", "\n\"Well, Arachne. You say you're a seamstress. Can you make anything out of this?\"\n\n\"Is that real lion?!? I haven't had material this nice since, well, ever.\nWait right here. I'll be back shortly.\"\n\nArachne returns with a fabulous lion skin vest which fits like a glove\nand a long coil of rope woven from the lion's mane. \"This rope sure might\ncome in handy\" you think as you slide on the vest and thank Arachne."));
+			eventActions.insert(std::make_pair("drop item", "lion pelt"));
+			eventActions.insert(std::make_pair("remove item", "lion pelt"));
+			eventActions.insert(std::make_pair("get item", "rope"));
+			return true;
+		} 
+		
+		else if (currentRoom.compare(gameData["hindLocation"]) == 0 && currentRoom.compare("woods3") == 0 && gameData["trapSet"].compare("true") == 0) {
+			gameData["hindLocation"] = "caught";
+			eventActions.insert(std::make_pair("display", "\nAgain the Hind hears you approach and flees. However, unfortunately\nfor the Hind it scampers towards the narrow path where your trap is\nset. You hear a commotion amongst the brush followed by a shrill yell\nfrom the Hind and are relieved\nto see the Hind dangling from the air with a hind\nleg caught in the snare. You rush over to the animal and quickly use the\nremaining rope to hog tie it before throwing the captured creature over your shoulder\nto haul back to Mycenae and King Eurystheus."));
+			eventActions.insert(std::make_pair("get item", "hind"));
+			return true;
+		}
+		
+		else if ((currentRoom.compare("woods3") == 0 || currentRoom.compare("woods4") == 0) && ((hParser.getAction().compare("use") == 0 && hParser.getObject().compare("rope") == 0 && existsArr[HOLDING_OBJ]) || (hParser.getAction().compare("set") == 0 && hParser.getObject().compare("trap"))) && gameData["trapSet"].compare("false") == 0) {
+			gameData["trapSet"] = "true";
+			eventActions.insert(std::make_pair("display", "\nTired of chasing this Hind all through these woods, you decide\nit's time to start hunting smarter and pull out the rope from Arachne.\nYou walk over to the narrow path and set up a snare to grab any unsuspecting passerby."));
+			return true;
+		}
+		
+		else if (currentRoom.compare(gameData["hindLocation"]) == 0) { //in room with Hind
+			eventActions.insert(std::make_pair("display", "\nWhat's that? In the distance you see the glint of sunlight on gold.\nThe Hind heard your approach and scampered away before you\ncould get in range of a shot."));
+			if (gameData["hindLocation"].compare("woods1") == 0) {
+				gameData["hindLocation"] = "woods2";
+			} else if (gameData["hindLocation"].compare("woods2") == 0) {
+				gameData["hindLocation"] = "woods3";
+			} else if (gameData["hindLocation"].compare("woods3") == 0) {
+				gameData["hindLocation"] = "woods4";
+			} else if (gameData["hindLocation"].compare("woods4") == 0) {
+				gameData["hindLocation"] = "woods5";
+			} else if (gameData["hindLocation"].compare("woods5") == 0) {
+				gameData["hindLocation"] = "woods6";
+			} else { //gameData["hindLocation"].compare("woods6") == 0)
+				gameData["hindLocation"] = "woods1";
+			}
+			return true;
+		} 
     }
-
-
+	
 	return false;
 }
 
 void setLabor(LABORS &currentLabor, string newLabor) {
 	// enum LABORS {NEMEAN, LERNA, CERYNEIA};
-	if (newLabor.compare("lerna") == 0)
+	if (newLabor.compare("lerna") == 0) {
 		currentLabor = LERNA;
-	else if (newLabor.compare("ceryneia") == 0)
+	} else if (newLabor.compare("ceryneia") == 0) {
 		currentLabor = CERYNEIA;
-
+	}
 }
 
 bool isItemPresent(string itemName, std::map<string, Item*>& inventory, std::map<string, Item*>& roomItems) {
@@ -1071,7 +1104,6 @@ bool isItemPresent(string itemName, std::map<string, Item*>& inventory) {
 	if(inventory.find(itemName) != inventory.end()) {
 		return true;
 	}
-
 	else
 		return false;
 }
@@ -1313,8 +1345,9 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 			}
 		}
 
-		//clear inventory, clear room items, remove all files from save/ directory, and copy all files from saved game to save/ directory
+		//clear inventory, clear gameData, clear room items, remove all files from save/ directory, and copy all files from saved game to save/ directory
 		inventory.clear();
+		//gameData.clear();
 		rmItems.clear();
 		string remove = "rm -r -f save/";
 		system(remove.c_str());
