@@ -4,4 +4,13 @@ caveBlocked
 false
 lionEscaped
 false
+hydraUnlocked
+false
+numHydraHeads
+1
+attackedHead
+false
+attackedImmortalHead
+false
+
 
