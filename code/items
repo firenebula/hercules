@@ -192,7 +192,7 @@ Iolaus is always good for a torch or too.  He is now staring listlessly into spa
 Poor Iolaus, always so used and abused!
 
 [talk]
-"How's the journey going bud? I gotta admit, I'm kind of depressed.  Lost me lucky charm the other day, but I don't remember where./n"
+"How's the journey going bud? I gotta admit, I'm kind of depressed.  Lost me lucky charm the other day, but I don't remember where."
 
 [movable]
 false
@@ -230,7 +230,7 @@ true
 silver coin
 
 [description]
-Shinny!
+Shiny!
 
 [use]
 Sadly nothing to buy.
@@ -259,6 +259,112 @@ No use for this
 
 [talk]
 No response
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true
+
+
+[name]
+hydra
+
+[description]
+The large scaly beast is staring at you with its multiple heads.
+
+[use]
+You can't use this!
+
+[talk]
+HIISSSSS!
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true
+
+[name]
+trees
+
+[description]
+Trees are all around and covered with moss. Some trees are dead but still standing. They look dry though.
+
+[use]
+You walk to the trees and relieve yourself.
+
+[talk]
+"Why don't you make like a tree and leave!"
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true
+
+[name]
+branches
+
+[description]
+Branches of various size and length. They look pretty dry.
+
+[use]
+"Avada Kedrava!" Nothing happened.
+
+[talk]
+"Expulso!"
+
+[movable]
+true
+
+[quantity]
+1
+
+[available]
+true
+
+[name]
+hydra head
+
+[description]
+One of the hydra's head. It is still hissing at you.
+
+[use]
+You can't use that!
+
+[talk]
+"HIIISSSSSS"
+
+[movable]
+true
+
+[quantity]
+1
+
+[available]
+true
+
+[name]
+hydra corpse
+
+[description]
+The headless corpse of the hydra. The blood oozing out of the body has a very acrid smell.
+
+[use]
+Hmmm, what can you do with this?
+
+[talk]
+Are you out of your mind?! Actually, the hydra is...
 
 [movable]
 false
