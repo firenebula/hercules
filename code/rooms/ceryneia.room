@@ -4,19 +4,27 @@ visited
 false
 
 exits
-null
+nemean
 null
 stymphalus
-null
+woods1
 null
 null
 
 
 long description
-This is the city of Ceryneia. The hind that is revered by Artemis lives in the surrounding areas. 
-Stymphalus is just east of here.
+You have entered the town of Ceryneia. Townspeople mill about all around
+you. What an industrious people - they all walk with the purpose and focus
+of someone with a job to do. Looking around you see that the road north is
+under construction and unpassable; to the west lies an expansive forest; and
+south leads to Nemea.
 
 short description
-The city of Ceryneia. Stymphalus is just east of here.
+The town of Ceryneia. West - forest; South - Nemea; East - Stymphalus
 
 items
+townsman
+1
+townswoman
+1
+

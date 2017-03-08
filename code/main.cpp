@@ -18,11 +18,11 @@ using std::cout;
 using std::endl;
 
 
-enum LABORS {NEMEAN, LERNA, CERYNEIA};
+enum LABORS {NEMEAN, LERNA, CERYNEIA, ERYMANTHIA};
 enum EXISTANCE {OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND};
 
 void testParseVal(string, Parser);
-Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile);
+Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile, int newGame = 1);
 void loadItems(std::map<string, Item*>& itemMap, string itemFile);
 void loadGameData(std::map<string, string>& gameData, string dataFile);
 
@@ -41,7 +41,9 @@ void printRoomItem(std::map<string, Item*>& roomItems);
 
 //bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& eventActions);
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions);
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList);
+
+/*, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList); */
 
 void setLabor(LABORS &currentLabor, string newLabor);
 
@@ -49,10 +51,14 @@ void saveInventory(std::map<string, Item*>& inventory);
 void loadInventory(std::map<string, Item*>& itemList, std::map<string, Item*>& inventory);
 void saveLabor(LABORS currentLabor);
 void saveCurrentRoom(Room current);
+void saveGameData(std::map<string, string>& gameData);
 void scanDirectory(std::vector<string>& dir_contents, string dir_path);
 int cleanInput(string& input, int& valid);
-void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs);
-void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string& saveAs);
+void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs, std::map<string, string>& gameData);
+void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string& saveAs, std::map<string, string>& gameData);
+
+void printGameData(std::map<string, string>& gameData);
+
 
 
 int main()
@@ -62,6 +68,8 @@ int main()
 	string saveAs = "";
 	string itemFile = "./items";
 	string dataFile = "./gamedata";
+	int i, all_digits = 0, valid = 1, selection;
+	LABORS currentLabor;
 	std::map <string, Item*> itemList;
 	std::map <string, Item*> inventory;
 	std::map <string, Item*> roomItems;
@@ -69,42 +77,78 @@ int main()
 	std::map <string, string> eventActions;
 	bool existsArr[4];
 
-	LABORS currentLabor = NEMEAN;
+	// load game items
+	loadItems(itemList, itemFile);
+
+	//create a Room object
+	Room current = loadRoom(itemList, roomItems, "throne", 0);
+
+	Parser hParser;
+
 	std::vector<string> save_files;
 	scanDirectory(save_files, "save");
 	if (save_files.size() > 0) {
 		system("exec rm -r save/*");
 	}
-	Parser hParser;
-//	testParseVal("Default Values: ", hParser);
-/*
-	std::cout << "\n****Testing Parser.  Type start to start game.****" << std::endl;
-    while (hParser.getObject().compare("start") != 0) {
-		cout << endl << "What do you want to do?  ";
+
+	cout << "\nWelcome Hercules! What would you like to do?\n\nPlease type the number corresponding to your choice:\n1.Start a new game\n2.Load a saved game\n\n";
+	std::getline(cin, command);
+	for (i = 0; i < command.length(); i++) {
+		if (!isdigit(command[i])) {
+			all_digits = 1;
+		}
+	}
+	if (all_digits == 0) {
+		selection = std::atoi(command.c_str());
+		if ((selection <= 2) && (selection > 0)) {
+			valid = 0;
+		}
+	}
+	while (valid == 1) {
+		all_digits = 0;
+		cout << "Your input was invalid. Please type the number corresponding to what you want to do:\n1.Start a new game\n2.Load a saved game\n\n";
 		std::getline(cin, command);
-		hParser.parse(command);
-		testParseVal("Current Values:", hParser);
+		for (i = 0; i < command.length(); i++) {
+			if (!isdigit(command[i])) {
+				all_digits = 1;
+			}
+		}
+		if (all_digits == 0) {
+			selection = std::atoi(command.c_str());
+			if ((selection <= 2) && (selection > 0)) {
+				valid = 0;
+			}
+		}
+	}
+	if (selection == 2) { //check for saved games. If any exist ask user which to load
+		std::vector<string> saved_games;
+		scanDirectory(saved_games, "saved_games");
+		if (saved_games.size() > 0) {
+			loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs, gameData);
+		} else {
+			cout << "Sorry, but there are no saved games. You'll have to start your adventure from the beginning!\n";
+			selection = 1;
+		}
+	}
+	if (selection == 1) { //new game: set current labor, clear out save directory, start with club and bow, load throne room
 
+		cout << "\nHercules, welcome to Mycenae. I am King Eurystheus and\nper the Oracle's decree you will complete the labors I\nassign to you as penance for your follies. To aid you\non your way I gift you an olive wood club and a bow\nwith quiver of arrows. These should serve you well as\nyour first task is to bring me the Nemean lion - dead or alive.\n";
 
-    }
-*/
+		// load game data
+		loadGameData(gameData, dataFile);
+		
+		// set initial labor
+		currentLabor = NEMEAN;
 
-	command = "";
-	
-	// load game items
-	loadItems(itemList, itemFile);
+		// start game with bow and club in inventory
+		addInventory(inventory, itemList, "club");
+		addInventory(inventory, itemList, "bow");
+		addInventory(inventory, itemList, "lion pelt");
 
-	// load game data
-	loadGameData(gameData, dataFile);
-	
-	// start game with bow and club in inventory
-	addInventory(inventory, itemList, "club");
-	addInventory(inventory, itemList, "bow");
-	addInventory(inventory, itemList, "lion pelt");
-	
-	// start game in throne room
-	Room current = loadRoom(itemList, roomItems, "throne");
-	
+		// start game in throne room
+		current = loadRoom(itemList, roomItems, "throne");
+	}
+
 	while (hParser.getAction().compare("quit") != 0) {
 		cout << endl << "What do you want to do?  ";
 		std::getline(cin, command);
@@ -121,8 +165,7 @@ int main()
 		existsArr[IND_EXISTS] = isItemPresent(indItem, inventory, roomItems);
         existsArr[HOLDING_IND] = isItemPresent(indItem, inventory);
 
-
-		if (!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions)) {
+		if (!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList)) {
 
 			if (hParser.getAction().compare("look") == 0) {
 				string lookItem = hParser.getObject();
@@ -218,20 +261,19 @@ int main()
 			}
 
 			else if (command.find("save") != std::string::npos) {
-				saveGame(roomItems, current, inventory, currentLabor, saveAs);
+				saveGame(roomItems, current, inventory, currentLabor, saveAs, gameData);
 			}
 			else if (command.find("load") != std::string::npos) {
-				loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs);
+				loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs, gameData);
 
 
 
 			}
 			//else if (command.compare("quit") != 0 &&
 			else if (hParser.getAction().compare("quit") != 0 &&
-					!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions)) {
+					!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList)) {
 				cout << "I don't understand that command!" << endl;
 			}
-
 		}
 
 		if (!eventActions.empty()) {
@@ -287,6 +329,7 @@ int main()
 					roomItems[eventActions[it->first]]->setMovable(true);
 					removeRoomItems(roomItems, eventActions[it->first]);
 				}
+				
 				// drop item from inventory
 				else if ((it->first).compare("drop item") == 0) {
 					inventory[eventActions[it->first]]->drop();
@@ -295,6 +338,7 @@ int main()
 					if (inventory[eventActions[it->first]]->getQuantity() == 0)
 						inventory.erase(eventActions[it->first]);
 				}
+
 				// consumes an item from inventory
 				else if ((it->first).compare("consume item") == 0) {
 					inventory[eventActions[it->first]]->drop();
@@ -302,6 +346,11 @@ int main()
 					if (inventory[eventActions[it->first]]->getQuantity() == 0)
 						inventory.erase(eventActions[it->first]);
 				}
+
+				else if ((it->first).compare("get item") == 0) {
+					addInventory(inventory, itemList, eventActions[it->first]);
+				}
+
 				else if ((it->first).compare("change short") == 0) {
 					current.setDescShort(eventActions[it->first]);
 				}
@@ -327,7 +376,7 @@ int main()
     return 0;
 }
 
-Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile) {
+Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile, int newGame) {
 	string data;
 //	bool visited;
 	string desc_long = "";
@@ -446,6 +495,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 
 		// all the lines of text in the "items" section and add them to
 		// the roomItems map
+		rmItems.clear();
 		while (std::getline(room_file, data)) {
 			if (data.compare("") != 0) {
 				itemName = data;
@@ -469,10 +519,11 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 	//current.printRoom();
 	room_file.close();
 
-
-	cout << endl << current.look();
-	printRoomItem(rmItems);
-	current.setVisited(true);
+	if (newGame == 1) {
+		cout << endl << current.look();
+		printRoomItem(rmItems);
+		current.setVisited(true);
+	}
 
 	return current;
 
@@ -503,7 +554,11 @@ void saveRoom(std::map<string, Item*>& roomItems, Room current) {
 
 		// visited section
 		save_room << "visited\n";
-		save_room << "true\n\n";
+		if (current.getVisited()) {
+			save_room << "true\n\n";
+		} else { //not visited
+			save_room << "false\n\n";
+		}
 
 		// exits section
 		save_room << "exits\n";
@@ -516,16 +571,14 @@ void saveRoom(std::map<string, Item*>& roomItems, Room current) {
 		save_room << "long description\n";
 
 		// set visited to false so that look() returns long description
-		current.setVisited(false);
-		save_room << current.look();
+		save_room << current.longLook();
 		save_room << "\n";
 
 		// short description section
 		save_room << "short description\n";
 
 		// set visited to true so that look() returns short description
-		current.setVisited(true);
-		save_room << current.look();
+		save_room << current.shortLook();
 		save_room << "\n";
 
 		// items section
@@ -839,13 +892,12 @@ void testParseVal(string label, Parser p){
 }
 
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions) {
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList) {//, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList) {
 
     //existsArr positions OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND
 
 	if (currentLabor == NEMEAN) {
-		if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("shadow") == 0
-				&& existsArr[OBJ_EXISTS] && currentRoom.compare("cave") == 0) {
+		if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("shadow") == 0 && existsArr[OBJ_EXISTS] && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You stop and stare as the shadow starts changing.\nThe woman's hair suddenly starts growing and her body begins to enlarge.\nThe very large shadow lets out a large roar and rushes at you!"));
 			eventActions.insert(std::make_pair("add item", "lion"));
 			eventActions.insert(std::make_pair("remove item", "shadow"));
@@ -853,8 +905,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 
-		else if ((hParser.getAction().compare("move") == 0 || hParser.getAction().compare("push") == 0)&& hParser.getObject().compare("boulder") == 0
-				&& existsArr[OBJ_EXISTS] && currentRoom.compare("trail") == 0) {
+		else if ((hParser.getAction().compare("move") == 0 || hParser.getAction().compare("push") == 0)&& hParser.getObject().compare("boulder") == 0 && existsArr[OBJ_EXISTS] && currentRoom.compare("trail") == 0) {
 			if (gameData["caveBlocked"].compare("false") == 0) {
 				gameData["caveBlocked"] = "true";
 				eventActions.insert(std::make_pair("display", "You pushed on the boulder and it starts to tip over. You jump out of the way as the boulder falls over and completely blocks the cave entrance."));
@@ -863,6 +914,12 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 				eventActions.insert(std::make_pair("change short", "A trail leading to a cave. Go up the trail to head back up the canyon.\n"));
 				eventActions.insert(std::make_pair("change look", "boulder"));
 				eventActions.insert(std::make_pair("boulder", "You tried to push the boulder but it will not budge."));
+				//block exit in cave room as well. load rooms without text output
+				current = loadRoom(itemList, roomItems, "cave", 0);
+				current.setExits(3, "null");
+				saveRoom(roomItems, current);
+				//go back to trail room so eventActions are performed on correct room
+				current = loadRoom(itemList, roomItems, currentRoom, 0);
 			}
 			else {
 				eventActions.insert(std::make_pair("display", "The boulder is fully settled in front of the cave entrance."));
@@ -870,28 +927,24 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 		// if the lion escaped and the hero goes another location, set flag, lionEscaped to signify the lion will return
-		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") != 0
-				&& gameData["lionEscaped"].compare("true") == 0) {
+		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") != 0 && gameData["lionEscaped"].compare("true") == 0) {
 			gameData["lionEscaped"] = "lionReturns";
 			return false;
 		}
 		// if the flag, lionEscaped is lionReturns, and the hero goes back to the cave then add the lion
-		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") == 0
-				&& gameData["lionEscaped"].compare("lionReturns") == 0) {
+		else if (hParser.getAction().compare("move") == 0 && currentRoom.compare("cave") == 0 && gameData["lionEscaped"].compare("lionReturns") == 0) {
 			gameData["lionEscaped"] = "false";
 			eventActions.insert(std::make_pair("add item", "lion"));
 			return true;
 		}
 
 
-		else if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("club") == 0
-				&& existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("lion") == 0 && currentRoom.compare("cave") == 0) {
+		else if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("club") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("lion") == 0 && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You swing the club at the lion but to your surprise the lion shrugs off the blow and rushes at you again."));
 			return true;
 		}
 
-        else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS]
-				&& hParser.getIndirect().compare("club") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("cave") == 0) {
+        else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS] && hParser.getIndirect().compare("club") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You swing the club at the lion but to your surprise the lion shrugs off the blow and rushes at you again."));
 			return true;
 		}
@@ -920,10 +973,9 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 
-		else if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS]
-				&& hParser.getIndirect().compare("bow") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("cave") == 0) {
+		else if (hParser.getAction().compare("shoot") == 0 && hParser.getObject().compare("lion") == 0 && existsArr[OBJ_EXISTS] && hParser.getIndirect().compare("bow") == 0 && existsArr[HOLDING_IND] && currentRoom.compare("cave") == 0) {
 			if ((rand() % 10) > 6) {
-				eventActions.insert(std::make_pair("display", "SWHUP! The arrow shoots straight through the lion's mouth and into the back of its head. It lets out a welp before crashing into the ground. The lion's body spasm for a second or two before finally coming to a complete stop. You killed the lion! You hear a loin club cry out for its father while another lion with scars and a dark mane roars in approval!"));
+				eventActions.insert(std::make_pair("display", "SWHUP! The arrow shoots straight through the lion's mouth and into the back of its head. It lets out a welp before crashing into the ground. The lion's body spasms for a second or two before finally coming to a complete stop. You killed the lion! You hear a lion cub cry out for its father while another lion with scars and a dark mane roars in approval!"));
 				eventActions.insert(std::make_pair("remove item", "lion"));
 				eventActions.insert(std::make_pair("add item", "lion pelt"));
 			}
@@ -934,182 +986,280 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 
+        else if (hParser.getAction().compare("shoot") == 0 && hParser.getObject().compare("bow") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("lion") == 0 && existsArr[IND_EXISTS] && currentRoom.compare("cave") == 0) {
+			if ((rand() % 10) > 6) {
+				eventActions.insert(std::make_pair("display", "SWHUP! The arrow shoots straight through the lion's mouth and into the back of its head. It lets out a welp before crashing into the ground. The lion's body spasms for a second or two before finally coming to a complete stop. You killed the lion! You hear a lion cub cry out for its father while another lion with scars and a dark mane roars in approval!"));
+				eventActions.insert(std::make_pair("remove item", "lion"));
+				eventActions.insert(std::make_pair("add item", "lion pelt"));
+			}
+			else {
+				eventActions.insert(std::make_pair("display", "To your amazement your arrows bounce off the body of the lion. You barely dodge the lion's attack but the lion has already recovered and is coming at you again."));
+			}
+
+			return true;
+		}
+
+
 		else if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("hyperbeam") == 0 && hParser.getIndirect().compare("lion")
 				 && currentRoom.compare("cave") == 0) {
-			eventActions.insert(std::make_pair("display", "You killed the lion! You hear a loin club cry out for its father \nwhile another lion with scars and a dark mane roars in approval!"));
+			eventActions.insert(std::make_pair("display", "You killed the lion! You hear a lion cub cry out for its father while another lion with scars and a dark mane roars in approval!"));
 			eventActions.insert(std::make_pair("remove item", "lion"));
 			eventActions.insert(std::make_pair("add item", "lion pelt"));
 			return true;
 		}
 
-		if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("lion pelt") == 0 && existsArr[HOLDING_OBJ]
-				&& hParser.getIndirect().compare("king") == 0 && currentRoom.compare("throne") == 0) {
+		else if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("lion pelt") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("king") == 0 && currentRoom.compare("throne") == 0) {
 			eventActions.insert(std::make_pair("change state", "lerna"));
-			eventActions.insert(std::make_pair("drop item", "lion pelt"));
-			eventActions.insert(std::make_pair("remove item", "lion pelt"));
+			//eventActions.insert(std::make_pair("drop item", "lion pelt"));
+			//eventActions.insert(std::make_pair("remove item", "lion pelt"));
 			eventActions.insert(std::make_pair("add exit", "south"));
 			eventActions.insert(std::make_pair("south", "lerna"));
-			eventActions.insert(std::make_pair("display", "GAH! You actually killed it! How did you...!?! I mean, of course you did. I am such a compassionate ruler that I gave you a very easy task. Here is another simple labour for you to perform, go kill the hydra to the south! And take that scary, I mean, disgusting lion skin with you!"));
-            eventActions.insert(std::make_pair("change short", "BIGLY, YUUGE PLACE!\n"
-                                      "Exits North and South.\n"));
-            eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nThe border wall to the south had been torn down!\n"));
+			eventActions.insert(std::make_pair("display", "GAH! You actually killed it! How did you...!?! I mean, of course you did. I am such a compassionate ruler that I gave you a very easy task. Here is another simple labor for you to perform, go kill the hydra to the south! And take that scary, I mean, disgusting lion skin with you!"));
+            eventActions.insert(std::make_pair("change short", "BIGLY, YUUGE PLACE!\nExits North and South.\n"));
+            eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nThe border wall to the south has been torn down!\n"));
 			eventActions.insert(std::make_pair("change talk", "king"));
 			eventActions.insert(std::make_pair("king", "Do you not understand Greek? Go kill the hydra of Lerna! Oh and your cousin wanted to talk to you about some nonsense now that the lion is gone.  He went for a walk."));
 			return true;
+
 		}
 
 	}
 
     else if (currentLabor == LERNA){
 		eventActions.insert(std::make_pair("display", ""));
+
+		if (hParser.getAction().compare("look") == 0 && hParser.getObject().compare("shimmer") == 0 && existsArr[OBJ_EXISTS] && currentRoom.compare("swamp2") == 0) {
+			eventActions["display"].append("This is your lucky day!  Someone dropped a coin here.");
+			eventActions.insert(std::make_pair("add item", "coin"));
+			eventActions.insert(std::make_pair("remove item", "shimmer"));
+			return true;
+		}
+
+		else if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("coin") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("iolaus") == 0 && currentRoom.compare("trail") == 0) {
+			eventActions.insert(std::make_pair("drop item", "coin"));
+			eventActions.insert(std::make_pair("remove item", "coin"));
+			eventActions["display"].append("You found it!  Take my torch as thanks!");
+			eventActions.insert(std::make_pair("add item", "torch"));
+			return true;
+		}
 		
 		
-			if (gameData["attackedHead"].compare("true") == 0) {
-				if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("torch") == 0 && existsArr[HOLDING_OBJ]
-				&& hParser.getIndirect().compare("hydra") == 0 && existsArr[IND_EXISTS]) {
-					eventActions["display"].append("You hold the torch into the stump of the head you just knocked off. You hear the sizzling of flesh being seared and the smell of burnt flesh hits your nostrils. ");
-					
-					// check if player destroyed last hydra head
-					if (atoi(gameData["numHydraHeads"].c_str()) < 1) {
-						eventActions["display"].append("\nWith the last head finally gone and unable to regrow anymore the headless body of the hydra finally collapses onto the muddy ground.");
-						eventActions.insert(std::make_pair("remove item", "hydra"));
-						eventActions.insert(std::make_pair("add item", "hydra corpse"));
-						eventActions.insert(std::make_pair("change long", "You are in the swamp of what was once the lair of the hydra.\n"));
-						gameData["hydraUnlocked"] = "null";
-					}
-					else {
-						
-						eventActions["display"].append("The hyrda writhes in pain and begins to attack you again only this time with one less head.");
-						 
-					}
-					gameData["attackedHead"] = "false";
-					
-					return true;
-				}
-				else {
-					eventActions["display"].append("The stump of the head you just knocked off begins quivering and blood starts oozing out. It is as if there is something trying to fight its way out of the hydra's body. You can only watch in shock as another head sprouts out of the stump. However, the stump begins quivering again and you look dumbfounded as ANOTHER head grows out of the same spot.\n");
-					int numHydraHeads = atoi(gameData["numHydraHeads"].c_str()) + 2;
-					std::stringstream ss;
-					ss << numHydraHeads;
-					ss >> gameData["numHydraHeads"];
-
-				}
-				
-				gameData["attackedHead"] = "false";
-			}
-
-
-		    if ((hParser.getAction().compare("get") == 0 || hParser.getAction().compare("attack") == 0) && 
-				hParser.getObject().compare("trees") == 0 && existsArr[OBJ_EXISTS]) {
-					
-				eventActions["display"].append("You manage to break some branches off the trees and onto the ground.");
-				eventActions.insert(std::make_pair("add item", "branches"));
-				return true;
-			}
-			
-			// if herc uses torch on tree branches in swamp4 then unlock hydra
+		if (gameData["attackedHead"].compare("true") == 0) {
 			if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("torch") == 0 && existsArr[HOLDING_OBJ]
-				&& hParser.getIndirect().compare("branches") == 0 && existsArr[HOLDING_IND]) {
-					if  (currentRoom.compare("swamp4") == 0 && gameData["hydraUnlocked"].compare("false") == 0) {
-						eventActions["display"].append("You light the branches with the torch and pretty soon you have a small fire going. The smoke begins billowing around the entrance of the den. After a few minutes you hear loud hissing and a large scaly beast slithers out of the den. THE HYDRA HAS APPEARED! \n\nThe hydra quickly slithers away heading further into the swamp. You jump into its path to prevent it from getting away. At that point the hydra wraps its tail around your one of your leg and rears its heads back baring its fangs.\n");
-						gameData["hydraUnlocked"] = "true";
-						eventActions.insert(std::make_pair("add item", "hydra"));
-						eventActions.insert(std::make_pair("consume item", "branches"));
-						eventActions.insert(std::make_pair("change long", "You are in a battle of life and death with the hydra! This is not the time to enjoy the scenery!\n"));
-					}
-					else {
-						eventActions["display"].append("You light the branches with the torch and pretty soon you have a small fire going. You sit by the fire to warm yourself up and think about your journey so far.");
-						eventActions.insert(std::make_pair("consume item", "branches"));
-						
-					}
+				&& hParser.getIndirect().compare("hydra") == 0 && existsArr[IND_EXISTS]) {
+				eventActions["display"].append("You hold the torch into the stump of the head you just knocked off. You hear the sizzling of flesh being seared and the smell of burnt flesh hits your nostrils. ");
 					
-				return true;	
-			}
-
-			if (hParser.getAction().compare("move") == 0 && gameData["hydraUnlocked"].compare("true") == 0) {
-				eventActions["display"].append("The hydra's tail is wrapped tightly around one of your legs preventing you from running.");
+				// check if player destroyed last hydra head
+				if (atoi(gameData["numHydraHeads"].c_str()) < 1) {
+					eventActions["display"].append("\nWith the last head finally gone and unable to regrow anymore the headless body of the hydra finally collapses onto the muddy ground.");
+					eventActions.insert(std::make_pair("remove item", "hydra"));
+					eventActions.insert(std::make_pair("add item", "hydra corpse"));
+					eventActions.insert(std::make_pair("change long", "You are in the swamp of what was once the lair of the hydra.\n"));
+					gameData["hydraUnlocked"] = "null";
+				}
+				else {		
+					eventActions["display"].append("The hyrda writhes in pain and begins to attack you again only this time with one less head.");
+				}
+				gameData["attackedHead"] = "false";
+					
 				return true;
 			}
-
-			if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("hydra") == 0 && existsArr[OBJ_EXISTS]
-				&& hParser.getIndirect().compare("club") == 0 && existsArr[HOLDING_IND]) {
-
-				eventActions["display"].append("You swing your club with all your might at one of the hydras head and manage to knock it off. You pause to look with satisfaction at the bloody stump on the hydra's body.");
-				
-				// check if newly dispatched head is immortal
-				int numHydraHeads = atoi(gameData["numHydraHeads"].c_str());
-		cout << "numHydraHeads = " << gameData["numHydraHeads"] << endl;
-				if (gameData["attackedImmortalHead"].compare("false") == 0) {
-					if ((rand() % numHydraHeads) == 0) {
-						eventActions["display"].append("\n\nYou hear hissing at your feet. When you look down you see the head you just decapitated is still hissing and biting at you. You step on it with your only unencumbered foot and turn back to face the rest of the hydra's heads.");
-						eventActions.insert(std::make_pair("add item", "hydra head"));
-						gameData["attackedImmortalHead"] = "true";
-					}
-				}
-				numHydraHeads--;
+			else {
+				eventActions["display"].append("The stump of the head you just knocked off begins quivering and blood starts oozing out. It is as if there is something trying to fight its way out of the hydra's body. You can only watch in shock as another head sprouts out of the stump. However, the stump begins quivering again and you look dumbfounded as ANOTHER head grows out of the same spot.\n");
+				int numHydraHeads = atoi(gameData["numHydraHeads"].c_str()) + 2;
 				std::stringstream ss;
 				ss << numHydraHeads;
 				ss >> gameData["numHydraHeads"];
-//		cout << "numHydraHeads = " << gameData["numHydraHeads"] << endl;
+			}
 				
-				gameData["attackedHead"] = "true";
+			gameData["attackedHead"] = "false";
+		}
 
+
+	    if ((hParser.getAction().compare("get") == 0 || hParser.getAction().compare("attack") == 0) && 
+				hParser.getObject().compare("trees") == 0 && existsArr[OBJ_EXISTS]) {
+			eventActions["display"].append("You manage to break some branches off the trees and onto the ground.");
+			eventActions.insert(std::make_pair("add item", "branches"));
+			return true;
+		}
+			
+		// if herc uses torch on tree branches in swamp4 then unlock hydra
+		if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("torch") == 0 && existsArr[HOLDING_OBJ]
+			&& hParser.getIndirect().compare("branches") == 0 && existsArr[HOLDING_IND]) {
+				if  (currentRoom.compare("swamp4") == 0 && gameData["hydraUnlocked"].compare("false") == 0) {
+					eventActions["display"].append("You light the branches with the torch and pretty soon you have a small fire going. The smoke begins billowing around the entrance of the den. After a few minutes you hear loud hissing and a large scaly beast slithers out of the den. THE HYDRA HAS APPEARED! \n\nThe hydra quickly slithers away heading further into the swamp. You jump into its path to prevent it from getting away. At that point the hydra wraps its tail around your one of your leg and rears its heads back baring its fangs.\n");
+					gameData["hydraUnlocked"] = "true";
+					eventActions.insert(std::make_pair("add item", "hydra"));
+					eventActions.insert(std::make_pair("consume item", "branches"));
+					eventActions.insert(std::make_pair("change long", "You are in a battle of life and death with the hydra! This is not the time to enjoy the scenery!\n"));
+				}
+				else {
+					eventActions["display"].append("You light the branches with the torch and pretty soon you have a small fire going. You sit by the fire to warm yourself up and think about your journey so far.");
+					eventActions.insert(std::make_pair("consume item", "branches"));
+				}
+					
+			return true;	
+		}
+
+		if (hParser.getAction().compare("move") == 0 && gameData["hydraUnlocked"].compare("true") == 0) {
+			eventActions["display"].append("The hydra's tail is wrapped tightly around one of your legs preventing you from running.");
+			return true;
+		}
+
+		if (hParser.getAction().compare("attack") == 0 && hParser.getObject().compare("hydra") == 0 && existsArr[OBJ_EXISTS]
+			&& hParser.getIndirect().compare("club") == 0 && existsArr[HOLDING_IND]) {
+
+			eventActions["display"].append("You swing your club with all your might at one of the hydras head and manage to knock it off. You pause to look with satisfaction at the bloody stump on the hydra's body.");
+				
+			// check if newly dispatched head is immortal
+			int numHydraHeads = atoi(gameData["numHydraHeads"].c_str());
+				//cout << "numHydraHeads = " << gameData["numHydraHeads"] << endl;
+			if (gameData["attackedImmortalHead"].compare("false") == 0) {
+				if ((rand() % numHydraHeads) == 0) {
+					eventActions["display"].append("\n\nYou hear hissing at your feet. When you look down you see the head you just decapitated is still hissing and biting at you. You step on it with your only unencumbered foot and turn back to face the rest of the hydra's heads.");
+					eventActions.insert(std::make_pair("add item", "hydra head"));
+					gameData["attackedImmortalHead"] = "true";
+				}
+			}
+			numHydraHeads--;
+			std::stringstream ss;
+			ss << numHydraHeads;
+			ss >> gameData["numHydraHeads"];
+			//cout << "numHydraHeads = " << gameData["numHydraHeads"] << endl;
+			gameData["attackedHead"] = "true";
 				
 			return true;
-			}			
+		}			
 			
+        if (hParser.getAction().compare("look") == 0 && hParser.getObject().compare("shimmer") == 0
+			&& existsArr[OBJ_EXISTS] && currentRoom.compare("swamp2") == 0) {
+			eventActions["display"].append("This is your lucky day!  Someone dropped a coin here.");
+			eventActions.insert(std::make_pair("add item", "silver coin"));
+			eventActions.insert(std::make_pair("remove item", "shimmer"));
+			return true;
+		}
 
-            if (hParser.getAction().compare("look") == 0 && hParser.getObject().compare("shimmer") == 0
-				&& existsArr[OBJ_EXISTS] && currentRoom.compare("swamp2") == 0) {
-				eventActions["display"].append("This is your lucky day!  Someone dropped a coin here.");
-				eventActions.insert(std::make_pair("add item", "silver coin"));
-				eventActions.insert(std::make_pair("remove item", "shimmer"));
-				return true;
-			}
-
-
-			if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("silver coin") == 0 && existsArr[HOLDING_OBJ]
-						&& hParser.getIndirect().compare("iolaus") == 0 && currentRoom.compare("trail") == 0) {
-				eventActions.insert(std::make_pair("drop item", "silver coin"));
-				eventActions.insert(std::make_pair("remove item", "silver coin"));
-				eventActions["display"].append("You found it!  Take my torch as thanks!");
-				eventActions.insert(std::make_pair("add item", "torch"));
-				return true;
-			}
+		if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("silver coin") == 0 && existsArr[HOLDING_OBJ]
+			&& hParser.getIndirect().compare("iolaus") == 0 && currentRoom.compare("trail") == 0) {
+			eventActions.insert(std::make_pair("drop item", "silver coin"));
+			eventActions.insert(std::make_pair("remove item", "silver coin"));
+			eventActions["display"].append("You found it!  Take my torch as thanks!");
+			eventActions.insert(std::make_pair("add item", "torch"));
+			return true;
+		}
 			
-			
-			if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("hydra head") == 0 && existsArr[HOLDING_OBJ]
+		if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("hydra head") == 0 && existsArr[HOLDING_OBJ]
 				&& hParser.getIndirect().compare("king") == 0 && currentRoom.compare("throne") == 0) {
-				eventActions.insert(std::make_pair("change state", "ceryneia"));
-				eventActions.insert(std::make_pair("drop item", "hydra head"));
-				eventActions.insert(std::make_pair("remove item", "hydra head"));
-				eventActions.insert(std::make_pair("add exit", "west"));
-				eventActions.insert(std::make_pair("west", "stymphalus"));
-				eventActions["display"].append("Hmmm? What did you bring to me? WHAH! What is that?!? It's still biting!! Why is it still alive! FINE! FINE! I believe that you killed the hydra just keep that monstrosity away from me! However, I heard from the oracle of Hera that your cousin aided you in this labour. These labours are meant to be performed by you without any help so I am afraid that killing the hydra was completely meaningless. However, being the wise king that I am, I have already decided on your next labour. You are to bring back the hind of Ceryneian. I've ordered the West gate to be opened for you.");
-				eventActions.insert(std::make_pair("change short", "BIGLY, YUUGE PLACE!\n"
+			eventActions.insert(std::make_pair("change state", "ceryneia"));
+			eventActions.insert(std::make_pair("drop item", "hydra head"));
+			eventActions.insert(std::make_pair("remove item", "hydra head"));
+			eventActions.insert(std::make_pair("add exit", "west"));
+			eventActions.insert(std::make_pair("west", "stymphalus"));
+			eventActions["display"].append("Hmmm? What did you bring to me? WHAH! What is that?!? It's still biting!! Why is it still alive! FINE! FINE! I believe that you killed the hydra just keep that monstrosity away from me! However, I heard from the oracle of Hera that your cousin aided you in this labour. These labours are meant to be performed by you without any help so I am afraid that killing the hydra was completely meaningless. However, being the wise king that I am, I have already decided on your next labour. You are to bring back the hind of Ceryneian. I've ordered the West gate to be opened for you.");
+			eventActions.insert(std::make_pair("change short", "BIGLY, YUUGE PLACE!\n"
 										  "Exits North and South. The gate to the west leads to the town of Stymphalus.\n"));
-				eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nThe border wall to the south had been torn down and the gate leading west to Stymphalus has been opened.\n"));
-				eventActions.insert(std::make_pair("change talk", "king"));
-				eventActions.insert(std::make_pair("king", "Oh? Did you bring back the hind of Ceryneian already? No? Then I have more important matters to attend to."));
+			eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nThe border wall to the south had been torn down and the gate leading west to Stymphalus has been opened.\n"));
+			eventActions.insert(std::make_pair("change talk", "king"));
+			eventActions.insert(std::make_pair("king", "Oh? Did you bring back the hind of Ceryneian already? No? Then I have more important matters to attend to."));
 				
-				return true;
+			return true;
 				
-			}
-			
+		}
+		/*
+		if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("hydra head") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("king") == 0 && currentRoom.compare("throne") == 0) {
+			eventActions.insert(std::make_pair("change state", "ceryneia"));
+			//open exit in nemean room north to ceryneia. load rooms without text output
+			current = loadRoom(itemList, roomItems, "nemean", 0);
+			current.setExits(0, "ceryneia");
+			current.setDescShort("The countryside of Nemea. North - Ceryneia; South - King Eurystheus\nWest - Lion's Cave; Down - Trail");
+			current.setDescLong("You are standing above a canyon just outside the city-state of Nemea.\nThe road north leads to Ceryneia. If you go west you'll reach the lion's cave.\nThere also appears to be a trail down the canyon. Mycenae and the\nthrone room of King Eurystheus lie to the south.");
+			current.setVisited(false);
+			saveRoom(roomItems, current);
+			//go back to throne room to continue adventure
+			current = loadRoom(itemList, roomItems, currentRoom, 0);
+			eventActions.insert(std::make_pair("display", "How in heavens did you kill that thing? On second thought, don't answer that.\nSince you clearly are adept at killing things, for this next labor I want you to bring me\nback something alive. Go north to Ceryneia and capture the fabled Hind and return it here."));
+			eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nYou can leave town along the road either north or south.\n"));
+			eventActions.insert(std::make_pair("change talk", "king"));
+			eventActions.insert(std::make_pair("king", "The Hind won't catch itself. Get going."));
+			return true;
+		}
+		*/
 
     }
 
-
+	else if (currentLabor == CERYNEIA){
+		
+		if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("lion pelt") == 0 && existsArr[HOLDING_OBJ] && (hParser.getIndirect().compare("townswoman") == 0 || hParser.getIndirect().compare("arachne") == 0) && currentRoom.compare("ceryneia") == 0) {
+			eventActions.insert(std::make_pair("display", "\n\"Well, Arachne. You say you're a seamstress. Can you make anything out of this?\"\n\n\"Is that real lion?!? I haven't had material this nice since, well, ever.\nWait right here. I'll be back shortly.\"\n\nArachne returns with a fabulous lion skin vest which fits like a glove\nand a long coil of rope woven from the lion's mane. \"This rope sure might\ncome in handy\" you think as you slide on the vest and thank Arachne."));
+			eventActions.insert(std::make_pair("drop item", "lion pelt"));
+			eventActions.insert(std::make_pair("remove item", "lion pelt"));
+			eventActions.insert(std::make_pair("get item", "rope"));
+			return true;
+		} 
+		
+		else if (currentRoom.compare(gameData["hindLocation"]) == 0 && currentRoom.compare("woods3") == 0 && gameData["trapSet"].compare("true") == 0) {
+			gameData["hindLocation"] = "caught";
+			eventActions.insert(std::make_pair("display", "\nAgain the Hind hears you approach and flees. However, unfortunately\nfor the Hind it scampers towards the narrow path where your trap is\nset. You hear a commotion amongst the brush followed by a shrill yell\nfrom the Hind and are relieved\nto see the Hind dangling from the air with a hind\nleg caught in the snare. You rush over to the animal and quickly use the\nremaining rope to hog tie it before throwing the captured creature over your shoulder\nto haul back to Mycenae and King Eurystheus."));
+			eventActions.insert(std::make_pair("get item", "hind"));
+			return true;
+		}
+		
+		else if ((currentRoom.compare("woods3") == 0 || currentRoom.compare("woods4") == 0) && ((hParser.getAction().compare("use") == 0 && hParser.getObject().compare("rope") == 0 && existsArr[HOLDING_OBJ]) || (hParser.getAction().compare("set") == 0 && hParser.getObject().compare("trap"))) && gameData["trapSet"].compare("false") == 0) {
+			gameData["trapSet"] = "true";
+			eventActions.insert(std::make_pair("display", "\nTired of chasing this Hind all through these woods, you decide\nit's time to start hunting smarter and pull out the rope from Arachne.\nYou walk over to the narrow path and set up a snare to grab any unsuspecting passerby."));
+			return true;
+		}
+		
+		else if (currentRoom.compare(gameData["hindLocation"]) == 0) { //in room with Hind
+			eventActions.insert(std::make_pair("display", "\nWhat's that? In the distance you see the glint of sunlight on gold.\nThe Hind heard your approach and scampered away before you\ncould get in range of a shot."));
+			if (gameData["hindLocation"].compare("woods1") == 0) {
+				gameData["hindLocation"] = "woods2";
+			} else if (gameData["hindLocation"].compare("woods2") == 0) {
+				gameData["hindLocation"] = "woods3";
+			} else if (gameData["hindLocation"].compare("woods3") == 0) {
+				gameData["hindLocation"] = "woods4";
+			} else if (gameData["hindLocation"].compare("woods4") == 0) {
+				gameData["hindLocation"] = "woods5";
+			} else if (gameData["hindLocation"].compare("woods5") == 0) {
+				gameData["hindLocation"] = "woods6";
+			} else { //gameData["hindLocation"].compare("woods6") == 0)
+				gameData["hindLocation"] = "woods1";
+			}
+			return true;
+		} 
+		
+		else if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("hind") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("king") == 0 && currentRoom.compare("throne") == 0) {
+			eventActions.insert(std::make_pair("change state", "erymanthia"));
+			eventActions.insert(std::make_pair("add exit", "east"));
+			eventActions.insert(std::make_pair("east", "tiryns"));
+			eventActions.insert(std::make_pair("display", "Back so soon? With the Hind?! There appears to be no stopping you when you\nset your mind to something. Well, maybe this next task can flummox you. I need\nyou to go to Mount Erymanthian and capture the boar that is ravaging the nearby\nvillages. Think you can do that? If so, head east to the port at Tiryns to catch\na ride aboard any of the vessels heading in that direction. Oh, and here's\nsome coin to pay your way. Don't get used to my coin in your pocket, though.\nBe off!"));
+			eventActions.insert(std::make_pair("drop item", "hind"));
+			eventActions.insert(std::make_pair("remove item", "hind"));
+			eventActions.insert(std::make_pair("get item", "coin"));
+			eventActions.insert(std::make_pair("get item", "coin"));
+			eventActions.insert(std::make_pair("get item", "coin"));
+			eventActions.insert(std::make_pair("get item", "coin"));
+			eventActions.insert(std::make_pair("get item", "coin"));
+            eventActions.insert(std::make_pair("change short", "BIGLY, YUUGE PLACE!\nExits North, South, and East.\n"));
+            eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nThe road north leads to Nemea and Ceryneia; the road south leads to Lerna; and\nto the east is the port of Tiryns\n"));
+			eventActions.insert(std::make_pair("change talk", "king"));
+			eventActions.insert(std::make_pair("king", "I don't want to hear excuses. Bring me that boar!"));
+			return true;
+		}
+    }
+	
 	return false;
 }
 
 void setLabor(LABORS &currentLabor, string newLabor) {
 	// enum LABORS {NEMEAN, LERNA, CERYNEIA};
-	if (newLabor.compare("lerna") == 0)
+	if (newLabor.compare("lerna") == 0) {
 		currentLabor = LERNA;
-	else if (newLabor.compare("ceryneia") == 0)
+	} else if (newLabor.compare("ceryneia") == 0) {
 		currentLabor = CERYNEIA;
-
+	} else if (newLabor.compare("erymanthia") == 0) {
+		currentLabor = ERYMANTHIA;
+	}
 }
 
 bool isItemPresent(string itemName, std::map<string, Item*>& inventory, std::map<string, Item*>& roomItems) {
@@ -1133,7 +1283,6 @@ bool isItemPresent(string itemName, std::map<string, Item*>& inventory) {
 	if(inventory.find(itemName) != inventory.end()) {
 		return true;
 	}
-
 	else
 		return false;
 }
@@ -1253,12 +1402,11 @@ int cleanInput(string& input, int& valid) {
 		}
 	}
 	input.resize(k + 1);
-	cout << input << endl;
 	return modified;
 }
 
 
-void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs) {
+void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& inventory, LABORS currentLabor, string& saveAs, std::map<string, string>& gameData) {
 	int i, j, k;
 	int save = 1, overwrite = 1, validInput = 1, modified = 1;
 	string yes_no;
@@ -1272,6 +1420,7 @@ void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string,
 	saveCurrentRoom(current);
 	saveInventory(inventory);
 	saveLabor(currentLabor);
+	saveGameData(gameData);
 
 	if (saveAs != "") {
 		cout << "You either loaded or previously saved the game titled: " << saveAs << ".\nWould you like to save with this same name and overwrite the game files?\n";
@@ -1329,7 +1478,7 @@ void saveGame(std::map<string, Item*>& roomItems, Room current, std::map<string,
 }
 
 
-void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string& saveAs){
+void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, Room& current, LABORS& currentLabor, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string& saveAs, std::map<string, string>& gameData){
 	int i, loadFrom, load = 1, all_digits = 0;
 	string input;
 	string::size_type sz;
@@ -1375,8 +1524,9 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 			}
 		}
 
-		//clear inventory, clear room items, remove all files from save/ directory, and copy all files from saved game to save/ directory
+		//clear inventory, clear gameData, clear room items, remove all files from save/ directory, and copy all files from saved game to save/ directory
 		inventory.clear();
+		gameData.clear();
 		rmItems.clear();
 		string remove = "rm -r -f save/";
 		system(remove.c_str());
@@ -1391,6 +1541,10 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		//load inventory
 		loadInventory(itemList, inventory);
 
+		//load gameData
+		string data_path = "./save/gameData.data";
+		loadGameData(gameData, data_path);
+		
 		//load current room
 		string current_room_name;
 		string current_room_path = "./save/currentRoom.currentRoom";
@@ -1426,20 +1580,25 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 }
 
 
+void saveGameData(std::map<string, string>& gameData) {
+	string save_path = "./save/gameData.data";
+	std::ofstream dest(save_path.c_str(), std::ios::binary);
+	for(map<string,string>::iterator it = gameData.begin(); it != gameData.end(); ++it) {
+		if (it->first != "") {
+			dest << it->first << endl << gameData[it->first] << endl;
+		}
+	}
+	dest.close();
+}
+
+
 void loadGameData(std::map<string, string>& gameData, string dataFile) {
 	string key = "";
 	string data = "";
 	std::fstream data_file;
 
-	// convert dataFile to lowercase
-	for(unsigned int i = 0; i < dataFile.length(); i++) {
-		dataFile[i] = tolower(dataFile[i]);
-	}
-
 	// convert dataFile to c-string for fstream open()
 	data_file.open(dataFile.c_str(), std::ios::out | std::ios::in);
-
-//	cout << "Data file opened = " << dataFile << endl;
 
 	if(data_file) {
 		while(std::getline(data_file, data)) {
@@ -1448,10 +1607,14 @@ void loadGameData(std::map<string, string>& gameData, string dataFile) {
 			gameData.insert(std::make_pair(key, data));
 			//cout << "[" << key << "] : [" << data << "]" << endl;
 		}
+	} else {
+		cout << "Could not open data_file: " << dataFile << endl;
 	}
-	/*
+}
+
+void printGameData(std::map<string, string>& gameData) {
 	cout << "Game Data:" << endl;
 	for(map<string,string>::iterator it = gameData.begin(); it != gameData.end(); ++it) {
-		cout << "[" << it->first << "] : [" << gameData[it->first] << "]" << endl; }
-	*/
+		cout << "[" << it->first << "] : [" << gameData[it->first] << "]" << endl;
+	}
 }

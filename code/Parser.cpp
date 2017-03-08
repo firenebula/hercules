@@ -111,6 +111,7 @@ void Parser::dictionaryLoad(){
     addEntry(actionMap, PUSH_CMDS,  PUSH);
     addEntry(actionMap, QUIT_CMDS,  QUIT);
     addEntry(actionMap, GIVE_CMDS,  GIVE);
+    addEntry(actionMap, SHOOT_CMDS,  SHOOT);
 
     addEntry(actionMap, TALK_CMDS,  TALK);
     addEntry(actionMap, INVENTORY_CMDS,  INVENTORY);

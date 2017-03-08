@@ -15,6 +15,10 @@ const string GIVE = "give";
 string giveArr[] = {"give"};
 std::vector<std::string> GIVE_CMDS(giveArr, giveArr+ sizeof(giveArr) / sizeof(giveArr[0]));
 
+const string SHOOT = "shoot";
+string shootArr[] = {"shoot"};
+std::vector<std::string> SHOOT_CMDS(shootArr, shootArr+ sizeof(shootArr) / sizeof(shootArr[0]));
+
 const string MOVE = "move";
 string moveArr[] = {"go", "move", "approach"};
 std::vector<std::string> MOVE_CMDS(moveArr, moveArr+ sizeof(moveArr) / sizeof(moveArr[0]));
@@ -33,7 +37,7 @@ std::vector<std::string> GET_CMDS(getArr, getArr + sizeof(getArr) / sizeof(getAr
 
 
 const string USE = "use";
-string useArr[] = {"use", "activate", "shoot", "swing"};
+string useArr[] = {"use", "activate", "swing"};
 std::vector<std::string> USE_CMDS(useArr, useArr + sizeof(useArr) / sizeof(useArr[0]));
 
 const string DROP = "drop";

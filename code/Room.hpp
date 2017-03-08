@@ -45,5 +45,6 @@ class Room
     void printRoom();
     string look();
     string longLook();
+	string shortLook();
 };
 #endif
