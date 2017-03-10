@@ -43,7 +43,7 @@ void printRoomItem(std::map<string, Item*>& roomItems);
 
 bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList);
 
-/*, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList); */
+/* std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList); */
 
 void setLabor(LABORS &currentLabor, string newLabor);
 
@@ -315,12 +315,42 @@ int main()
 						exitIndex = 3;
 					else if (rmExit.compare("up") == 0)
 						exitIndex = 4;
-					else if (rmExit.compare("down") == 0)
+					else if (rmExit.compare("down") == 0) 
 						exitIndex = 5;
-
-					if (exitIndex > 0)
+					
+					if (exitIndex >= 0)
 						current.setExits(exitIndex, "null");
 				}
+				else if ((it->first).compare("remove room exit") == 0) {
+					// eventActions[it->first] is the name of the non-current room
+					// and the specific exit to be removed is stored in eventActions[eventActions[it->first]]
+					string rmExit = eventActions[it->first];
+					int exitIndex = -1;
+					std::map <string, Item*> tempList;
+					Room temp = loadRoom(itemList, tempList, rmExit, 0);
+					rmExit = eventActions[rmExit];
+					
+					if (rmExit.compare("north") == 0)
+						exitIndex = 0;
+					else if (rmExit.compare("south") == 0)
+						exitIndex = 1;
+					else if (rmExit.compare("east") == 0)
+						exitIndex = 2;
+					else if (rmExit.compare("west") == 0)
+						exitIndex = 3;
+					else if (rmExit.compare("up") == 0)
+						exitIndex = 4;
+					else if (rmExit.compare("down") == 0) 
+						exitIndex = 5;
+					
+					if (exitIndex >= 0)
+						temp.setExits(exitIndex, "null");
+					
+					cout << "removed " << temp.getName() << "'s " << rmExit <<  " exit!" << endl;
+					saveRoom(tempList, temp);					
+				}
+
+				
 				else if ((it->first).compare("add item") == 0) {
 					addRoomItems(roomItems, itemList, eventActions[it->first]);
 				}
@@ -916,7 +946,18 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			if (gameData["caveBlocked"].compare("false") == 0) {
 				gameData["caveBlocked"] = "true";
 				eventActions.insert(std::make_pair("display", "You pushed on the boulder and it starts to tip over. You jump out of the way as the boulder falls over and completely blocks the cave entrance."));
-				eventActions.insert(std::make_pair("remove exit", "east"));
+				
+				// remove exit from lion cave
+				//Room temp = loadRoom(itemList, roomItems, "nemean", 0);
+
+				
+				eventActions.insert(std::make_pair("remove exit", "west"));
+				
+				// remove exit from lion cave
+				eventActions.insert(std::make_pair("remove room exit", "cave"));
+				eventActions.insert(std::make_pair("cave", "east"));
+				
+				
 				eventActions.insert(std::make_pair("change long", "The trail is covered broken branches and animal tracks of a very large animal. A large boulder is completely blocking the cave entrance. The sounds of a woman crying is emanating from the cave.\n"));
 				eventActions.insert(std::make_pair("change short", "A trail leading to a cave. Go up the trail to head back up the canyon.\n"));
 				eventActions.insert(std::make_pair("change look", "boulder"));
@@ -1068,8 +1109,11 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 
 
 		if (gameData["attackedHead"].compare("true") == 0) {
-			if (hParser.getAction().compare("use") == 0 && hParser.getObject().compare("torch") == 0 && existsArr[HOLDING_OBJ]
-				&& hParser.getIndirect().compare("hydra") == 0 && existsArr[IND_EXISTS]) {
+			if ((hParser.getAction().compare("use") == 0 && hParser.getObject().compare("torch") == 0 && existsArr[HOLDING_OBJ]
+				&& hParser.getIndirect().compare("hydra") == 0 && existsArr[IND_EXISTS]) || 
+				(hParser.getAction().compare("light") == 0 && hParser.getObject().compare("hydra") == 0 && existsArr[OBJ_EXISTS]
+				&& hParser.getIndirect().compare("torch") == 0 && existsArr[HOLDING_IND])
+				) {
 				eventActions["display"].append("You hold the torch into the stump of the head you just knocked off. You hear the sizzling of flesh being seared and the smell of burnt flesh hits your nostrils. ");
 
 				// check if player destroyed last hydra head
@@ -1156,8 +1200,6 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 
 			return true;
 		}
-
-
 
 
 		if (hParser.getAction().compare("move") == 0 && gameData["hydraUnlocked"].compare("true") == 0) {
@@ -1342,7 +1384,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 }
 
 void setLabor(LABORS &currentLabor, string newLabor) {
-	// enum LABORS {NEMEAN, LERNA, CERYNEIA};
+	// enum LABORS {NEMEAN, LERNA, CERYNEIA, ERYMANTHIA};
 	if (newLabor.compare("lerna") == 0) {
 		currentLabor = LERNA;
 	} else if (newLabor.compare("ceryneia") == 0) {
@@ -1652,7 +1694,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		//load labor
 		string current_labor_string;
 		int current_labor_int;
-		LABORS labors_list[] = {NEMEAN, LERNA, CERYNEIA};
+		LABORS labors_list[] = {NEMEAN, LERNA, CERYNEIA, ERYMANTHIA};
 		string current_labor_path = "./save/labor.labor";
 		std::fstream current_labor_file;
 		current_labor_file.open(current_labor_path.c_str(), std::ios::out | std::ios::in);
@@ -1661,6 +1703,26 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 			std::getline(current_labor_file, current_labor_string);
 			current_labor_int = std::atoi(current_labor_string.c_str());;
 			currentLabor = labors_list[current_labor_int];
+			
+			// change how the king speaks accordingly to the current labor
+			string kingsTalk = "";
+			switch (currentLabor) {
+				case LERNA:
+					kingsTalk = "Do you not understand Greek? Go kill the hydra of Lerna! Oh and your cousin wanted to talk to you about some nonsense now that the lion is gone.  He went for a walk.";
+					break;
+				case CERYNEIA:
+					kingsTalk = "Oh? Did you bring back the hind of Ceryneian already? No? Then I have more important matters to attend to.";
+					break;
+				case ERYMANTHIA:
+					kingsTalk = "I don't want to hear excuses. Bring me that boar!";
+					break;
+				default:
+					kingsTalk = "Can someone tell this stinking, lumbering buffon to go kill the Nemean lion!";
+					break;
+			}
+			
+			itemMap["king"]->setTalk(kingsTalk);
+			
 		} else {
 			cout << "could not find/open current labor file.\n";
 		}
