@@ -6,21 +6,21 @@ false
 exits
 null
 null
-cave
 null
+cave
 nemean
 null
 
 long description
 The trail is covered with broken branches and animal tracks from 
-a very large animal. To the east is a cave that is partially
+a very large animal. To the west is a cave that is partially
 obscured by a large boulder. You feel a slight breeze blow past
 you and into the cave. There are more bones scattered about the
 entrance and the sounds of a woman crying emanate from the cave.
 Climbing back up the trail leads to Nemea.
 
 short description
-A trail leading to a cave. Exits: East - cave;
+A trail leading to a cave. Exits: West - cave;
 Up - Nemea 
 
 items
