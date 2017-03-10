@@ -13,8 +13,9 @@ null
 
 long description
 You arrive at the quaint little village of Lerna. Folks
-pass one another on the street without looking up. Everyones
-got somewhere to go and everyone is minding their own business.
+pass one another on the street without looking up. Everyone's
+got somewhere to go and everyone, with the exception of the 
+town gossip  is minding their own business.
 There is a damp smell of too much livestock in too little space.
 To the north lies the road back to palace. To the east lies a
 road that looks vaguely swampy. The south and west roads are
@@ -25,7 +26,7 @@ The Village of Lerna. Exits: North - King's throne room;
 East - Swamp
 
 items
-
-
+gossip
+1
 
 

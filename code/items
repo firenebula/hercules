@@ -471,11 +471,11 @@ false
 true
 
 [name]
-sword in stone
+sword hilt
 
 [description]
-The inscription on the sword reads "Feed me and I live. Give me drink and I die. Say my name
-to receive the gift."
+Encased in rock, the inscription on the sword reads "Feed me and I live. Give me drink and I die. Say my name
+to receive my gift."
 
 [use]
 The sword will not budge
@@ -507,6 +507,29 @@ You swish the sword through the air a few times.  This is fun!
 
 [movable]
 true
+
+[quantity]
+1
+
+[available]
+true
+
+
+[name]
+gossip
+
+[description]
+The town gossip is idly weaving tales to whoever will listen.
+
+[use]
+Gossip sadly has no use.
+
+[talk]
+"I COULD tell you the Hydra's weakness, but shouldn't a true 
+hero at least have a sword?!"
+
+[movable]
+false
 
 [quantity]
 1
