@@ -10,6 +10,18 @@ using std::string;
 const char* NONE = "$none";
 
 //ACTION DEFINITIONS That use Objects
+const string SET = "set";
+string setArr[] = {"set", "make"};
+std::vector<std::string> SET_CMDS(setArr, setArr+ sizeof(setArr) / sizeof(setArr[0]));
+
+const string LIGHT = "light";
+string lightArr[] = {"light", "burn", "ignite"};
+std::vector<std::string> LIGHT_CMDS(lightArr, lightArr+ sizeof(lightArr) / sizeof(lightArr[0]));
+
+const string CUT = "cut";
+string cutArr[] = {"cut", "break"};
+std::vector<std::string> CUT_CMDS(cutArr, cutArr+ sizeof(cutArr) / sizeof(cutArr[0]));
+
 
 const string GIVE = "give";
 string giveArr[] = {"give"};
@@ -60,8 +72,11 @@ const string QUIT = "quit";
 string quitArr[] = {"q", "quit"};
 std::vector<std::string> QUIT_CMDS(quitArr, quitArr + sizeof(quitArr) / sizeof(quitArr[0]));
 
-//Commands that stand for an action and an object
+const string SAY = "say";
+string sayArr[] = {"say", "speak"};
+std::vector<std::string> SAY_CMDS(sayArr, sayArr + sizeof(sayArr) / sizeof(sayArr[0]));
 
+//Commands that stand for an action and an object
 
 
 const string START = "start";
