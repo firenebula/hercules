@@ -143,6 +143,7 @@ int main()
 		// start game with bow and club in inventory
 		addInventory(inventory, itemList, "club");
 		addInventory(inventory, itemList, "bow");
+		addInventory(inventory, itemList, "lion pelt");
 
 		// start game in throne room
 		current = loadRoom(itemList, roomItems, "throne");
@@ -891,23 +892,11 @@ void testParseVal(string label, Parser p){
 }
 
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList) {
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList) {//, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList) {
 
     //existsArr positions OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND
-	if (currentRoom.compare("woods3") == 0 && hParser.getAction().compare("move") == 0 && (hParser.getObject().compare("game trail") == 0 || hParser.getObject().compare("trail") == 0)) {
-		saveRoom(roomItems, current);
-		roomItems.clear();
-		current = loadRoom(itemList, roomItems, "woods4");
-		return true;
-	}
-	else if (currentRoom.compare("woods4") == 0 && hParser.getAction().compare("move") == 0 && (hParser.getObject().compare("game trail") == 0 || hParser.getObject().compare("trail") == 0)) {
-		saveRoom(roomItems, current);
-		roomItems.clear();
-		current = loadRoom(itemList, roomItems, "woods3");
-		return true;
-	}
-	
-	else if (currentLabor == NEMEAN) {
+
+	if (currentLabor == NEMEAN) {
 		if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("shadow") == 0 && existsArr[OBJ_EXISTS] && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You stop and stare as the shadow starts changing.\nThe woman's hair suddenly starts growing and her body begins to enlarge.\nThe very large shadow lets out a large roar and rushes at you!"));
 			eventActions.insert(std::make_pair("add item", "lion"));
@@ -970,7 +959,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			}
 			else {
 				if (gameData["caveBlocked"].compare("false") == 0){
-					eventActions.insert(std::make_pair("display", "You once again wrestle with the lion grabbing the lion's throat.  The lion breaks free once more but this time it has had enough of fighting with you. The lion starts retreating and runs toward the exit at the back of the cave. You chase after it but it is too late and the beast has already put too much distance between you. It doesn't look like it will be back here for a few days."));
+					eventActions.insert(std::make_pair("display", "You once again wrestle with the lion grabbing the lion's throat.  The lion breaks free once more but this time it has enough of fighting with you. The lion starts retreating and runs toward the exit at the back of the cave. You chase after it but it is too late and the beast has already put too much distance between you. It doesn't look like it will be back here for a few days."));
 					eventActions.insert(std::make_pair("remove item", "lion"));
 					gameData["lionEscaped"] = "true";
 					gameData["lionAttacks"] = "0";
