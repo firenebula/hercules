@@ -4,7 +4,7 @@ visited
 false
 
 exits
-ceryneia
+null
 throne
 null
 cave
@@ -14,13 +14,12 @@ trail
 
 long description
 You are standing above a canyon just outside the city-state of Nemea.
-The road north to Ceryneia is blocked. The locals said that if you go
-west you'll reach the lion's cave. There also appears to be a trail
-down the canyon. Mycenae and the throne room of King Eurystheus lie south. 
+The locals say that if you go west you'll reach the lion's cave. There
+also appears to be a trail heading down into the canyon. Mycenae and
+the throne room of King Eurystheus lie to the south. 
 
 short description
-The countryside of Nemea. The way north to Ceryneia is blocked. To the
-west is the lion's cave, to the south is the throne room of King
-Eurystheus. There is also a trail that leads down.
+The countryside of Nemea. Exits: South - King's throne room;
+West - Lion's den; Down - canyon trail
 
 items

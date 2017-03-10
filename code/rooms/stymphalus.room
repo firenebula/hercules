@@ -13,9 +13,11 @@ trail
 
 
 long description
-You've reached the village of Stymphalus. If you continue West, you will reach the town of Ceryneia.
+You've reached the village of Stymphalus. Going West, you will
+reach the town of Ceryneia. East is Mycenae and King Eurystheus.
 
 short description
-The village of Stymphalus. Ceryneia lies to the West.
+The village of Stymphalus. Exits: East - King's throne room;
+West - Ceryneia
 
 items
