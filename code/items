@@ -469,3 +469,47 @@ false
 
 [available]
 true
+
+[name]
+sword in stone
+
+[description]
+The inscription on the sword reads "Feed me and I live. Give me drink and I die. Say my name
+to receive the gift."
+
+[use]
+The sword will not budge
+
+[talk]
+"No answer..."
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true
+
+
+[name]
+sword
+
+[description]
+A deadly weapon worthy of a true hero.
+
+[use]
+You swish the sword through the air a few times.  This is fun!
+
+[talk]
+"Less talky, more slicey"
+
+[movable]
+true
+
+[quantity]
+1
+
+[available]
+true
