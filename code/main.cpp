@@ -553,7 +553,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 	room_file.close();
 
 	if (newGame == 1) {
-		cout << endl << current.look();
+		cout << endl << current.longLook();
 		printRoomItem(rmItems);
 		current.setVisited(true);
 	}
@@ -978,7 +978,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 				eventActions.insert(std::make_pair("cave", "east"));
 				
 				
-				eventActions.insert(std::make_pair("change long", "The trail is covered broken branches and animal tracks of a very large animal. A large boulder is completely blocking the cave entrance. The sounds of a woman crying is emanating from the cave.\n"));
+				eventActions.insert(std::make_pair("change long", "The trail is covered by broken branches and animal tracks from a very large animal. A large boulder is completely blocking the cave entrance. The sounds of a woman crying emanate from inside the cave.\n"));
 				eventActions.insert(std::make_pair("change short", "A trail leading to a cave. Go up the trail to head back up the canyon.\n"));
 				eventActions.insert(std::make_pair("change look", "boulder"));
 				eventActions.insert(std::make_pair("boulder", "You tried to push the boulder but it will not budge."));
@@ -1729,6 +1729,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		}
 		current_room_file.close();
 		cout << current.longLook();
+		printRoomItem(rmItems);
 
 		//load labor
 		string current_labor_string;
