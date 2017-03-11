@@ -38,7 +38,7 @@ bool isItemPresent(string itemName, std::map<string, Item*>& inventory);
 
 void printRoomItem(std::map<string, Item*>& roomItems);
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser& hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string command);
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string command);
 
 void setLabor(LABORS &currentLabor, string newLabor);
 
@@ -925,7 +925,7 @@ void testParseVal(string label, Parser p){
 }
 
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser& hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string command) {
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string command) {
 
     //existsArr positions OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND
 
