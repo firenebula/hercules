@@ -41,7 +41,7 @@ void printRoomItem(std::map<string, Item*>& roomItems);
 
 //bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& eventActions);
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList);
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory);
 
 /* std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList); */
 
@@ -165,7 +165,7 @@ int main()
 		existsArr[IND_EXISTS] = isItemPresent(indItem, inventory, roomItems);
         existsArr[HOLDING_IND] = isItemPresent(indItem, inventory);
 
-		if (!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList)) {
+		if (!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory)) {
 
 			if (hParser.getAction().compare("look") == 0) {
 				string lookItem = hParser.getObject();
@@ -271,9 +271,10 @@ int main()
 			}
 			//else if (command.compare("quit") != 0 &&
 			else if (hParser.getAction().compare("quit") != 0 &&
-					!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList)) {
+					!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory)) {
 				cout << "I don't understand that command!" << endl;
 			}
+			checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory);
 		}
 
 		if (!eventActions.empty()) {
@@ -929,7 +930,7 @@ void testParseVal(string label, Parser p){
 }
 
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList) {//, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList) {
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory) {
 
     //existsArr positions OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND
 
@@ -1336,10 +1337,28 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			return true;
 		}
 
-		else if ((currentRoom.compare("woods3") == 0 || currentRoom.compare("woods4") == 0) && ((hParser.getAction().compare("use") == 0 && hParser.getObject().compare("rope") == 0 && existsArr[HOLDING_OBJ]) || (hParser.getAction().compare("set") == 0 && hParser.getObject().compare("trap"))) && gameData["trapSet"].compare("false") == 0) {
-			gameData["trapSet"] = "true";
-			eventActions.insert(std::make_pair("display", "\nTired of chasing this Hind all through these woods, you decide\nit's time to start hunting smarter and pull out the rope from Arachne.\nYou walk over to the narrow path and set up a snare to grab any unsuspecting passerby."));
+		else if ((currentRoom.compare("woods3") == 0 || currentRoom.compare("woods4") == 0) && hParser.getAction().compare("use") == 0 && hParser.getObject().compare("rope") == 0 && existsArr[HOLDING_OBJ]) {
+			if (gameData["trapSet"].compare("false") == 0) {
+				gameData["trapSet"] = "true";
+				eventActions.insert(std::make_pair("display", "\nTired of chasing this Hind all through these woods, you decide\nit's time to start hunting smarter and pull out the rope from Arachne.\nYou walk over to the narrow path and set up a snare to grab any unsuspecting passerby."));
+			} else { //trap already set
+				eventActions.insert(std::make_pair("display", "\nHow many traps do you think you need to set?\nIf you put up anymore you may not get off this trail without catching yourself.\nBesides, you've used all your rope, knucklehead."));
+			}
 			return true;
+		}
+		
+		else if ((currentRoom.compare("woods3") == 0 || currentRoom.compare("woods4") == 0) && hParser.getAction().compare("set") == 0 && (hParser.getObject().compare("trap") == 0 || hParser.getObject().compare("snare") == 0)) {
+			if (isItemPresent("rope", inventory)) {
+				if (gameData["trapSet"].compare("false") == 0) {
+					gameData["trapSet"] = "true";
+					eventActions.insert(std::make_pair("display", "\nTired of chasing this Hind all through these woods, you decide\nit's time to start hunting smarter and pull out the rope from Arachne.\nYou walk over to the narrow path and set up a snare to grab any unsuspecting passerby."));
+				} else { //trap already set
+					eventActions.insert(std::make_pair("display", "\nHow many traps do you think you need to set?\nIf you put up anymore you may not get off this trail without catching yourself.\nBesides, you've used all your rope, knucklehead."));
+				}
+			} else {
+				eventActions.insert(std::make_pair("display", "\nGreat idea! One problem, however...\nYou need the materials to do it."));
+			}
+			return true;	
 		}
 
 		else if (currentRoom.compare(gameData["hindLocation"]) == 0) { //in room with Hind
@@ -1685,11 +1704,12 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		if (current_room_file) {
 			//get each line of file which contains the current room name
 			std::getline(current_room_file, current_room_name);
-			current = loadRoom(itemList, rmItems, current_room_name);
+			current = loadRoom(itemList, rmItems, current_room_name, 0);
 		} else {
 			cout << "could not find/open current room file.\n";
 		}
 		current_room_file.close();
+		cout << current.longLook();
 
 		//load labor
 		string current_labor_string;
