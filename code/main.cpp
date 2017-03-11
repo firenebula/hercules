@@ -38,12 +38,7 @@ bool isItemPresent(string itemName, std::map<string, Item*>& inventory);
 
 void printRoomItem(std::map<string, Item*>& roomItems);
 
-
-//bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& eventActions);
-
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory);
-
-/* std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList); */
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser& hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string command);
 
 void setLabor(LABORS &currentLabor, string newLabor);
 
@@ -165,7 +160,7 @@ int main()
 		existsArr[IND_EXISTS] = isItemPresent(indItem, inventory, roomItems);
         existsArr[HOLDING_IND] = isItemPresent(indItem, inventory);
 
-		if (!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory)) {
+		if (!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory, command)) {
 
 			if (hParser.getAction().compare("look") == 0) {
 				string lookItem = hParser.getObject();
@@ -271,10 +266,10 @@ int main()
 			}
 			//else if (command.compare("quit") != 0 &&
 			else if (hParser.getAction().compare("quit") != 0 &&
-					!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory)) {
+					!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory, command)) {
 				cout << "I don't understand that command!" << endl;
 			}
-			checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory);
+			checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory, command);
 		}
 
 		if (!eventActions.empty()) {
@@ -347,7 +342,7 @@ int main()
 					if (exitIndex >= 0)
 						temp.setExits(exitIndex, "null");
 					
-					cout << "removed " << temp.getName() << "'s " << rmExit <<  " exit!" << endl;
+					//cout << "removed " << temp.getName() << "'s " << rmExit <<  " exit!" << endl;
 					saveRoom(tempList, temp);					
 				}
 
@@ -930,11 +925,35 @@ void testParseVal(string label, Parser p){
 }
 
 
-bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory) {
+bool checkForEvent(LABORS currentLabor, string currentRoom, Parser& hParser, bool existsArr[4], std::map<string, string>& gameData, std::map<string, string>& eventActions, std::map<string, Item*>& roomItems, Room current, std::map<string, Item*>& itemList, std::map<string, Item*>& inventory, string command) {
 
     //existsArr positions OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND
 
-	if (currentLabor == NEMEAN) {
+	if (currentRoom.compare("woods3") == 0 && ((hParser.getAction().compare("move") == 0 && (hParser.getObject().compare("game trail") == 0 || hParser.getObject().compare("trail") == 0)) || (command.compare("game trail") == 0 || command.compare("trail") == 0))) {
+		eventActions.insert(std::make_pair("move", "woods4"));
+		if (gameData["hindLocation"].compare("woods4") == 0) {
+			eventActions.insert(std::make_pair("display", "\nWhat's that? In the distance you see the glint of sunlight on gold.\nThe Hind heard your approach and scampered away before you\ncould get in range of a shot."));
+			gameData["hindLocation"] = "woods5";
+		}
+		return true;
+	}
+	
+	else if (currentRoom.compare("woods4") == 0 && ((hParser.getAction().compare("move") == 0 && (hParser.getObject().compare("game trail") == 0 || hParser.getObject().compare("trail") == 0)) || (command.compare("game trail") == 0 || command.compare("trail") == 0))) {
+		eventActions.insert(std::make_pair("move", "woods3"));
+		if (gameData["hindLocation"].compare("woods3") == 0) {
+			if (gameData["trapSet"].compare("false") == 0) {
+				eventActions.insert(std::make_pair("display", "\nWhat's that? In the distance you see the glint of sunlight on gold.\nThe Hind heard your approach and scampered away before you\ncould get in range of a shot."));
+				gameData["hindLocation"] = "woods4";
+			} else { //gameData["trapSet"] == "true"
+				gameData["hindLocation"] = "caught";
+				eventActions.insert(std::make_pair("display", "\nAgain the Hind hears you approach and flees. However, unfortunately\nfor the Hind it scampers towards the narrow path where your trap is\nset. You hear a commotion amongst the brush followed by a shrill yell\nfrom the Hind and are relieved\nto see the Hind dangling from the air with a hind\nleg caught in the snare. You rush over to the animal and quickly use the\nremaining rope to hog tie it before throwing the captured creature over your shoulder\nto haul back to Mycenae and King Eurystheus."));
+				eventActions.insert(std::make_pair("get item", "hind"));
+			}
+		}
+		return true;
+	}
+	
+	else if (currentLabor == NEMEAN) {
 		if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("shadow") == 0 && existsArr[OBJ_EXISTS] && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You stop and stare as the shadow starts changing.\nThe woman's hair suddenly starts growing and her body begins to enlarge.\nThe very large shadow lets out a large roar and rushes at you!"));
 			eventActions.insert(std::make_pair("add item", "lion"));
