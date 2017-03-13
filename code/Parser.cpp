@@ -46,10 +46,11 @@ void Parser::parse(string inPut){
     while(i < splitVec.size() && !doneProcessing){
        // std::cout << "Word " << i + 1 << " : " << splitVec[i] << std::endl;
 
+            bool actionFound = checkAction(splitVec[i]);
+
             if(checkMovObj(splitVec[i]))
                 doneProcessing = true;
-
-            else if(checkAction(splitVec[i])){
+            else if(actionFound){
                 i++; //checking next word
                 doneProcessing = true;
                 while(i < splitVec.size() && tempStr == "$none"){
@@ -84,6 +85,20 @@ void Parser::parse(string inPut){
 
             }//end else if
 
+            else if (!actionFound){
+                string customAction = splitVec[i];
+                i++;
+                 while(i < splitVec.size() && !checkIgnore(splitVec[i])){
+                      customAction += " ";
+                      customAction += splitVec[i];
+                      i++;
+                      }
+                setAction(customAction);
+                return;
+
+            }
+
+
                 i++; // main loop incrementer
 
             }
@@ -116,6 +131,7 @@ void Parser::dictionaryLoad(){
     addEntry(actionMap, SET_CMDS,  SET);
     addEntry(actionMap, LIGHT_CMDS,  LIGHT);
     addEntry(actionMap, CUT_CMDS,  CUT);
+    addEntry(actionMap, HELP_CMDS,  HELP);
 
     addEntry(actionMap, TALK_CMDS,  TALK);
     addEntry(actionMap, INVENTORY_CMDS,  INVENTORY);
@@ -164,6 +180,9 @@ bool Parser::checkAction(string checkVal){
     }
     else
         found = false;
+
+
+
 
 
     return found;

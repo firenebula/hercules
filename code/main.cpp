@@ -22,6 +22,7 @@ enum LABORS {NEMEAN, LERNA, CERYNEIA, ERYMANTHIA};
 enum EXISTANCE {OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND};
 
 void testParseVal(string, Parser);
+void checkForExit(Room R, Parser& P);
 Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems, string roomFile, int newGame = 1);
 void loadItems(std::map<string, Item*>& itemMap, string itemFile);
 void loadGameData(std::map<string, string>& gameData, string dataFile);
@@ -145,9 +146,18 @@ int main()
 	}
 
 	while (hParser.getAction().compare("quit") != 0) {
+
+
+   //     while(true){
+
 		cout << endl << "What do you want to do? ---> ";
 		std::getline(cin, command);
 		hParser.parse(command);
+	//	testParseVal("***", hParser);
+
+    //    }
+
+
 
 //	cout << "[" << hParser.getAction() << "] [" << hParser.getObject() << "] [" << hParser.getIndirect() << "]" << endl;
 
@@ -161,6 +171,9 @@ int main()
         existsArr[HOLDING_IND] = isItemPresent(indItem, inventory);
 
 		if (!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory, command)) {
+
+           checkForExit(current, hParser);
+
 
 			if (hParser.getAction().compare("look") == 0) {
 				string lookItem = hParser.getObject();
@@ -266,6 +279,13 @@ int main()
 
 
 			}
+
+
+			else if (hParser.getAction().compare("help") == 0) {
+				cout << "HELP TEXT HERE!" << endl;
+			}
+
+
 			//else if (command.compare("quit") != 0 &&
 			else if (hParser.getAction().compare("quit") != 0 &&
 					!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory, command)) {
@@ -287,19 +307,33 @@ int main()
 				else if ((it->first).compare("add exit") == 0) {
 					string newExit = eventActions[it->first];
 				//cout << "Add exit [" << newExit << "]" << endl;
-					if (newExit.compare("north") == 0)
+					if (newExit.compare("north") == 0){
 						current.setExits(0, eventActions[newExit]);
-					else if (newExit.compare("south") == 0)
+						current.setDisplay_Exits(0, eventActions[newExit]);
+					}
+					else if (newExit.compare("south") == 0){
 						current.setExits(1, eventActions[newExit]);
-					else if (newExit.compare("east") == 0)
+						current.setDisplay_Exits(1, eventActions[newExit]);
+					}
+					else if (newExit.compare("east") == 0){
 						current.setExits(2, eventActions[newExit]);
-					else if (newExit.compare("west") == 0)
+						current.setDisplay_Exits(2, eventActions[newExit]);
+					}
+					else if (newExit.compare("west") == 0){
 						current.setExits(3, eventActions[newExit]);
-					else if (newExit.compare("up") == 0)
+						current.setDisplay_Exits(3, eventActions[newExit]);
+					}
+					else if (newExit.compare("up") == 0){
 						current.setExits(4, eventActions[newExit]);
-					else if (newExit.compare("down") == 0)
+						current.setDisplay_Exits(4, eventActions[newExit]);
+					}
+					else if (newExit.compare("down") == 0){
 						current.setExits(5, eventActions[newExit]);
+						current.setDisplay_Exits(5, eventActions[newExit]);
 				}
+
+				}
+
 				else if ((it->first).compare("remove exit") == 0) {
 					string rmExit = eventActions[it->first];
 					int exitIndex = -1;
@@ -318,6 +352,7 @@ int main()
 
 					if (exitIndex >= 0)
 						current.setExits(exitIndex, "null");
+						current.setDisplay_Exits(exitIndex, "null");
 				}
 				else if ((it->first).compare("remove room exit") == 0) {
 					// eventActions[it->first] is the name of the non-current room
@@ -343,6 +378,7 @@ int main()
 
 					if (exitIndex >= 0)
 						temp.setExits(exitIndex, "null");
+						temp.setDisplay_Exits(exitIndex, "null");
 
 					//cout << "removed " << temp.getName() << "'s " << rmExit <<  " exit!" << endl;
 					saveRoom(tempList, temp);
@@ -570,11 +606,12 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 
 	if (newGame == 1) {
         cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-		cout << endl << current.longLook();
+		cout << endl << current.look();
 		current.printExits();
 		printRoomItem(rmItems);
-		current.setVisited(true);
+
 	}
+	current.setVisited(true);
 
 	return current;
 
@@ -1753,9 +1790,11 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 			cout << "could not find/open current room file.\n";
 		}
 		current_room_file.close();
+
         cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-		cout << current.longLook();
+		cout << current.look();
 		printRoomItem(rmItems);
+
 
 		//load labor
 		string current_labor_string;
@@ -1836,3 +1875,40 @@ void printGameData(std::map<string, string>& gameData) {
 		cout << "[" << it->first << "] : [" << gameData[it->first] << "]" << endl;
 	}
 }
+
+
+void checkForExit(Room R, Parser& P){
+
+    string directions[6] = {"north", "south", "east", "west", "up", "down"};
+    string reparse = "move ";
+
+if (P.getAction().compare("move") == 0){
+
+    for(int i = 0; i < NUM_OF_EXITS; i ++){
+            if (P.getObject().compare(R.getDisplay_Exit(i)) == 0){
+                reparse.append(directions[i]);
+                P.parse(reparse);
+
+                return;
+
+            }
+    }
+
+}
+
+else
+        for(int i = 0; i < NUM_OF_EXITS; i ++){
+            if (P.getAction().compare(R.getDisplay_Exit(i)) == 0){
+            reparse.append(directions[i]);
+            P.parse(reparse);
+
+            return;
+
+            }
+
+
+    }
+
+}
+
+

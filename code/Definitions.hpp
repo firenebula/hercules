@@ -44,7 +44,7 @@ string lookArr[] = {"l", "look", "examine"};
 std::vector<std::string> LOOK_CMDS(lookArr, lookArr + sizeof(lookArr) / sizeof(lookArr[0]));
 
 const string GET = "get";
-string getArr[] = {"get", "take", "grab", "pick"};
+string getArr[] = {"get", "take", "grab", "pickup"};
 std::vector<std::string> GET_CMDS(getArr, getArr + sizeof(getArr) / sizeof(getArr[0]));
 
 
@@ -53,7 +53,7 @@ string useArr[] = {"use", "activate", "swing"};
 std::vector<std::string> USE_CMDS(useArr, useArr + sizeof(useArr) / sizeof(useArr[0]));
 
 const string DROP = "drop";
-string dropArr[] = {"drop", "leave"};
+string dropArr[] = {"drop", "leave", "putdown"};
 std::vector<std::string> DROP_CMDS(dropArr, dropArr + sizeof(dropArr) / sizeof(dropArr[0]));
 
 const string ATTACK = "attack";
@@ -71,6 +71,10 @@ std::vector<std::string> INVENTORY_CMDS(inventoryArr, inventoryArr + sizeof(inve
 const string QUIT = "quit";
 string quitArr[] = {"q", "quit"};
 std::vector<std::string> QUIT_CMDS(quitArr, quitArr + sizeof(quitArr) / sizeof(quitArr[0]));
+
+const string HELP = "help";
+string helpArr[] = {"h", "help", "?"};
+std::vector<std::string> HELP_CMDS(helpArr, helpArr + sizeof(helpArr) / sizeof(helpArr[0]));
 
 const string SAY = "say";
 string sayArr[] = {"say", "speak"};
