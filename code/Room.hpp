@@ -30,6 +30,7 @@ class Room
       string desc_long;
       bool visited;
       std::string exits[NUM_OF_EXITS];  // index 0 = north, 1 = south, 2 = east, 3 = west, 4 = up, 5 = down
+      std::string display_exits[NUM_OF_EXITS];
 
 
 
@@ -41,8 +42,11 @@ class Room
 	string getName();
     bool getVisited();
 	void setExits(int exit_index, std::string exit_name);
+    string getDisplay_Exit(int exit_index);
+    void setDisplay_Exits(int exit_index, std::string exit_name);
     string getExit(int exit_index);
     void printRoom();
+    void printExits();
     string look();
     string longLook();
 	string shortLook();

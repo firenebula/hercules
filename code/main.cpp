@@ -145,7 +145,7 @@ int main()
 	}
 
 	while (hParser.getAction().compare("quit") != 0) {
-		cout << endl << "What do you want to do?  ";
+		cout << endl << "What do you want to do? ---> ";
 		std::getline(cin, command);
 		hParser.parse(command);
 
@@ -165,7 +165,9 @@ int main()
 			if (hParser.getAction().compare("look") == 0) {
 				string lookItem = hParser.getObject();
 				if (lookItem.compare("$none") == 0) {
+                    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
 					cout << current.longLook();
+					current.printExits();
 					// for debugging
 					printRoomItem(roomItems);
 				}
@@ -311,9 +313,9 @@ int main()
 						exitIndex = 3;
 					else if (rmExit.compare("up") == 0)
 						exitIndex = 4;
-					else if (rmExit.compare("down") == 0) 
+					else if (rmExit.compare("down") == 0)
 						exitIndex = 5;
-					
+
 					if (exitIndex >= 0)
 						current.setExits(exitIndex, "null");
 				}
@@ -325,7 +327,7 @@ int main()
 					std::map <string, Item*> tempList;
 					Room temp = loadRoom(itemList, tempList, rmExit, 0);
 					rmExit = eventActions[rmExit];
-					
+
 					if (rmExit.compare("north") == 0)
 						exitIndex = 0;
 					else if (rmExit.compare("south") == 0)
@@ -336,17 +338,17 @@ int main()
 						exitIndex = 3;
 					else if (rmExit.compare("up") == 0)
 						exitIndex = 4;
-					else if (rmExit.compare("down") == 0) 
+					else if (rmExit.compare("down") == 0)
 						exitIndex = 5;
-					
+
 					if (exitIndex >= 0)
 						temp.setExits(exitIndex, "null");
-					
+
 					//cout << "removed " << temp.getName() << "'s " << rmExit <<  " exit!" << endl;
-					saveRoom(tempList, temp);					
+					saveRoom(tempList, temp);
 				}
 
-				
+
 				else if ((it->first).compare("add item") == 0) {
 					addRoomItems(roomItems, itemList, eventActions[it->first]);
 				}
@@ -487,13 +489,27 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		// get lines of text until exits section is reached
 		while (data.compare("exits") != 0) {
 			std::getline(room_file, data);
+
 		}
 
 		// store next several lines of text into the exit array of Room object
 		for (int i = 0; i < NUM_OF_EXITS; i++) {
 			std::getline(room_file, data);
 			current.setExits(i, data);
+
 		}
+
+
+		while (data.compare("dexits") != 0) {
+			std::getline(room_file, data);
+		}
+
+		// store next several lines of text into the exit array of Room object
+		for (int i = 0; i < NUM_OF_EXITS; i++) {
+			std::getline(room_file, data);
+			current.setDisplay_Exits(i, data);
+		}
+
 
 		// get lines of text until long description section is reached
 		while(data.compare("long description") != 0) {
@@ -553,7 +569,9 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 	room_file.close();
 
 	if (newGame == 1) {
+        cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
 		cout << endl << current.longLook();
+		current.printExits();
 		printRoomItem(rmItems);
 		current.setVisited(true);
 	}
@@ -597,6 +615,13 @@ void saveRoom(std::map<string, Item*>& roomItems, Room current) {
 		save_room << "exits\n";
 		for (int j = 0; j < NUM_OF_EXITS; j++) {
 			save_room << current.getExit(j) << "\n";
+		}
+		save_room << "\n";
+
+		//display exits section
+		save_room << "dexits\n";
+		for (int j = 0; j < NUM_OF_EXITS; j++) {
+			save_room << current.getDisplay_Exit(j) << "\n";
 		}
 		save_room << "\n";
 
@@ -852,7 +877,7 @@ void printRoomItem(std::map<string, Item*>& roomItems) {
 		//cout << "[" << it->first << "]" << "\t";
 
 		if (roomItems[it->first]->getQuantity() == 1)
-            cout << it->first << " is here.\n";
+            cout << "*** " << it->first << " is here.\n";
         else
             cout << "There are " << roomItems[it->first]->getQuantity() << " " << it->first << " here.\n";
 
@@ -937,7 +962,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 		}
 		return true;
 	}
-	
+
 	else if (currentRoom.compare("woods4") == 0 && ((hParser.getAction().compare("move") == 0 && (hParser.getObject().compare("game trail") == 0 || hParser.getObject().compare("trail") == 0)) || (command.compare("game trail") == 0 || command.compare("trail") == 0))) {
 		eventActions.insert(std::make_pair("move", "woods3"));
 		if (gameData["hindLocation"].compare("woods3") == 0) {
@@ -952,7 +977,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 		}
 		return true;
 	}
-	
+
 	else if (currentLabor == NEMEAN) {
 		if (hParser.getAction().compare("move") == 0 && hParser.getObject().compare("shadow") == 0 && existsArr[OBJ_EXISTS] && currentRoom.compare("cave") == 0) {
 			eventActions.insert(std::make_pair("display", "You stop and stare as the shadow starts changing.\nThe woman's hair suddenly starts growing and her body begins to enlarge.\nThe very large shadow lets out a large roar and rushes at you!"));
@@ -966,18 +991,18 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			if (gameData["caveBlocked"].compare("false") == 0) {
 				gameData["caveBlocked"] = "true";
 				eventActions.insert(std::make_pair("display", "You pushed on the boulder and it starts to tip over. You jump out of the way as the boulder falls over and completely blocks the cave entrance."));
-				
+
 				// remove exit from lion cave
 				//Room temp = loadRoom(itemList, roomItems, "nemean", 0);
 
-				
+
 				eventActions.insert(std::make_pair("remove exit", "west"));
-				
+
 				// remove exit from lion cave
 				eventActions.insert(std::make_pair("remove room exit", "cave"));
 				eventActions.insert(std::make_pair("cave", "east"));
-				
-				
+
+
 				eventActions.insert(std::make_pair("change long", "The trail is covered by broken branches and animal tracks from a very large animal. A large boulder is completely blocking the cave entrance. The sounds of a woman crying emanate from inside the cave.\n"));
 				eventActions.insert(std::make_pair("change short", "A trail leading to a cave. Go up the trail to head back up the canyon.\n"));
 				eventActions.insert(std::make_pair("change look", "boulder"));
@@ -1130,7 +1155,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 
 		if (gameData["attackedHead"].compare("true") == 0) {
 			if ((hParser.getAction().compare("use") == 0 && hParser.getObject().compare("torch") == 0 && existsArr[HOLDING_OBJ]
-				&& hParser.getIndirect().compare("hydra") == 0 && existsArr[IND_EXISTS]) || 
+				&& hParser.getIndirect().compare("hydra") == 0 && existsArr[IND_EXISTS]) ||
 				(hParser.getAction().compare("light") == 0 && hParser.getObject().compare("hydra") == 0 && existsArr[OBJ_EXISTS]
 				&& hParser.getIndirect().compare("torch") == 0 && existsArr[HOLDING_IND])
 				) {
@@ -1365,7 +1390,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			}
 			return true;
 		}
-		
+
 		else if ((currentRoom.compare("woods3") == 0 || currentRoom.compare("woods4") == 0) && hParser.getAction().compare("set") == 0 && (hParser.getObject().compare("trap") == 0 || hParser.getObject().compare("snare") == 0)) {
 			if (isItemPresent("rope", inventory)) {
 				if (gameData["trapSet"].compare("false") == 0) {
@@ -1377,7 +1402,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			} else {
 				eventActions.insert(std::make_pair("display", "\nGreat idea! One problem, however...\nYou need the materials to do it."));
 			}
-			return true;	
+			return true;
 		}
 
 		else if (currentRoom.compare(gameData["hindLocation"]) == 0) { //in room with Hind
@@ -1728,6 +1753,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 			cout << "could not find/open current room file.\n";
 		}
 		current_room_file.close();
+        cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
 		cout << current.longLook();
 		printRoomItem(rmItems);
 
@@ -1743,7 +1769,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 			std::getline(current_labor_file, current_labor_string);
 			current_labor_int = std::atoi(current_labor_string.c_str());;
 			currentLabor = labors_list[current_labor_int];
-			
+
 			// change how the king speaks accordingly to the current labor
 			string kingsTalk = "";
 			switch (currentLabor) {
@@ -1760,9 +1786,9 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 					kingsTalk = "Can someone tell this stinking, lumbering buffon to go kill the Nemean lion!";
 					break;
 			}
-			
+
 			itemMap["king"]->setTalk(kingsTalk);
-			
+
 		} else {
 			cout << "could not find/open current labor file.\n";
 		}

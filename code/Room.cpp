@@ -163,3 +163,64 @@ string Room::getName() {
  }
 
 
+
+  /****************************************************
+ * Room::setExits(int exit_index, string exit_name)
+ * This function sets the member string array, exits.
+ * The first parameter is the index array and is
+ * associated with the direction of the exit as so:
+ *    0 = North
+ *    1 = South
+ *    2 = East
+ *    3 = West
+ * The string parameter sets element of the array
+ * which is the display exit name of the room.
+****************************************************/
+
+ void Room::setDisplay_Exits(int exit_index, std::string exit_name) {
+	 this->display_exits[exit_index] = exit_name;
+ }
+
+
+ /****************************************************
+ * string Room::getExit(int exit_index)
+ * This function returns the name of the display exit specified
+ * by the parameter, exit_index.
+ *
+****************************************************/
+
+ string Room::getDisplay_Exit(int exit_index) {
+	 return this->display_exits[exit_index];
+ }
+
+
+
+ /****************************************************
+ * Room::printExits()
+ * This function prints the room's display Exits
+****************************************************/
+
+ void Room::printExits() {
+     string directions[NUM_OF_EXITS] = {"North", "South", "East", "West", "Up", "Down"};
+     int j = 0;
+        cout << endl;
+	 for (int i = 0; i < NUM_OF_EXITS - 2; i++) {
+
+        if(this->display_exits[i].compare("null") != 0){
+		 cout << "-> To the " << directions[j] << " there is a " << this->display_exits[i] << endl;
+        }
+        j++;
+	 }
+
+    for (int i = NUM_OF_EXITS - 2; i < NUM_OF_EXITS; i++) {
+        if(this->display_exits[i].compare("null") != 0){
+		 cout << "-> " << directions[j] << " there is a " << this->display_exits[i] << endl;
+
+        }
+        j++;
+
+
+ }
+
+ }
+
