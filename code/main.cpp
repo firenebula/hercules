@@ -284,7 +284,7 @@ int main()
 				if ((confirmLoad == "y") || (confirmLoad == "yes")) {
 					loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs, gameData);
 				} else {
-					cout << "Did not load a game.";
+					cout << "Did not load a game.\n";
 				}
 			}
 
