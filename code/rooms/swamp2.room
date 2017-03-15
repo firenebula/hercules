@@ -13,17 +13,19 @@ null
 
 dexits
 null
-swamp4
+slippery hill
 null
-swamp1
+overgrown path
 null
 null
 
 long description
-You are standing knee deep in murky swamp water
+You are standing knee deep in murky swamp water.  
+It looks much the same as the swamp you just 
+came from.  
 
 short description
-Swamp North East.  Exits: South - swamp; West - swamp 
+Swamp North East. 
 
 items
 shimmer
