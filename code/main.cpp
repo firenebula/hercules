@@ -64,6 +64,7 @@ int main()
 	string saveAs = "";
 	string itemFile = "./items";
 	string dataFile = "./gamedata";
+	string confirmLoad = "";
 	int i, all_digits = 0, valid = 1, selection;
 	LABORS currentLabor;
 	std::map <string, Item*> itemList;
@@ -270,14 +271,21 @@ int main()
 				}
 			}
 
-			else if (command.find("save") != std::string::npos) {
+			else if (hParser.getAction().compare("save") == 0) {
 				saveGame(roomItems, current, inventory, currentLabor, saveAs, gameData);
 			}
-			else if (command.find("load") != std::string::npos) {
-				loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs, gameData);
-
-
-
+			
+			else if (hParser.getAction().compare("load") == 0) {
+				cout << "Loading a game will cause you to lose your current progress. Are you sure you want to load a game?\n";
+				std::getline(cin, confirmLoad);
+				for(i = 0; i < confirmLoad.length(); i++) {
+					confirmLoad[i] = tolower(confirmLoad[i]);
+				}
+				if ((confirmLoad == "y") || (confirmLoad == "yes")) {
+					loadGame(itemList, roomItems, current, currentLabor, itemList, inventory, saveAs, gameData);
+				} else {
+					cout << "Did not load a game.";
+				}
 			}
 
 
@@ -1370,7 +1378,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 										  "Exits North and South. The gate to the west leads to the town of Stymphalus.\n"));
 			eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nThe border wall to the south had been torn down and the gate leading west to Stymphalus has been opened.\n"));
 			eventActions.insert(std::make_pair("change talk", "king"));
-			eventActions.insert(std::make_pair("king", "Oh? Did you bring back the hind of Ceryneian already? No? Then I have more important matters to attend to."));
+			eventActions.insert(std::make_pair("king", "Oh? Did you bring back the hind of Ceryneia already? No? Then I have more important matters to attend to."));
 
 			return true;
 
@@ -1816,7 +1824,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 					kingsTalk = "Do you not understand Greek? Go kill the hydra of Lerna! Oh and your cousin wanted to talk to you about some nonsense now that the lion is gone.  He went for a walk.";
 					break;
 				case CERYNEIA:
-					kingsTalk = "Oh? Did you bring back the hind of Ceryneian already? No? Then I have more important matters to attend to.";
+					kingsTalk = "Oh? Did you bring back the hind of Ceryneia already? No? Then I have more important matters to attend to.";
 					break;
 				case ERYMANTHIA:
 					kingsTalk = "I don't want to hear excuses. Bring me that boar!";
