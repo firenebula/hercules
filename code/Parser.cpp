@@ -132,6 +132,8 @@ void Parser::dictionaryLoad(){
     addEntry(actionMap, LIGHT_CMDS,  LIGHT);
     addEntry(actionMap, CUT_CMDS,  CUT);
     addEntry(actionMap, HELP_CMDS,  HELP);
+	addEntry(actionMap, SAVE_CMDS,  SAVE);
+	addEntry(actionMap, LOAD_CMDS,  LOAD);
 
     addEntry(actionMap, TALK_CMDS,  TALK);
     addEntry(actionMap, INVENTORY_CMDS,  INVENTORY);

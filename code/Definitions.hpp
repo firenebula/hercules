@@ -80,6 +80,15 @@ const string SAY = "say";
 string sayArr[] = {"say", "speak"};
 std::vector<std::string> SAY_CMDS(sayArr, sayArr + sizeof(sayArr) / sizeof(sayArr[0]));
 
+const string SAVE = "save";
+string saveArr[] = {"save", "save game", "savegame"};
+std::vector<std::string> SAVE_CMDS(saveArr, saveArr + sizeof(saveArr) / sizeof(saveArr[0]));
+
+const string LOAD = "load";
+string loadArr[] = {"load", "load game", "loadgame"};
+std::vector<std::string> LOAD_CMDS(loadArr, loadArr + sizeof(loadArr) / sizeof(loadArr[0]));
+
+
 //Commands that stand for an action and an object
 
 
