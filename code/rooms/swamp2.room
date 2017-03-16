@@ -22,7 +22,8 @@ null
 long description
 You are standing knee deep in murky swamp water.  
 It looks much the same as the swamp you just 
-came from.  
+came from. A feeling of dispair cuts through
+you. 
 
 short description
 Swamp North East. 
@@ -31,4 +32,6 @@ items
 shimmer
 1
 trees
+1
+log
 1

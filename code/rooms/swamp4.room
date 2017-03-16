@@ -12,19 +12,24 @@ null
 null
 
 dexits
-swamp2
+slippery slope
 null
 null
-swamp3
+misty slope
 null
 null
 
 long description
-You are at the lair of the Hydra.  It is dark here and you can feel eyes on you.
+You are at the lair of the Hydra.  
+It is dark here and you can feel eyes on you.
+The mist is so thick it's hard to catch
+your breath.
 
 short description
-Hydra Lair.  Exits: West - swamp; North - swamp 
+Hydra Lair.
 
 items
 trees
+1
+log
 1

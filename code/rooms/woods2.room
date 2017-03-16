@@ -12,10 +12,10 @@ null
 null
 
 dexits
-woods5
+northern path
 null
-woods1
-woods3
+eastern path
+western path
 null
 null
 
@@ -24,7 +24,10 @@ You are in the Woods of the Hind. Trees crowd in all around
 you. Paths lead into yet more woods to the north, east, and west. 
 
 short description
-You are in the Woods of the Hind. Exits: North - more woods;
-East - more woods; West - more woods
+You are in the Woods of the Hind.
 
 items
+log
+1
+trees
+1

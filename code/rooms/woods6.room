@@ -13,9 +13,9 @@ null
 
 dexits
 null
-woods1
+southern trail
 null
-woods5
+western trail
 null
 null
 
@@ -24,6 +24,10 @@ You are in the Woods of the Hind. Trees crowd in all around
 you. Paths lead into yet more woods to the south and west. 
 
 short description
-You are in the Woods of the Hind. South - more woods; West - more woods
+You are in the Woods of the Hind.
 
 items
+log
+1
+trees
+1

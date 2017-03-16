@@ -12,10 +12,10 @@ null
 null
 
 dexits
-woods6
+northern path
 null
-ceryneia
-woods2
+ceryneia path
+western path
 null
 null
 
@@ -25,7 +25,10 @@ you. Paths lead farther into the woods to the north and west.
 The trail east leads to Ceryneia. 
 
 short description
-You are in the Woods of the Hind. Exits: North - more woods;
-East - Ceryneia; West - more woods
+You are in the Woods of the Hind.
 
 items
+fairy
+1
+mushroom
+1
