@@ -474,7 +474,8 @@ true
 sword hilt
 
 [description]
-Encased in rock, the inscription on the sword reads "Feed me and I live. Give me drink and I die. Say my name
+Encased in rock, the inscription on the sword reads 
+"Feed me and I live. Give me drink and I die. Say my name
 to receive my gift."
 
 [use]
@@ -527,6 +528,70 @@ Gossip sadly has no use.
 [talk]
 "I COULD tell you the Hydra's weakness, but shouldn't a true 
 hero at least have a sword?!"
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true
+
+[name]
+fairy
+
+[description]
+A glowing aura eminates from the fluttering creature.
+
+[use]
+Unfortunately pixie dust cannot help you on this
+adventure.
+
+[talk]
+"Think happy thoughts..."
+
+[movable]
+false
+
+[quantity]
+1
+
+[available]
+true
+
+[name]
+mushroom
+
+[description]
+It is covered in green spots and smells strange.
+
+[use]
+You take a bite of the mushroom. It tastes terrible.
+
+[talk]
+"Your princess is in another castle!"
+
+[movable]
+true
+
+[quantity]
+1
+
+[available]
+true
+
+[name]
+log
+
+[description]
+It is covered in moss and teeming with insects.
+
+[use]
+The log doesn't budge.
+
+[talk]
+The log isn't feeling talkative.
 
 [movable]
 false

@@ -274,7 +274,7 @@ int main()
 			else if (hParser.getAction().compare("save") == 0) {
 				saveGame(roomItems, current, inventory, currentLabor, saveAs, gameData);
 			}
-			
+
 			else if (hParser.getAction().compare("load") == 0) {
 				cout << "Loading a game will cause you to lose your current progress. Are you sure you want to load a game?\n";
 				std::getline(cin, confirmLoad);
@@ -290,14 +290,34 @@ int main()
 
 
 			else if (hParser.getAction().compare("help") == 0) {
-				cout << "HELP TEXT HERE!" << endl;
-			}
+                cout << "\n*** How to play ***" << endl;
+				cout << "Enter 'help' at anytime to review these instructions" << endl;
+                cout << "To play, simply type what you want to do" << endl <<endl;
+                cout << "Movement:" << endl;
+                cout << "'Go' <direction>, <direction>, 'Go Exit' or <Exit>" << endl;
+                cout << "Exits are listed for each room" << endl;
+                cout << "Available directions are 'north,' 'south,' 'east,'west,' up' and 'down'" << endl;
+                cout << "'Move North' will also work and so will 'N'" << endl;
+                cout << "Experiment to find new commands" << endl <<endl;
+                cout << "Looking:" << endl;
+                cout << "'look' will give you a description of your immediate surroundings" << endl;
+                cout << "You can also 'look at' OR 'examine' <item>" << endl <<endl;
+                cout << "Items:" << endl;
+                cout << "Try 'take' <item>, 'drop' <item> or 'use' <item>"<< endl << endl;
+                cout << "Attacking:" <<endl;
+                cout << "'attack' <enemy> 'with' <weapon>, 'swing' <weapon> 'at' <enemy>, 'hit' <enemy> 'with' <weapon>" << endl;
+                cout << "'shoot' <enemy> 'with bow,' 'shoot bow at' <enemy>" << endl << endl;
+                cout << "Other actions:" << endl;
+                cout << "'talk to' <person>, 'give' <item> 'to' <person>, 'say' <something>" << endl << endl;
+                cout << "Finally, you can 'savegame,' 'loadgame' or 'quit' when you are finished" << endl << endl;
+
+            			}
 
 
 			//else if (command.compare("quit") != 0 &&
 			else if (hParser.getAction().compare("quit") != 0 &&
 					!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory, command)) {
-				cout << "I don't understand that command!" << endl;
+				cout << "You can't do that here!" << endl;
 			}
 			checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory, command);
 		}
