@@ -79,7 +79,6 @@ int main()
 
 	//create a Room object
 	Room current = loadRoom(itemList, roomItems, "throne", 0);
-
 	Parser hParser;
 
 	std::vector<string> save_files;
@@ -553,21 +552,19 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		// get lines of text until exits section is reached
 		while (data.compare("exits") != 0) {
 			std::getline(room_file, data);
-
 		}
 
 		// store next several lines of text into the exit array of Room object
 		for (int i = 0; i < NUM_OF_EXITS; i++) {
 			std::getline(room_file, data);
 			current.setExits(i, data);
-
 		}
 
 
 		while (data.compare("dexits") != 0) {
 			std::getline(room_file, data);
 		}
-
+		
 		// store next several lines of text into the exit array of Room object
 		for (int i = 0; i < NUM_OF_EXITS; i++) {
 			std::getline(room_file, data);
@@ -1430,9 +1427,9 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 
 
 	else if (currentLabor == CERYNEIA){
-
+		eventActions.insert(std::make_pair("display", ""));
 		if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("lion pelt") == 0 && existsArr[HOLDING_OBJ] && (hParser.getIndirect().compare("townswoman") == 0 || hParser.getIndirect().compare("arachne") == 0) && currentRoom.compare("ceryneia") == 0) {
-			eventActions.insert(std::make_pair("display", "\n\"Well, Arachne. You say you're a seamstress. Can you make anything out of this?\"\n\n\"Is that real lion?!? I haven't had material this nice since, well, ever.\nWait right here. I'll be back shortly.\"\n\nArachne returns with a fabulous lion skin vest which fits like a glove\nand a long coil of rope woven from the lion's mane. \"This rope sure might\ncome in handy\" you think as you slide on the vest and thank Arachne."));
+			eventActions["display"].append("\n\"Well, Arachne. You say you're a seamstress. Can you make anything out of this?\"\n\n\"Is that real lion?!? I haven't had material this nice since, well, ever.\nWait right here. I'll be back shortly.\"\n\nArachne returns with a fabulous lion skin vest which fits like a glove\nand a long coil of rope woven from the lion's mane. \"This rope sure might\ncome in handy\" you think as you slide on the vest and thank Arachne.");
 			eventActions.insert(std::make_pair("drop item", "lion pelt"));
 			eventActions.insert(std::make_pair("remove item", "lion pelt"));
 			eventActions.insert(std::make_pair("get item", "rope"));
@@ -1441,7 +1438,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 
 		else if (currentRoom.compare(gameData["hindLocation"]) == 0 && currentRoom.compare("woods3") == 0 && gameData["trapSet"].compare("true") == 0) {
 			gameData["hindLocation"] = "caught";
-			eventActions.insert(std::make_pair("display", "\nAgain the Hind hears you approach and flees. However, unfortunately\nfor the Hind it scampers towards the narrow path where your trap is\nset. You hear a commotion amongst the brush followed by a shrill yell\nfrom the Hind and are relieved\nto see the Hind dangling from the air with a hind\nleg caught in the snare. You rush over to the animal and quickly use the\nremaining rope to hog tie it before throwing the captured creature over your shoulder\nto haul back to Mycenae and King Eurystheus."));
+			eventActions["display"].append("\nAgain the Hind hears you approach and flees. However, unfortunately\nfor the Hind it scampers towards the narrow path where your trap is\nset. You hear a commotion amongst the brush followed by a shrill yell\nfrom the Hind and are relieved\nto see the Hind dangling from the air with a hind\nleg caught in the snare. You rush over to the animal and quickly use the\nremaining rope to hog tie it before throwing the captured creature over your shoulder\nto haul back to Mycenae and King Eurystheus.");
 			eventActions.insert(std::make_pair("get item", "hind"));
 			return true;
 		}
@@ -1449,9 +1446,9 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 		else if ((currentRoom.compare("woods3") == 0 || currentRoom.compare("woods4") == 0) && hParser.getAction().compare("use") == 0 && hParser.getObject().compare("rope") == 0 && existsArr[HOLDING_OBJ]) {
 			if (gameData["trapSet"].compare("false") == 0) {
 				gameData["trapSet"] = "true";
-				eventActions.insert(std::make_pair("display", "\nTired of chasing this Hind all through these woods, you decide\nit's time to start hunting smarter and pull out the rope from Arachne.\nYou walk over to the narrow path and set up a snare to grab any unsuspecting passerby."));
+				eventActions["display"].append("\nTired of chasing this Hind all through these woods, you decide\nit's time to start hunting smarter and pull out the rope from Arachne.\nYou walk over to the narrow path and set up a snare to grab any unsuspecting passerby.");
 			} else { //trap already set
-				eventActions.insert(std::make_pair("display", "\nHow many traps do you think you need to set?\nIf you put up anymore you may not get off this trail without catching yourself.\nBesides, you've used all your rope, knucklehead."));
+				eventActions["display"].append("\nHow many traps do you think you need to set?\nIf you put up anymore you may not get off this trail without catching yourself.\nBesides, you've used all your rope, knucklehead.");
 			}
 			return true;
 		}
@@ -1460,18 +1457,18 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			if (isItemPresent("rope", inventory)) {
 				if (gameData["trapSet"].compare("false") == 0) {
 					gameData["trapSet"] = "true";
-					eventActions.insert(std::make_pair("display", "\nTired of chasing this Hind all through these woods, you decide\nit's time to start hunting smarter and pull out the rope from Arachne.\nYou walk over to the narrow path and set up a snare to grab any unsuspecting passerby."));
+					eventActions["display"].append("\nTired of chasing this Hind all through these woods, you decide\nit's time to start hunting smarter and pull out the rope from Arachne.\nYou walk over to the narrow path and set up a snare to grab any unsuspecting passerby.");
 				} else { //trap already set
-					eventActions.insert(std::make_pair("display", "\nHow many traps do you think you need to set?\nIf you put up anymore you may not get off this trail without catching yourself.\nBesides, you've used all your rope, knucklehead."));
+					eventActions["display"].append("\nHow many traps do you think you need to set?\nIf you put up anymore you may not get off this trail without catching yourself.\nBesides, you've used all your rope, knucklehead.");
 				}
 			} else {
-				eventActions.insert(std::make_pair("display", "\nGreat idea! One problem, however...\nYou need the materials to do it."));
+				eventActions["display"].append("\nGreat idea! One problem, however...\nYou need the materials to do it.");
 			}
 			return true;
 		}
 
 		else if (currentRoom.compare(gameData["hindLocation"]) == 0) { //in room with Hind
-			eventActions.insert(std::make_pair("display", "\nWhat's that? In the distance you see the glint of sunlight on gold.\nThe Hind heard your approach and scampered away before you\ncould get in range of a shot."));
+			eventActions["display"].append("\nWhat's that? In the distance you see the glint of sunlight on gold.\nThe Hind heard your approach and scampered away before you\ncould get in range of a shot.");
 			if (gameData["hindLocation"].compare("woods1") == 0) {
 				gameData["hindLocation"] = "woods2";
 			} else if (gameData["hindLocation"].compare("woods2") == 0) {
@@ -1485,14 +1482,14 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			} else { //gameData["hindLocation"].compare("woods6") == 0)
 				gameData["hindLocation"] = "woods1";
 			}
-			return true;
+			return false;
 		}
 
 		else if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("hind") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("king") == 0 && currentRoom.compare("throne") == 0) {
 			eventActions.insert(std::make_pair("change state", "erymanthia"));
 			eventActions.insert(std::make_pair("add exit", "east"));
 			eventActions.insert(std::make_pair("east", "tiryns"));
-			eventActions.insert(std::make_pair("display", "Back so soon? With the Hind?! There appears to be no stopping you when you\nset your mind to something. Well, maybe this next task can flummox you. I need\nyou to go to Mount Erymanthian and capture the boar that is ravaging the nearby\nvillages. Think you can do that? If so, head east to the port at Tiryns to catch\na ride aboard any of the vessels heading in that direction. Oh, and here's\nsome coin to pay your way. Don't get used to my coin in your pocket, though.\nBe off!"));
+			eventActions["display"].append("Back so soon? With the Hind?! There appears to be no stopping you when you\nset your mind to something. Well, maybe this next task can flummox you. I need\nyou to go to Mount Erymanthian and capture the boar that is ravaging the nearby\nvillages. Think you can do that? If so, head east to the port at Tiryns to catch\na ride aboard any of the vessels heading in that direction. Oh, and here's\nsome coin to pay your way. Don't get used to my coin in your pocket, though.\nBe off!");
 			eventActions.insert(std::make_pair("drop item", "hind"));
 			eventActions.insert(std::make_pair("remove item", "hind"));
 			eventActions.insert(std::make_pair("get item", "coin"));
