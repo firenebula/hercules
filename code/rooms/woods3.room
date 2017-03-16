@@ -12,9 +12,9 @@ null
 null
 
 dexits
-woods4
+game trail
 null
-woods2
+eastern path
 null
 null
 null
@@ -26,7 +26,10 @@ be able to follow north into what looks like more woods. The
 path east leads to more woods.
 
 short description
-You are in the Woods of the Hind. Exits: North - game trail;
-East - more woods
+You are in the Woods of the Hind.
 
 items
+trees
+1
+fairy
+1

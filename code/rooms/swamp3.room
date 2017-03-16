@@ -12,18 +12,19 @@ null
 null
 
 dexits
-swamp1
+sinking walkway
 null
-swamp4
+slippery hill
 null
 null
 null
 
 long description
-You are standing knee deep in murky swamp water. 
+You are standing knee deep in murky swamp water.
+You can feel yourself sinking deeper with every step. 
 
 short description
-Swamp South West.  Exits: North - swamp; East - swamp
+Swamp South West.
 
 items
 trees

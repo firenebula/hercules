@@ -16,7 +16,7 @@ null
 null
 null
 cave
-nemean
+nemean trail
 null
 
 long description
@@ -28,11 +28,12 @@ entrance and the sounds of a woman crying emanate from the cave.
 Climbing back up the trail leads to Nemea.
 
 short description
-A trail leading to a cave. Exits: West - cave;
-Up - Nemea 
+A trail leading to a cave.
 
 items
 boulder
 1
 iolaus
+1
+log
 1

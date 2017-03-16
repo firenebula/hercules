@@ -13,9 +13,9 @@ null
 
 dexits
 null
-woods2
-woods6
-woods4
+southern path
+eastern path
+western path
 null
 null
 
@@ -24,7 +24,12 @@ You are in the Woods of the Hind home. Trees crowd in all around
 you. Paths lead into yet more woods to the south, east, and west. 
 
 short description
-You are in the Woods of the Hind. Exits: South - more woods;
-East - more woods; West - more woods
+You are in the Woods of the Hind.
 
 items
+fairy
+1
+log
+1
+trees
+1
