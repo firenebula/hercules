@@ -142,10 +142,10 @@ int main()
 		addInventory(inventory, itemList, "bow");
 
 
-		addInventory(inventory, itemList, "hydra head");
-		addInventory(inventory, itemList, "hind");
-
-		addInventory(inventory, itemList, "lion pelt");
+//		addInventory(inventory, itemList, "hydra head");
+//		addInventory(inventory, itemList, "hind");
+//
+//		addInventory(inventory, itemList, "lion pelt");
 
 		// start game in throne room
 		current = loadRoom(itemList, roomItems, "throne");
