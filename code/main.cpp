@@ -320,6 +320,21 @@ int main()
             			}
 
 
+            else if (hParser.getAction().compare("eat") == 0)	{
+
+                    if (hParser.getObject().compare("mushroom") == 0 && isItemPresent("mushroom", inventory)){
+                        cout << "You feel yourself growing... taller? and \nfeel the sudden impulse to step on turtles.\n";
+                        cout << "You awaken later feeling groggy but also as if you've\ngained a whole new life.\n\n";
+
+                    }
+
+                    else
+                        cout << "You can't eat that?!\n";
+
+
+            }
+
+
 			//else if (command.compare("quit") != 0 &&
 			else if (hParser.getAction().compare("quit") != 0 &&
 					!checkForEvent(currentLabor, current.getName(), hParser, existsArr, gameData, eventActions, roomItems, current, itemList, inventory, command)) {

@@ -117,6 +117,8 @@ void Parser::parse(string inPut){
 
 void Parser::dictionaryLoad(){
 
+    addEntry(actionMap, EAT_CMDS, EAT);
+
     addEntry(actionMap, MOVE_CMDS, MOVE);
     addEntry(actionMap, LOOK_CMDS, LOOK);
     addEntry(actionMap, USE_CMDS, USE);
@@ -132,8 +134,6 @@ void Parser::dictionaryLoad(){
     addEntry(actionMap, LIGHT_CMDS,  LIGHT);
     addEntry(actionMap, CUT_CMDS,  CUT);
     addEntry(actionMap, HELP_CMDS,  HELP);
-	addEntry(actionMap, SAVE_CMDS,  SAVE);
-	addEntry(actionMap, LOAD_CMDS,  LOAD);
 
     addEntry(actionMap, TALK_CMDS,  TALK);
     addEntry(actionMap, INVENTORY_CMDS,  INVENTORY);

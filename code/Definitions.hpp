@@ -22,6 +22,11 @@ const string CUT = "cut";
 string cutArr[] = {"cut", "break"};
 std::vector<std::string> CUT_CMDS(cutArr, cutArr+ sizeof(cutArr) / sizeof(cutArr[0]));
 
+const string EAT = "eat";
+string eatArr[] = {"eat", "consume"};
+std::vector<std::string> EAT_CMDS(eatArr, eatArr+ sizeof(eatArr) / sizeof(eatArr[0]));
+
+
 
 const string GIVE = "give";
 string giveArr[] = {"give"};
@@ -79,15 +84,6 @@ std::vector<std::string> HELP_CMDS(helpArr, helpArr + sizeof(helpArr) / sizeof(h
 const string SAY = "say";
 string sayArr[] = {"say", "speak"};
 std::vector<std::string> SAY_CMDS(sayArr, sayArr + sizeof(sayArr) / sizeof(sayArr[0]));
-
-const string SAVE = "save";
-string saveArr[] = {"save", "save game", "savegame"};
-std::vector<std::string> SAVE_CMDS(saveArr, saveArr + sizeof(saveArr) / sizeof(saveArr[0]));
-
-const string LOAD = "load";
-string loadArr[] = {"load", "load game", "loadgame"};
-std::vector<std::string> LOAD_CMDS(loadArr, loadArr + sizeof(loadArr) / sizeof(loadArr[0]));
-
 
 //Commands that stand for an action and an object
 
