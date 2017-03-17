@@ -295,7 +295,7 @@ int main()
                 cout << "Movement:" << endl;
                 cout << "'Go' <direction>, <direction>, 'Go Exit' or <Exit>" << endl;
                 cout << "Exits are listed for each room" << endl;
-                cout << "Available directions are 'north,' 'south,' 'east,'west,' up' and 'down'" << endl;
+                cout << "Available directions are 'north', 'south', 'east', 'west', 'up' and 'down'" << endl;
                 cout << "'Move North' will also work and so will 'N'" << endl;
                 cout << "Experiment to find new commands" << endl <<endl;
                 cout << "Looking:" << endl;
@@ -1498,7 +1498,7 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 			eventActions.insert(std::make_pair("get item", "coin"));
 			eventActions.insert(std::make_pair("get item", "coin"));
             eventActions.insert(std::make_pair("change short", "BIGLY, YUUGE PLACE!\nExits North, South, and East.\n"));
-            eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\nThe road north leads to Nemea and Ceryneia; the road south leads to Lerna; and\nto the east is the port of Tiryns\n"));
+            eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\n"));
 			eventActions.insert(std::make_pair("change talk", "king"));
 			eventActions.insert(std::make_pair("king", "I don't want to hear excuses. Bring me that boar!"));
 			return true;
