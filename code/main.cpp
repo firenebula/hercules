@@ -309,7 +309,7 @@ int main()
                 cout << "You can also 'look at' OR 'examine' <item>" << endl <<endl;
                 cout << "Items:" << endl;
                 cout << "Try 'take' <item>, 'drop' <item> or 'use' <item>" << endl << endl;
-                cout << "'inventory' or just 'inv' will list your inventory" << endl << endl;
+                cout << "'inventory' or just 'inv' will list your inventory" << endl;
                 cout << "Attacking:" <<endl;
                 cout << "'attack' <enemy> 'with' <weapon>, 'swing' <weapon> 'at' <enemy>, 'hit' <enemy> 'with' <weapon>" << endl;
                 cout << "'shoot' <enemy> 'with bow,' 'shoot bow at' <enemy>" << endl << endl;
@@ -1897,7 +1897,7 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		//load labor
 		string current_labor_string;
 		int current_labor_int;
-		LABORS labors_list[] = {NEMEAN, LERNA, CERYNEIA, ERYMANTHIA};
+		LABORS labors_list[] = {NEMEAN, LERNA, CERYNEIA, ERYMANTHIA, LASTSCENE};
 		string current_labor_path = "./save/labor.labor";
 		std::fstream current_labor_file;
 		current_labor_file.open(current_labor_path.c_str(), std::ios::out | std::ios::in);
