@@ -309,7 +309,7 @@ int main()
                 cout << "You can also 'look at' OR 'examine' <item>" << endl <<endl;
                 cout << "Items:" << endl;
                 cout << "Try 'take' <item>, 'drop' <item> or 'use' <item>" << endl << endl;
-                cout << "'inventory' or just 'inv' will list your inventory" << endl;
+                cout << "'inventory' or just 'inv' will list your inventory" << endl << endl;
                 cout << "Attacking:" <<endl;
                 cout << "'attack' <enemy> 'with' <weapon>, 'swing' <weapon> 'at' <enemy>, 'hit' <enemy> 'with' <weapon>" << endl;
                 cout << "'shoot' <enemy> 'with bow,' 'shoot bow at' <enemy>" << endl << endl;
