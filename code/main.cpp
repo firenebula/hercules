@@ -960,7 +960,7 @@ void printRoomItem(std::map<string, Item*>& roomItems) {
 		if (roomItems[it->first]->getQuantity() == 1)
             cout << "*** " << it->first << " is here.\n";
         else
-            cout << "There are " << roomItems[it->first]->getQuantity() << " " << it->first << " here.\n";
+            cout << "*** There are " << roomItems[it->first]->getQuantity() << " " << it->first << " here.\n";
 
 	//	cout << it->first << "\t";
 	//	cout << roomItems[it->first]->getQuantity() << "\n";
