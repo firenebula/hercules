@@ -18,7 +18,7 @@ using std::cout;
 using std::endl;
 
 
-enum LABORS {NEMEAN, LERNA, CERYNEIA, ERYMANTHIA};
+enum LABORS {NEMEAN, LERNA, CERYNEIA, ERYMANTHIA, LASTSCENE};
 enum EXISTANCE {OBJ_EXISTS, HOLDING_OBJ, IND_EXISTS, HOLDING_IND};
 
 void testParseVal(string, Parser);
@@ -72,6 +72,7 @@ int main()
 	std::map <string, Item*> roomItems;
 	std::map <string, string> gameData;
 	std::map <string, string> eventActions;
+	bool gameOver = false;
 	bool existsArr[4];
 
 	// load game items
@@ -139,13 +140,18 @@ int main()
 		// start game with bow and club in inventory
 		addInventory(inventory, itemList, "club");
 		addInventory(inventory, itemList, "bow");
-		//addInventory(inventory, itemList, "lion pelt");
+
+
+//		addInventory(inventory, itemList, "hydra head");
+//		addInventory(inventory, itemList, "hind");
+//
+//		addInventory(inventory, itemList, "lion pelt");
 
 		// start game in throne room
 		current = loadRoom(itemList, roomItems, "throne");
 	}
 
-	while (hParser.getAction().compare("quit") != 0) {
+	while (hParser.getAction().compare("quit") != 0 && !gameOver) {
 
 
    //     while(true){
@@ -302,7 +308,8 @@ int main()
                 cout << "'look' will give you a description of your immediate surroundings" << endl;
                 cout << "You can also 'look at' OR 'examine' <item>" << endl <<endl;
                 cout << "Items:" << endl;
-                cout << "Try 'take' <item>, 'drop' <item> or 'use' <item>"<< endl << endl;
+                cout << "Try 'take' <item>, 'drop' <item> or 'use' <item>" << endl << endl;
+                cout << "'inventory' or just 'inv' will list your inventory" << endl;
                 cout << "Attacking:" <<endl;
                 cout << "'attack' <enemy> 'with' <weapon>, 'swing' <weapon> 'at' <enemy>, 'hit' <enemy> 'with' <weapon>" << endl;
                 cout << "'shoot' <enemy> 'with bow,' 'shoot bow at' <enemy>" << endl << endl;
@@ -331,6 +338,11 @@ int main()
 				else if ((it->first).compare("change state") == 0) {
 					setLabor(currentLabor, eventActions[it->first]);
 				}
+
+
+
+
+
 				else if ((it->first).compare("add exit") == 0) {
 					string newExit = eventActions[it->first];
 				//cout << "Add exit [" << newExit << "]" << endl;
@@ -462,6 +474,13 @@ int main()
 				}
 
 
+				else if ((it->first).compare("end game") == 0){
+                cout << endl << endl << "*** THE END ***" << endl;
+                gameOver = true;
+
+             }
+
+
 			}
 			eventActions.clear();
 
@@ -564,7 +583,7 @@ Room loadRoom(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 		while (data.compare("dexits") != 0) {
 			std::getline(room_file, data);
 		}
-		
+
 		// store next several lines of text into the exit array of Room object
 		for (int i = 0; i < NUM_OF_EXITS; i++) {
 			std::getline(room_file, data);
@@ -1486,24 +1505,74 @@ bool checkForEvent(LABORS currentLabor, string currentRoom, Parser hParser, bool
 		}
 
 		else if (hParser.getAction().compare("give") == 0 && hParser.getObject().compare("hind") == 0 && existsArr[HOLDING_OBJ] && hParser.getIndirect().compare("king") == 0 && currentRoom.compare("throne") == 0) {
-			eventActions.insert(std::make_pair("change state", "erymanthia"));
-			eventActions.insert(std::make_pair("add exit", "east"));
-			eventActions.insert(std::make_pair("east", "tiryns"));
-			eventActions["display"].append("Back so soon? With the Hind?! There appears to be no stopping you when you\nset your mind to something. Well, maybe this next task can flummox you. I need\nyou to go to Mount Erymanthian and capture the boar that is ravaging the nearby\nvillages. Think you can do that? If so, head east to the port at Tiryns to catch\na ride aboard any of the vessels heading in that direction. Oh, and here's\nsome coin to pay your way. Don't get used to my coin in your pocket, though.\nBe off!");
-			eventActions.insert(std::make_pair("drop item", "hind"));
+			eventActions.insert(std::make_pair("change state", "lastScene"));
+//            eventActions.insert(std::make_pair("remove exit", "west"));
+//            eventActions.insert(std::make_pair("remove exit", "north"));
+//            eventActions.insert(std::make_pair("remove exit", "south"));
+            eventActions.insert(std::make_pair("drop item", "hind"));
 			eventActions.insert(std::make_pair("remove item", "hind"));
-			eventActions.insert(std::make_pair("get item", "coin"));
-			eventActions.insert(std::make_pair("get item", "coin"));
-			eventActions.insert(std::make_pair("get item", "coin"));
-			eventActions.insert(std::make_pair("get item", "coin"));
-			eventActions.insert(std::make_pair("get item", "coin"));
+			eventActions["display"].append("Back so soon? With the Hind?! There appears to be no stopping you when you set your mind to something.");
+			eventActions["display"].append("You have journeyed far... For your final test Hero... In one word tell me what is most important? ");
+			eventActions["display"].append("Is it Power? Wisdom? or Courage?\n");
+
+//			eventActions.insert(std::make_pair("get item", "coin"));
+//			eventActions.insert(std::make_pair("get item", "coin"));
+//			eventActions.insert(std::make_pair("get item", "coin"));
+//			eventActions.insert(std::make_pair("get item", "coin"));
+//			eventActions.insert(std::make_pair("get item", "coin"));
             eventActions.insert(std::make_pair("change short", "BIGLY, YUUGE PLACE!\nExits North, South, and East.\n"));
             eventActions.insert(std::make_pair("change long", "This is the throne of King E. In the center of the rooms sits a golden throne.\n"));
 			eventActions.insert(std::make_pair("change talk", "king"));
-			eventActions.insert(std::make_pair("king", "I don't want to hear excuses. Bring me that boar!"));
+			eventActions.insert(std::make_pair("king", "Well, what will it be?  Power, Wisdom or Courage?"));
 			return true;
 		}
-    }
+
+	}
+        if (currentLabor == LASTSCENE){
+
+                if (hParser.getAction().compare("say") == 0 && currentRoom.compare("throne") == 0){
+
+                    if(hParser.getObject().compare("power") == 0){
+                        eventActions["display"].append("'Big mistake!' the king shouts shrilly.\n");
+                        eventActions["display"].append("'REALLY Big mistake!' the king shouts shrilly.\n");
+                        eventActions["display"].append("'I knew you were trying to overthrow me!'\n");
+                        eventActions["display"].append("It occurs to you as you are lead to the dungeon...\n");
+                        eventActions["display"].append("It could be worse! He could have asked you to slay another monster!\n");
+                        eventActions.insert(std::make_pair("end game", "null"));
+                        return true;
+                    }//end power
+
+                                   if(hParser.getObject().compare("courage") == 0){
+                        eventActions["display"].append("'And that, I must say you have in droves!\n");
+                        eventActions["display"].append("I must admit, your popularity is starting to eclipse my own.\n");
+                        eventActions["display"].append("Here, take this pile of gold and get out of my face!'\n");
+                        eventActions["display"].append("You wonder as you make the long boat ride home...\n");
+                        eventActions["display"].append("did you really make the right choice?\n");
+                        eventActions.insert(std::make_pair("end game", "null"));
+                        return true;
+
+                    }//end courage
+
+
+                                   if(hParser.getObject().compare("wisdom") == 0){
+                        eventActions["display"].append("No sooner do the words leave your mouth than\n");
+                        eventActions["display"].append("you find yourself groggily regaining consciousness.\n");
+                        eventActions["display"].append("On the TV a late night movie flickers.  Something \n");
+                        eventActions["display"].append("about labors of the hero or some nonsense. Your laptop \n");
+                        eventActions["display"].append("is next to you on the couch with the battery almost dead \n");
+                        eventActions["display"].append("'No more all night text adventures for me.' you mutter \n");
+                        eventActions["display"].append("closing the lid.\n");
+                        eventActions.insert(std::make_pair("end game", "null"));
+                        return true;
+
+                    }//end power
+
+
+                }//end say
+
+			}//end final
+
+
 
 	return false;
 }
@@ -1516,6 +1585,10 @@ void setLabor(LABORS &currentLabor, string newLabor) {
 		currentLabor = CERYNEIA;
 	} else if (newLabor.compare("erymanthia") == 0) {
 		currentLabor = ERYMANTHIA;
+	}
+
+	else if (newLabor.compare("lastScene") == 0) {
+		currentLabor = LASTSCENE;
 	}
 }
 
@@ -1846,9 +1919,17 @@ void loadGame(std::map<string, Item*>& itemMap, std::map<string, Item*>& rmItems
 				case ERYMANTHIA:
 					kingsTalk = "I don't want to hear excuses. Bring me that boar!";
 					break;
+
+				case LASTSCENE:
+					kingsTalk = "Well, what will it be?  Power, Wisdom or Courage?";
+					break;
+
 				default:
 					kingsTalk = "Can someone tell this stinking, lumbering buffon to go kill the Nemean lion!";
 					break;
+
+
+
 			}
 
 			itemMap["king"]->setTalk(kingsTalk);
